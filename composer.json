@@ -1,0 +1,25 @@
+{
+    "name": "falcon758/phlexus-module-shop",
+    "license": "BSD-3-Clause",
+    "description": "Phlexus Shop Module",
+    "require": {
+        "falcon758/phlexus-core": "dev-master",
+        "falcon758/phlexus-library-auth": "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8",
+        "phalcon/ide-stubs": "^4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Phlexus\\Modules\\Shop\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

@@ -30,6 +30,8 @@ class CartController extends Controller
             $total += $product['price'] * $product['quantity'];
         }
 
+
+        $this->view->setVar('csrfToken', $this->security->getToken());
         $this->view->setVar('products', $products);
         $this->view->setVar('total', $total);
     }

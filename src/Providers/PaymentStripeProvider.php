@@ -23,7 +23,7 @@ class PaymentStripeProvider extends AbstractProvider
     public function register(array $parameters = []): void
     {
         $apiKey = (string)getenv('STRIPE_SECRET');
-        $this->di->setShared('stripeCheckout', function () use ($apiKey) {
+        $this->di->setShared('stripe', function () use ($apiKey) {
             Stripe::setApiKey($apiKey);
 
             return new Session();

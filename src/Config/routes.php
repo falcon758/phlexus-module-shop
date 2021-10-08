@@ -6,12 +6,12 @@ use Phalcon\Mvc\Router\Group as RouterGroup;
 $routes = new RouterGroup([
     'module' => \Phlexus\Modules\Shop\Module::getModuleName(),
     'namespace' => \Phlexus\Modules\Shop\Module::getHandlersNamespace() . '\\Controllers',
-    'controller' => 'index',
+    'controller' => 'cart',
     'action' => 'index',
 ]);
 
 $routes->addGet('/cart', [
-    'controller' => 'index',
+    'controller' => 'cart',
     'action' => 'index',
 ]);
 

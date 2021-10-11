@@ -6,7 +6,7 @@ namespace Phlexus\Modules\Shop\Controllers;
 
 use Phalcon\Http\ResponseInterface;
 use Phalcon\Mvc\Controller;
-use Phalcon\Modules\Shop\Models\Product;
+use Phlexus\Modules\Shop\Models\Product;
 use Stripe\Checkout\Session;
 
 

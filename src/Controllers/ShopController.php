@@ -6,19 +6,20 @@ namespace Phlexus\Modules\Shop\Controllers;
 
 use Phalcon\Http\ResponseInterface;
 use Phalcon\Mvc\Controller;
-use StockOff\Models\Product;
+use Phalcon\Modules\Shop\Models\Product;
 use Stripe\Checkout\Session;
 
+
 /**
- * @RoutePrefix('/cart')
+ * @RoutePrefix('/shop')
  *
  */
-class CartController extends Controller
+class ShopController extends Controller
 {
     /**
      * @Get('/')
      */
-    public function indexAction()
+    public function cartAction()
     {
         $products = [];
         if ($this->session->has('cart')) {
@@ -34,6 +35,11 @@ class CartController extends Controller
         $this->view->setVar('csrfToken', $this->security->getToken());
         $this->view->setVar('products', $products);
         $this->view->setVar('total', $total);
+    }
+
+    public function listAction()
+    {
+        $this->view->setVar('products', Product::find());
     }
 
     /**

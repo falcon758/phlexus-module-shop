@@ -11,8 +11,13 @@ $routes = new RouterGroup([
 ]);
 
 $routes->addGet('/cart', [
-    'controller' => 'cart',
-    'action' => 'index',
+    'controller' => 'shop',
+    'action' => 'cart',
+]);
+
+$routes->addGet('/products', [
+    'controller' => 'shop',
+    'action' => 'list',
 ]);
 
 return $routes;

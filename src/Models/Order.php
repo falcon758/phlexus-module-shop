@@ -21,6 +21,8 @@ class Product extends Model
 
     public $id;
 
+    public $active;
+
     public $userId;
 
     /**
@@ -30,6 +32,8 @@ class Product extends Model
      */
     public function initialize()
     {
+        $this->setSource('orders');
+
         $this->hasOne('userID', User::class, 'id', [
             'alias'    => 'user',
             'reusable' => true,

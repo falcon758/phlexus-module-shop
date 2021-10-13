@@ -22,4 +22,16 @@ class Product extends Model
     public $id;
 
     public $name;
+
+    public $active;
+
+    /**
+     * Initialize
+     *
+     * @return void
+     */
+    public function initialize()
+    {
+        $this->setSource('products');
+    }
 }

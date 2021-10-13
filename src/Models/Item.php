@@ -22,9 +22,11 @@ class Product extends Model
 
     public $id;
 
-    public $productID;
+    public $active;
 
-    public $orderID;
+    public $productId;
+
+    public $orderId;
 
     /**
      * Initialize
@@ -33,12 +35,14 @@ class Product extends Model
      */
     public function initialize()
     {
-        $this->hasOne('orderID', Product::class, 'id', [
+        $this->setSource('products');
+
+        $this->hasOne('productId', Product::class, 'id', [
             'alias'    => 'Product',
             'reusable' => true,
         ]);
 
-        $this->hasOne('orderID', Order::class, 'id', [
+        $this->hasOne('orderId', Order::class, 'id', [
             'alias'    => 'Order',
             'reusable' => true,
         ]);

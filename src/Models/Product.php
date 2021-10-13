@@ -6,7 +6,7 @@ namespace Phlexus\Modules\Shop\Models;
 use Phalcon\Mvc\Model;
 use Phalcon\DI;
 use Phalcon\Security;
-use Phlexus\Modules\BaseUser\Models\Users;
+use Phlexus\Modules\BaseUser\Models\User;
 
 /**
  * Class Product

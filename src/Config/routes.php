@@ -17,7 +17,7 @@ $routes->addGet('/cart', [
 
 $routes->addGet('/products', [
     'controller' => 'shop',
-    'action' => 'list',
+    'action' => 'products',
 ]);
 
 return $routes;

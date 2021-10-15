@@ -40,7 +40,7 @@ class ShopController extends Controller
     public function productsAction()
     {
         $this->view->setVar('csrfToken', $this->security->getToken());
-        $this->view->setVar('products', Product::find());
+        $this->view->setVar('products', Product::find()->toArray());
     }
 
     /**

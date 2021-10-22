@@ -20,4 +20,9 @@ $routes->addGet('/products', [
     'action' => 'products',
 ]);
 
+$routes->addPost('/cart/add/{id:[0-9]+}', [
+    'controller' => 'shop',
+    'action' => 'add',
+]);
+
 return $routes;

@@ -52,7 +52,8 @@ class ShopController extends Controller
      */
     public function addAction(int $productId): ResponseInterface
     {
-        if (!$this->addToCart($productId)) {
+        if (!$this->addToCart($productId) 
+            || !$this->security->checkToken('csrf', $this->request->getPost('csrf', null))) {
             return $this->response->setJsonContent([
                 'success' => false,
             ]);

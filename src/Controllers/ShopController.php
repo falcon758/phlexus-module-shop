@@ -87,6 +87,12 @@ class ShopController extends Controller
      */
     public function removeAction(int $productId): ResponseInterface
     {
+        if (!$this->security->checkToken('csrf', $this->request->getPost('csrf', null))) {
+            return $this->response->setJsonContent([
+                'success' => false,
+            ]);
+        }
+
         $product = Product::findFirst($productId);
         if ($product === null) {
             //$this->flashSession->error('Product not found');

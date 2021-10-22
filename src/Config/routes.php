@@ -25,4 +25,9 @@ $routes->addPost('/cart/add/{id:[0-9]+}', [
     'action' => 'add',
 ]);
 
+$routes->addPost('/cart/delete/{id:[0-9]+}', [
+    'controller' => 'shop',
+    'action' => 'remove',
+]);
+
 return $routes;

@@ -31,14 +31,15 @@ class ShopController extends Controller
             $total += $product['price'] * $product['quantity'];
         }
 
-
+        
+        $this->view->setVar('checkoutRoute', '/checkout/');
         $this->view->setVar('csrfToken', $this->security->getToken());
         $this->view->setVar('products', $products);
         $this->view->setVar('total', $total);
     }
 
     public function productsAction()
-    {        
+    {
         $this->view->setVar('saveRoute', '/cart/add/');
         $this->view->setVar('csrfToken', $this->security->getToken());
         $this->view->setVar('products', Product::find()->toArray());

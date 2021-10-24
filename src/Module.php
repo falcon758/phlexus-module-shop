@@ -85,7 +85,7 @@ class Module extends PhlexusModule
             }
         ]);
 
-        $view->setMainView($themePath . '/layouts/default');
+        $view->setMainView($themePath . '/layouts/public');
         $view->setViewsDir($themePath . '/');
     }
 }

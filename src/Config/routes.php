@@ -30,4 +30,9 @@ $routes->addPost('/cart/delete/{id:[0-9]+}', [
     'action' => 'remove',
 ]);
 
+$routes->addGet('/checkout', [
+    'controller' => 'shop',
+    'action' => 'checkout',
+]);
+
 return $routes;

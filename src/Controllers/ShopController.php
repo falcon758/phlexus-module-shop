@@ -21,10 +21,7 @@ class ShopController extends Controller
      */
     public function cartAction()
     {
-        $products = [];
-        if ($this->session->has('cart')) {
-            $products = $this->session->get('cart');
-        }
+        $products = $this->getProductsOnCart();
 
         $total = 0;
         foreach ($products as $product) {
@@ -100,10 +97,7 @@ class ShopController extends Controller
             return $this->response->redirect('cart');
         }
 
-        $cart = [];
-        if ($this->session->has('cart')) {
-            $cart = $this->session->get('cart');
-        }
+        $cart = $this->getProductsOnCart();
 
         foreach ($cart as $key => $product) {
             if ($product['id'] == $productId) {
@@ -122,6 +116,13 @@ class ShopController extends Controller
      */
     public function checkoutAction()
     {
+        $products = $this->getProductsOnCart();
+
+        if (count($products) === 0) {
+            return $this->response->redirect('cart');
+        }
+
+        $this->view->setVar('products', $products);
     }
 
     /**
@@ -184,10 +185,7 @@ class ShopController extends Controller
 
         $product = $product->toArray();
 
-        $cart = [];
-        if ($this->session->has('cart')) {
-            $cart = $this->session->get('cart');
-        }
+        $cart = $this->getProductsOnCart();
 
         $added = false;
         foreach ($cart as &$product) {
@@ -206,5 +204,25 @@ class ShopController extends Controller
         $this->session->set('cart', $cart);
 
         return true;
+    }
+
+    /**
+     * @return bool
+     */
+    private function hasProductsOnCart() {
+        return count($this->getProductsOnCart) > 0;
+    }
+
+    /**
+     * @return array
+     */
+    private function getProductsOnCart() {
+        $products = [];
+
+        if ($this->session->has('cart')) {
+            $products = $this->session->get('cart');
+        }
+
+        return $products;
     }
 }

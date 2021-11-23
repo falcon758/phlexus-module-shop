@@ -6,11 +6,11 @@ namespace Phlexus\Modules\Shop\Models;
 use Phalcon\Mvc\Model;
 
 /**
- * Class Product
+ * Class ShippingMethod
  *
  * @package Phlexus\Modules\Shop\Models
  */
-class Product extends Model
+class ShippingMethod extends Model
 {
     const DISABLED = 0;
 
@@ -21,6 +21,8 @@ class Product extends Model
     public $name;
 
     public $active;
+
+    public $postCodeID;
 
     public $createdAt;
 
@@ -33,6 +35,6 @@ class Product extends Model
      */
     public function initialize()
     {
-        $this->setSource('products');
+        $this->setSource('shipping_method');
     }
 }

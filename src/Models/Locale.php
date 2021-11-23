@@ -4,13 +4,14 @@ declare(strict_types=1);
 namespace Phlexus\Modules\Shop\Models;
 
 use Phalcon\Mvc\Model;
+use Phlexus\Modules\Shop\Models\Country;
 
 /**
- * Class Product
+ * Class Locale
  *
  * @package Phlexus\Modules\Shop\Models
  */
-class Product extends Model
+class Locale extends Model
 {
     const DISABLED = 0;
 
@@ -21,6 +22,8 @@ class Product extends Model
     public $name;
 
     public $active;
+
+    public $countryID;
 
     public $createdAt;
 
@@ -33,6 +36,11 @@ class Product extends Model
      */
     public function initialize()
     {
-        $this->setSource('products');
+        $this->setSource('locale');
+
+        $this->hasOne('countryID', Country::class, 'id', [
+            'alias'    => 'Country',
+            'reusable' => true,
+        ]);
     }
 }

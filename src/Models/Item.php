@@ -26,6 +26,10 @@ class Product extends Model
 
     public $orderId;
 
+    public $createdAt;
+
+    public $modifiedAt;
+
     /**
      * Initialize
      *

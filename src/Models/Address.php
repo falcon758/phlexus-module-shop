@@ -4,13 +4,14 @@ declare(strict_types=1);
 namespace Phlexus\Modules\Shop\Models;
 
 use Phalcon\Mvc\Model;
+use Phlexus\Modules\Shop\Models\PostCode;
 
 /**
- * Class Product
+ * Class Address
  *
  * @package Phlexus\Modules\Shop\Models
  */
-class Product extends Model
+class Address extends Model
 {
     const DISABLED = 0;
 
@@ -18,9 +19,9 @@ class Product extends Model
 
     public $id;
 
-    public $name;
-
     public $active;
+
+    public $postCodeID;
 
     public $createdAt;
 
@@ -33,6 +34,11 @@ class Product extends Model
      */
     public function initialize()
     {
-        $this->setSource('products');
+        $this->setSource('address');
+
+        $this->hasOne('postCodeID', PostCode::class, 'id', [
+            'alias'    => 'PostCode',
+            'reusable' => true,
+        ]);
     }
 }

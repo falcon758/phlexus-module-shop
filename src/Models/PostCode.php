@@ -4,13 +4,14 @@ declare(strict_types=1);
 namespace Phlexus\Modules\Shop\Models;
 
 use Phalcon\Mvc\Model;
+use Phlexus\Modules\Shop\Models\Locale;
 
 /**
- * Class Product
+ * Class PostCode
  *
  * @package Phlexus\Modules\Shop\Models
  */
-class Product extends Model
+class PostCode extends Model
 {
     const DISABLED = 0;
 
@@ -18,9 +19,9 @@ class Product extends Model
 
     public $id;
 
-    public $name;
-
     public $active;
+
+    public $localeID;
 
     public $createdAt;
 
@@ -33,6 +34,11 @@ class Product extends Model
      */
     public function initialize()
     {
-        $this->setSource('products');
+        $this->setSource('post_codes');
+
+        $this->hasOne('localeID', Locale::class, 'id', [
+            'alias'    => 'Locale',
+            'reusable' => true,
+        ]);
     }
 }

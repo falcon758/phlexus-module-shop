@@ -5,6 +5,9 @@ namespace Phlexus\Modules\Shop\Models;
 
 use Phalcon\Mvc\Model;
 use Phlexus\Modules\BaseUser\Models\User;
+use Phlexus\Modules\Shop\Models\UserAddress;
+use Phlexus\Modules\Shop\Models\PaymentMethod;
+use Phlexus\Modules\Shop\Models\ShippingMethod;
 
 /**
  * Class Product
@@ -23,6 +26,18 @@ class Product extends Model
 
     public $userId;
 
+    public $billingID;
+
+    public $shipmentID;
+
+    public $paymentMethodID;
+
+    public $shippingMethodID;
+
+    public $createdAt;
+
+    public $modifiedAt;
+
     /**
      * Initialize
      *
@@ -34,6 +49,26 @@ class Product extends Model
 
         $this->hasOne('userID', User::class, 'id', [
             'alias'    => 'user',
+            'reusable' => true,
+        ]);
+
+        $this->hasOne('billingID', UserAddress::class, 'id', [
+            'alias'    => 'billing_address',
+            'reusable' => true,
+        ]);
+
+        $this->hasOne('shipmentID', UserAddress::class, 'id', [
+            'alias'    => 'shipment_address',
+            'reusable' => true,
+        ]);
+
+        $this->hasOne('paymentMethodID', PaymentMethod::class, 'id', [
+            'alias'    => 'payment_method',
+            'reusable' => true,
+        ]);
+
+        $this->hasOne('shippingMethodID', shippingMethod::class, 'id', [
+            'alias'    => 'shipping_method',
             'reusable' => true,
         ]);
     }

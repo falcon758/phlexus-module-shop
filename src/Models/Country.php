@@ -6,11 +6,11 @@ namespace Phlexus\Modules\Shop\Models;
 use Phalcon\Mvc\Model;
 
 /**
- * Class Product
+ * Class Country
  *
  * @package Phlexus\Modules\Shop\Models
  */
-class Product extends Model
+class Country extends Model
 {
     const DISABLED = 0;
 
@@ -18,7 +18,9 @@ class Product extends Model
 
     public $id;
 
-    public $name;
+    public $iso;
+
+    public $country;
 
     public $active;
 
@@ -33,6 +35,6 @@ class Product extends Model
      */
     public function initialize()
     {
-        $this->setSource('products');
+        $this->setSource('country');
     }
 }

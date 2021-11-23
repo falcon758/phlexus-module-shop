@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace Phlexus\Modules\Shop\Models;
 
 use Phalcon\Mvc\Model;
-use Phalcon\DI;
-use Phalcon\Security;
 use Phlexus\Modules\Shop\Models\Order;
 use Phlexus\Modules\Shop\Models\Product;
 

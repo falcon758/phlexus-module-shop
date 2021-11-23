@@ -67,7 +67,7 @@ class Product extends Model
             'reusable' => true,
         ]);
 
-        $this->hasOne('shippingMethodID', shippingMethod::class, 'id', [
+        $this->hasOne('shippingMethodID', ShippingMethod::class, 'id', [
             'alias'    => 'shipping_method',
             'reusable' => true,
         ]);

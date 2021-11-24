@@ -35,6 +35,6 @@ class Country extends Model
      */
     public function initialize()
     {
-        $this->setSource('country');
+        $this->setSource('countries');
     }
 }

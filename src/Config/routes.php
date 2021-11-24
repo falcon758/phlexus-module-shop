@@ -35,4 +35,19 @@ $routes->addGet('/checkout', [
     'action' => 'checkout',
 ]);
 
+$routes->addPost('/checkout/order', [
+    'controller' => 'shop',
+    'action' => 'order',
+]);
+
+$routes->addGet('/checkout/success', [
+    'controller' => 'shop',
+    'action' => 'success',
+]);
+
+$routes->addGet('/checkout/cancel', [
+    'controller' => 'shop',
+    'action' => 'cancel',
+]);
+
 return $routes;

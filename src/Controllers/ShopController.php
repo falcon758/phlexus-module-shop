@@ -7,6 +7,7 @@ namespace Phlexus\Modules\Shop\Controllers;
 use Phalcon\Http\ResponseInterface;
 use Phalcon\Mvc\Controller;
 use Phlexus\Modules\Shop\Models\Product;
+use Phlexus\Modules\Shop\Form\CheckoutForm;
 use Stripe\Checkout\Session;
 
 
@@ -19,25 +20,19 @@ class ShopController extends Controller
     /**
      * @Get('/')
      */
-    public function cartAction()
+    public function cartAction(): void
     {
         $products = $this->getProductsOnCart();
-
-        $total = 0;
-        foreach ($products as $product) {
-            $total += $product['price'] * $product['quantity'];
-        }
-
         
-        $this->view->setVar('checkoutRoute', '/checkout/');
+        $this->view->setVar('checkoutRoute', '/checkout');
         $this->view->setVar('csrfToken', $this->security->getToken());
         $this->view->setVar('products', $products);
-        $this->view->setVar('total', $total);
+        $this->view->setVar('total', $this->getProductsTotalPrice());
     }
 
-    public function productsAction()
+    public function productsAction(): void
     {
-        $this->view->setVar('saveRoute', '/cart/add/');
+        $this->view->setVar('saveRoute', '/cart/add');
         $this->view->setVar('csrfToken', $this->security->getToken());
         $this->view->setVar('products', Product::find()->toArray());
     }
@@ -123,6 +118,24 @@ class ShopController extends Controller
         }
 
         $this->view->setVar('products', $products);
+        $this->view->setVar('orderRoute', '/checkout/order');
+        $this->view->setVar('csrfToken', $this->security->getToken());
+        $this->view->setVar('total', $this->getProductsTotalPrice());
+        $this->view->setVar('checkoutForm', new CheckoutForm());
+    }
+
+    /**
+     * @Get('/checkout/order')
+     */
+    public function orderAction()
+    {
+        $products = $this->getProductsOnCart();
+
+        if (count($products) === 0) {
+            return $this->response->redirect('cart');
+        }
+
+        return $this->response->redirect('checkout/success');
     }
 
     /**
@@ -168,6 +181,7 @@ class ShopController extends Controller
      */
     public function cancelAction()
     {
+        return $this->response->redirect('cart');
     }
 
     /**
@@ -209,14 +223,14 @@ class ShopController extends Controller
     /**
      * @return bool
      */
-    private function hasProductsOnCart() {
+    private function hasProductsOnCart(): bool {
         return count($this->getProductsOnCart) > 0;
     }
 
     /**
      * @return array
      */
-    private function getProductsOnCart() {
+    private function getProductsOnCart(): array {
         $products = [];
 
         if ($this->session->has('cart')) {
@@ -224,5 +238,19 @@ class ShopController extends Controller
         }
 
         return $products;
+    }
+
+    /**
+     * @return float
+     */
+    private function getProductsTotalPrice(): float {
+        $products = $this->getProductsOnCart();
+
+        $total = 0;
+        foreach ($products as $product) {
+            $total += $product['price'] * $product['quantity'];
+        }
+
+        return $total;
     }
 }

@@ -18,7 +18,7 @@ class AddressType extends Model
 
     const BILLING = 1;
 
-    const SHIPPING = 1;
+    const SHIPPING = 2; 
 
     public $id;
 

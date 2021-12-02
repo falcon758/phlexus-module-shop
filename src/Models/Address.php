@@ -58,9 +58,27 @@ class Address extends Model
      */
     public static function createAddress(string $address, string $postCode, string $locale, int $country): Address {
         $ordeFlow = [
-            'address'  => ['class' => Address::clProductass, 'field' => 'address'],
-            'postCode' => ['class' => PostCode::class, 'field' => 'post_code'],
-            'locale'   => ['class' => Locale::class, 'field' => 'name']
+            'address'  => [
+                'class' => Address::class,
+                'field' => 'address',
+                'related' => [
+                    'PostCodeID' => 'PostCodeId'
+                ]
+            ],
+            'postCode' => [
+                'class' => PostCode::class,
+                'field' => 'post_code',
+                'related' => [
+                    'localeID' => 'localeId'
+                ]
+            ],
+            'locale'   => [
+                'class' => Locale::class,
+                'field' => 'name',
+                'related' => [
+                    'countryID' => 'countryId'
+                ]
+            ]
         ];
         
         $orderKeys = array_keys($orderFlow);
@@ -70,15 +88,27 @@ class Address extends Model
         $postCodeId = null;
         $localeId = null;
         while (count($ordeFlow) > 0) {
-            $value = key($ordeFlow);
-            $model = current($ordeFlow);
-            $class = $model['class'];
-            $field = $model['field'];
+            $value   = key($ordeFlow);
+            $model   = current($ordeFlow);
+            $class   = $model['class'];
+            $field   = $model['field'];
+            $related = isset($model['related']) ? $model['related'] : [];
             
             $position = array_search($value);
 
-            $retrieve_name = 'findBy' . $field;
-            $record = $class::$retrieve_name(${$value});
+            $params = [
+                'conditions' => "$field = :$value:",
+                'bind'       => [
+                    $value => ${$value}
+                ],
+            ];
+
+            foreach ($related as $dbField => $valField) {
+                $params['conditions'] .= " $dbField = :$dbField:";
+                $params['bind'][$dbField] = ${$valField};
+            }
+
+            $record = $class::findFirst($params);
 
             $isLast = $position === count($ordeFlow) - 1;
             if ($record) {
@@ -89,19 +119,22 @@ class Address extends Model
                     reset($orderFlow);
                 } else {
                     $prev_position = $position - 1;
-                    $orderFlow = array_slice($orderFlow, $prev_position >= 0 ? $prev_position : 0);
+                    $orderFlow = array_slice($orderFlow, 0, $prev_position >= 0 ? $prev_position : 0);
                 }
             } elseif ($isLast) {
-                // Missing related fields
                 $newModel = new $class;
                 $newModel->field = ${$value};
+
+                foreach ($related as $dbField => $valField) {
+                    $newModel->$dbField = ${$valField};
+                }
                 
                 if (!$newModel->save()) {
-                    return false;
+                    return null;
+                } elseif ($newModel instanceof Address) {
+                    return $newModel;
                 }
             }
-
-            break;
         }
     }
 }

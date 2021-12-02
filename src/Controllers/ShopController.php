@@ -151,13 +151,13 @@ class ShopController extends Controller
 
         $postCode = $post['post_code'];
 
-        $country = $post['country'];        
+        $country = (int) $post['country'];        
 
         $locale = 'Unknown' /*$post['local']*/;
 
-        $paymentMethod = $post['payment_method'];
+        $paymentMethod = (int) $post['payment_method'];
 
-        $shippingMethod = $post['shipping_method'];
+        $shippingMethod = (int )$post['shipping_method'];
 
         $billing = [
             'address'   => $address,

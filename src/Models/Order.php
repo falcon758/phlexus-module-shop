@@ -88,7 +88,7 @@ class Product extends Model
         int $userId, int $billingId, int $shipmentID,
         int $paymentMethod, int $shippingMethod
     ) {
-        $order = new Order();
+        $order = new self;
         $order->billingID = $billingUserAddressId;
         $order->shipmentID = $shippingUserAddressId;
         $order->paymentMethodID = $paymentMethod;

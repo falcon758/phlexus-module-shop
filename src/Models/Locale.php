@@ -43,4 +43,33 @@ class Locale extends Model
             'reusable' => true,
         ]);
     }
+
+    /**
+     * Create locale or return if exists
+     * 
+     * @param string $name      Locale to create
+     * @param int    $countryId Country id to assign
+     *
+     * @return Locale
+     */
+    public static function createLocale(string $name, int $countryId): Locale {
+        $locale = self::findFirst([
+            'conditions' => 'active = :active: AND countryID = :country_id: AND name = :name:',
+            'bind'       => [
+                'active'     => self::ENABLED,
+                'country_id' => $countryId,
+                'name'       => $name,
+            ],
+        ]);
+
+        if ($locale) {
+            return $locale;
+        }
+
+        $locale = new self;
+        $locale->name = $name;
+        $locale->countryID = $countryId;
+
+        return $locale->save() ? $locale : null;
+    }
 }

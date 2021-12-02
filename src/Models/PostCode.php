@@ -43,4 +43,33 @@ class PostCode extends Model
             'reusable' => true,
         ]);
     }
+
+    /**
+     * Create post code or return if exists
+     * 
+     * @param string $postcode  Post code to create
+     * @param int    $localeId  Locale id to assign
+     *
+     * @return PostCode
+     */
+    public static function createPostCode(string $postcode, int $localeId): PostCode {
+        $postcode = self::findFirst([
+            'conditions' => 'active = :active: AND LocaleID = :locale_id: AND post_code = :post_code:',
+            'bind'       => [
+                'active'    => self::ENABLED,
+                'locale_id' => $localeId,
+                'post_code' => $postcode,
+            ],
+        ]);
+
+        if ($postcode) {
+            return $postcode;
+        }
+
+        $postcode = new self;
+        $postcode->post_code = $postcode;
+        $postcode->localeID = $localeId;
+
+        return $postcode->save() ? $postcode : null;
+    }
 }

@@ -70,10 +70,10 @@ class Address extends Model
     public static function createUserAddress(int $userId, int $addressId, int $addressTypeId): UserAddress {
         $userAddress = self::findFirst(
             [
-                'conditions' => 'status = :status: AND addressId = :address_id: 
+                'conditions' => 'active = :active: AND addressId = :address_id: 
                                 AND addressTypeId = :address_type_id:',
                 'bind'       => [
-                    'status'          => UserAddress::ENABLED,
+                    'active'          => UserAddress::ENABLED,
                     'address_id'      => $addressId,
                     'address_type_id' => $addressTypeId
                 ],

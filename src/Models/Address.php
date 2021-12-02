@@ -57,12 +57,57 @@ class Address extends Model
      * @return Address
      */
     public static function createAddress(string $address, string $postCode, string $locale, int $country): Address {
-        $ordeFlow = [
+        $newLocale = Locale::createLocale($locale, $country);
+
+        if (!$newLocale) {
+            return null;
+        }
+
+        var_dump($newLocale);
+        exit();
+        $newPostCode = PostCode::createPostCode($postCode, $newLocale->id);
+
+        if (!$newPostCode) {
+            return null;
+        }
+
+        $address = self::findFirst([
+            'conditions' => 'active = :active: AND postCodeID = :post_code_id: AND address = :address:',
+            'bind'       => [
+                'active'    => self::ENABLED,
+                'post_code_id' => $newPostCode->id,
+                'address' => $address,
+            ],
+        ]);
+
+        if ($address) {
+            return $address;
+        }
+
+        $address          = new self;
+        $address->address = $address;
+        $address->postCodeID = $newPostCode->id;
+
+        return $address->save() ? $address : null;
+    }
+
+    /**
+     * Auto create all address chain or return if exists
+     * 
+     * @param string $address Address to create
+     * @param string $postCode Post code to create
+     * @param string $locale Locale to create
+     * @param int    $country Locale to verify
+     *
+     * @return Address
+     */
+    public static function createAddressChain(string $address, string $postCode, string $locale, int $country): Address {
+        $orderFlow = [
             'address'  => [
                 'class' => Address::class,
                 'field' => 'address',
                 'related' => [
-                    'PostCodeID' => 'PostCodeId'
+                    'postCodeID' => 'postCodeId'
                 ]
             ],
             'postCode' => [
@@ -87,14 +132,14 @@ class Address extends Model
         $addressId = null;
         $postCodeId = null;
         $localeId = null;
-        while (count($ordeFlow) > 0) {
-            $value   = key($ordeFlow);
-            $model   = current($ordeFlow);
+        while (count($orderFlow) > 0) {
+            $value   = key($orderFlow);
+            $model   = current($orderFlow);
             $class   = $model['class'];
             $field   = $model['field'];
             $related = isset($model['related']) ? $model['related'] : [];
             
-            $position = array_search($value);
+            $position = array_search($value, $orderKeys);
 
             $params = [
                 'conditions' => "$field = :$value:",
@@ -104,18 +149,18 @@ class Address extends Model
             ];
 
             foreach ($related as $dbField => $valField) {
-                $params['conditions'] .= " $dbField = :$dbField:";
+                $params['conditions'] .= " AND $dbField = :$dbField:";
                 $params['bind'][$dbField] = ${$valField};
             }
 
             $record = $class::findFirst($params);
 
-            $isLast = $position === count($ordeFlow) - 1;
+            $isLast = $position === count($orderFlow) - 1;
             if ($record) {
                 ${$value . 'Id'} = $record->id;
 
                 if ($isLast) {
-                    unset($orderFlow[$position]);
+                    unset($orderFlow[$value]);
                     reset($orderFlow);
                 } else {
                     $prev_position = $position - 1;

@@ -19,6 +19,8 @@ class PostCode extends Model
 
     public $id;
 
+    public $post_code;
+
     public $active;
 
     public $localeID;

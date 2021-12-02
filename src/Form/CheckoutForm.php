@@ -42,6 +42,8 @@ class checkoutForm extends CaptchaForm
             'placeholder' => 'Post Code'
         ]);
 
+        $post_code->addValidator(new PresenceOf(['message' => 'Post Code is required']));
+
         $country = new Select(
             'country',
             Country::find(),
@@ -52,6 +54,8 @@ class checkoutForm extends CaptchaForm
                 'placeholder' => 'Country'
             ]
         );
+
+        $country->addValidator(new PresenceOf(['message' => 'Country is required']));
 
         $payment_method = new Select(
             'payment_method',
@@ -64,6 +68,8 @@ class checkoutForm extends CaptchaForm
             ]
         );
 
+        $payment_method->addValidator(new PresenceOf(['message' => 'Payment method is required']));
+
         $shipping_method = new Select(
             'shipping_method',
             ShippingMethod::find(),
@@ -74,6 +80,8 @@ class checkoutForm extends CaptchaForm
                 'placeholder' => 'Shipping method'
             ]
         );
+
+        $shipping_method->addValidator(new PresenceOf(['message' => 'Shipping method is required']));
 
         $this->add($address);
         $this->add($post_code);

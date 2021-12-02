@@ -7,6 +7,10 @@ namespace Phlexus\Modules\Shop\Controllers;
 use Phalcon\Http\ResponseInterface;
 use Phalcon\Mvc\Controller;
 use Phlexus\Modules\Shop\Models\Product;
+use Phlexus\Modules\Shop\Models\Address;
+use Phlexus\Modules\Shop\Models\AddressType;
+use Phlexus\Modules\Shop\Models\UserAddress;
+use Phlexus\Modules\Shop\Models\Order;
 use Phlexus\Modules\Shop\Form\CheckoutForm;
 use Stripe\Checkout\Session;
 
@@ -32,7 +36,7 @@ class ShopController extends Controller
 
     public function productsAction(): void
     {
-        $this->view->setVar('saveRoute', '/cart/add');
+        $this->view->setVar('saveRoute', '/cart/add/');
         $this->view->setVar('csrfToken', $this->security->getToken());
         $this->view->setVar('products', Product::find()->toArray());
     }
@@ -135,7 +139,45 @@ class ShopController extends Controller
             return $this->response->redirect('cart');
         }
 
-        return $this->response->redirect('checkout/success');
+        $form = new CheckoutForm(false);
+
+        $post = $this->request->getPost();
+
+        if (!$form->isValid($post)) {
+            return $this->response->redirect('checkout');
+        }
+
+        $address = $post['address'];
+
+        $postCode = $post['post_code'];
+
+        $country = $post['country'];        
+
+        $locale = 'Unknown' /*$post['local']*/;
+
+        $paymentMethod = $post['payment_method'];
+
+        $shippingMethod = $post['shipping_method'];
+
+        $billing = [
+            'address'   => $address,
+            'post_code' => $postCode,
+            'locale'    => $locale,
+            'country'   => $country
+        ];
+
+        $shipment = [
+            'address'   => $address,
+            'post_code' => $postCode,
+            'locale'    => $locale,
+            'country'   => $country
+        ];
+
+        if ($this->createOrder($billing, $shipment, $paymentMethod, $shippingMethod, $country)) {
+            return $this->response->redirect('checkout/success');
+        } else {
+            return $this->response->redirect('checkout/cancel');
+        }
     }
 
     /**
@@ -252,5 +294,50 @@ class ShopController extends Controller
         }
 
         return $total;
+    }
+
+    /**
+     * Create order
+     * 
+     * @param array $billing        Billing address
+     * @param array $shipment       Shipment address
+     * @param array $paymentMethod  Payment method
+     * @param array $shippingMethod Shipping address
+     * 
+     * @return bool
+     */
+    private function createOrder(array $billing, array $shipment, int $paymentMethod, int $shippingMethod, int $country): bool {
+        $billingId = Address::createAddress(
+            $billing['address'],
+            $billing['post_code'],
+            $billing['locale'],
+            $country
+        );
+
+        $shipmentId = Address::createAddress(
+            $shipment['address'],
+            $shipment['post_code'],
+            $shipment['locale'],
+            $country
+        );
+
+        $userId = null;
+
+        $billingUserAddressId = UserAddress::createUserAddress(
+            $userId,
+            $billingId,
+            AddressType::BILLING
+        );
+
+        $shippingUserAddressId = UserAddress::createUserAddress(
+            $userId,
+            $shipmentId,
+            AddressType::SHIPPING
+        );
+
+        return Order::createOrder(
+            $userId, $billingUserAddressId, $shippingUserAddressId,
+            $paymentMethod, $shippingMethod
+        );
     }
 }

@@ -16,6 +16,10 @@ class AddressType extends Model
 
     const ENABLED = 1;
 
+    const BILLING = 1;
+
+    const SHIPPING = 1;
+
     public $id;
 
     public $active;

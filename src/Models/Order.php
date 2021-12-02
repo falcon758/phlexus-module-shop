@@ -72,4 +72,28 @@ class Product extends Model
             'reusable' => true,
         ]);
     }
+
+    /**
+     * Create order
+     * 
+     * @param int $userId           User to assign order to
+     * @param int $billingId        Billing id to assign
+     * @param int $shipmentID       Shipment id to assign
+     * @param int $paymentMethodID  Payment method id to assign
+     * @param int $shippingMethodID Shipping method id to assign
+     *
+     * @return Order
+     */
+    public static function createOrder(
+        int $userId, int $billingId, int $shipmentID,
+        int $paymentMethod, int $shippingMethod
+    ) {
+        $order = new Order();
+        $order->billingID = $billingUserAddressId;
+        $order->shipmentID = $shippingUserAddressId;
+        $order->paymentMethodID = $paymentMethod;
+        $order->shippingMethodID = $shippingMethod;
+
+        return $order->save() ? $order : null;
+    }
 }

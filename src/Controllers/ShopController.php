@@ -144,9 +144,9 @@ class ShopController extends Controller
 
         $post = $this->request->getPost();
 
-        /*if (!$form->isValid($post)) {
+        if (!$form->isValid($post)) {
             return $this->response->redirect('checkout');
-        }*/
+        }
 
         $address = $post['address'];
 

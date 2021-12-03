@@ -53,8 +53,8 @@ class PostCode extends Model
      * @return PostCode
      */
     public static function createPostCode(string $postcode, int $localeId): PostCode {
-        $postcode = self::findFirst([
-            'conditions' => 'active = :active: AND LocaleID = :locale_id: AND post_code = :post_code:',
+        $newPostcode = self::findFirst([
+            'conditions' => 'active = :active: AND localeID = :locale_id: AND post_code = :post_code:',
             'bind'       => [
                 'active'    => self::ENABLED,
                 'locale_id' => $localeId,
@@ -62,14 +62,14 @@ class PostCode extends Model
             ],
         ]);
 
-        if ($postcode) {
-            return $postcode;
+        if ($newPostcode) {
+            return $newPostcode;
         }
 
-        $postcode = new self;
-        $postcode->post_code = $postcode;
-        $postcode->localeID = $localeId;
+        $newPostcode = new self;
+        $newPostcode->post_code = $postcode;
+        $newPostcode->localeID = $localeId;
 
-        return $postcode->save() ? $postcode : null;
+        return $newPostcode->save() ? $newPostcode : null;
     }
 }

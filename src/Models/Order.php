@@ -10,11 +10,11 @@ use Phlexus\Modules\Shop\Models\PaymentMethod;
 use Phlexus\Modules\Shop\Models\ShippingMethod;
 
 /**
- * Class Product
+ * Class Order
  *
  * @package Phlexus\Modules\Shop\Models
  */
-class Product extends Model
+class Order extends Model
 {
     const DISABLED = 0;
 
@@ -24,7 +24,7 @@ class Product extends Model
 
     public $active;
 
-    public $userId;
+    public $userID;
 
     public $billingID;
 
@@ -87,10 +87,11 @@ class Product extends Model
     public static function createOrder(
         int $userId, int $billingId, int $shipmentID,
         int $paymentMethod, int $shippingMethod
-    ) {
+    ): Order {
         $order = new self;
-        $order->billingID = $billingUserAddressId;
-        $order->shipmentID = $shippingUserAddressId;
+        $order->userID = $userId;
+        $order->billingID = $billingId;
+        $order->shipmentID = $shipmentID;
         $order->paymentMethodID = $paymentMethod;
         $order->shippingMethodID = $shippingMethod;
 

@@ -63,15 +63,13 @@ class Address extends Model
             return null;
         }
 
-        var_dump($newLocale);
-        exit();
-        $newPostCode = PostCode::createPostCode($postCode, $newLocale->id);
+        $newPostCode = PostCode::createPostCode($postCode, (int) $newLocale->id);
 
         if (!$newPostCode) {
             return null;
         }
 
-        $address = self::findFirst([
+        $newAddress = self::findFirst([
             'conditions' => 'active = :active: AND postCodeID = :post_code_id: AND address = :address:',
             'bind'       => [
                 'active'    => self::ENABLED,
@@ -80,15 +78,15 @@ class Address extends Model
             ],
         ]);
 
-        if ($address) {
-            return $address;
+        if ($newAddress) {
+            return $newAddress;
         }
 
-        $address          = new self;
-        $address->address = $address;
-        $address->postCodeID = $newPostCode->id;
+        $newAddress          = new self;
+        $newAddress->address = $address;
+        $newAddress->postCodeID = $newPostCode->id;
 
-        return $address->save() ? $address : null;
+        return $newAddress->save() ? $newAddress : null;
     }
 
     /**

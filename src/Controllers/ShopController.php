@@ -12,6 +12,7 @@ use Phlexus\Modules\Shop\Models\AddressType;
 use Phlexus\Modules\Shop\Models\UserAddress;
 use Phlexus\Modules\Shop\Models\Order;
 use Phlexus\Modules\Shop\Form\CheckoutForm;
+use Phlexus\Modules\BaseUser\Models\User;
 use Stripe\Checkout\Session;
 
 
@@ -143,9 +144,9 @@ class ShopController extends Controller
 
         $post = $this->request->getPost();
 
-        if (!$form->isValid($post)) {
+        /*if (!$form->isValid($post)) {
             return $this->response->redirect('checkout');
-        }
+        }*/
 
         $address = $post['address'];
 
@@ -306,7 +307,10 @@ class ShopController extends Controller
      * 
      * @return bool
      */
-    private function createOrder(array $billing, array $shipment, int $paymentMethod, int $shippingMethod, int $country): bool {
+    private function createOrder(
+        array $billing, array $shipment, int $paymentMethod,
+        int $shippingMethod, int $country
+    ): bool {
         $billingId = Address::createAddress(
             $billing['address'],
             $billing['post_code'],
@@ -321,23 +325,33 @@ class ShopController extends Controller
             $country
         );
 
+        // Get current logged user
+        $user = User::getUser();
+
         $userId = null;
 
-        $billingUserAddressId = UserAddress::createUserAddress(
+        if ($user) {
+            $userId = (int) $user->id;
+        } else {
+            // @ToDo: Change to a temp user or force register/login
+            $userId = 1;
+        }
+
+        $billingUserAddress = UserAddress::createUserAddress(
             $userId,
-            $billingId,
+            (int) $billingId->id,
             AddressType::BILLING
         );
 
-        $shippingUserAddressId = UserAddress::createUserAddress(
+        $shippingUserAddress = UserAddress::createUserAddress(
             $userId,
-            $shipmentId,
+            (int) $shipmentId->id,
             AddressType::SHIPPING
         );
 
         return Order::createOrder(
-            $userId, $billingUserAddressId, $shippingUserAddressId,
+            $userId, (int) $billingUserAddress->id, (int) $shippingUserAddress->id,
             $paymentMethod, $shippingMethod
-        );
+        ) ? true : false;
     }
 }

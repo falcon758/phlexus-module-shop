@@ -9,11 +9,11 @@ use Phlexus\Modules\Shop\Models\Address;
 use Phlexus\Modules\Shop\Models\AddressType;
 
 /**
- * Class Address
+ * Class UserAddress
  *
  * @package Phlexus\Modules\Shop\Models
  */
-class Address extends Model
+class UserAddress extends Model
 {
     const DISABLED = 0;
 
@@ -68,10 +68,10 @@ class Address extends Model
      * @return UserAddress
      */
     public static function createUserAddress(int $userId, int $addressId, int $addressTypeId): UserAddress {
-        $userAddress = self::findFirst(
+        $newUserAddress = self::findFirst(
             [
-                'conditions' => 'active = :active: AND addressId = :address_id: 
-                                AND addressTypeId = :address_type_id:',
+                'conditions' => 'active = :active: AND addressID = :address_id: 
+                                AND addressTypeID = :address_type_id:',
                 'bind'       => [
                     'active'          => UserAddress::ENABLED,
                     'address_id'      => $addressId,
@@ -80,15 +80,15 @@ class Address extends Model
             ]
         );
 
-        if ($userAddress) {
-            return $userAddress;
+        if ($newUserAddress) {
+            return $newUserAddress;
         }
 
-        $userAddress                = new self;
-        $userAddress->userID        = $userId;
-        $userAddress->addressID     = $addressId;
-        $userAddress->addressTypeId = $addressTypeId;
+        $newUserAddress                = new self;
+        $newUserAddress->userID        = $userId;
+        $newUserAddress->addressID     = $addressId;
+        $newUserAddress->addressTypeID = $addressTypeId;
 
-        return $userAddress->save() ? $userAddress : null;
+        return $newUserAddress->save() ? $newUserAddress : null;
     }
 }

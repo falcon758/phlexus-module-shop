@@ -8,11 +8,11 @@ use Phlexus\Modules\Shop\Models\Order;
 use Phlexus\Modules\Shop\Models\Product;
 
 /**
- * Class Product
+ * Class Item
  *
  * @package Phlexus\Modules\Shop\Models
  */
-class Product extends Model
+class Item extends Model
 {
     const DISABLED = 0;
 
@@ -22,9 +22,9 @@ class Product extends Model
 
     public $active;
 
-    public $productId;
+    public $productID;
 
-    public $orderId;
+    public $orderID;
 
     public $createdAt;
 
@@ -37,7 +37,7 @@ class Product extends Model
      */
     public function initialize()
     {
-        $this->setSource('products');
+        $this->setSource('items');
 
         $this->hasOne('productId', Product::class, 'id', [
             'alias'    => 'Product',
@@ -48,5 +48,30 @@ class Product extends Model
             'alias'    => 'Order',
             'reusable' => true,
         ]);
+    }
+
+    /**
+     * Create items
+     * 
+     * @param int $productId Product id to assign
+     * @param int $orderId   Order id to assign
+     *
+     * @return Item
+     * 
+     * @throws Exception
+     */
+    public static function createItem(int $productId, int $orderId): Item {
+        $item = new self;
+
+        $product = Product::findFirstByid($productId);
+
+        if (!$product) {
+            throw new \Exception('Product doesn\'t exists');
+        }
+
+        $item->productID = $productId;
+        $item->orderID = $orderId;
+
+        return $item->save() ? $item : null;
     }
 }

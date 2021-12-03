@@ -11,6 +11,7 @@ use Phlexus\Modules\Shop\Models\Address;
 use Phlexus\Modules\Shop\Models\AddressType;
 use Phlexus\Modules\Shop\Models\UserAddress;
 use Phlexus\Modules\Shop\Models\Order;
+use Phlexus\Modules\Shop\Models\Item;
 use Phlexus\Modules\Shop\Form\CheckoutForm;
 use Phlexus\Modules\BaseUser\Models\User;
 use Stripe\Checkout\Session;
@@ -349,9 +350,24 @@ class ShopController extends Controller
             AddressType::SHIPPING
         );
 
-        return Order::createOrder(
+        $order = Order::createOrder(
             $userId, (int) $billingUserAddress->id, (int) $shippingUserAddress->id,
             $paymentMethod, $shippingMethod
-        ) ? true : false;
+        );
+
+        if (!$order) {
+            return false;
+        }
+
+        $products = $this->getProductsOnCart();
+
+        foreach ($products as $product) {
+            if (!Item::createItem((int) $product['id'], (int) $order->id)) {
+                $order->delete();
+                return false;
+            }
+        }
+        
+        return true;
     }
 }

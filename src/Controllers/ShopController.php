@@ -235,20 +235,20 @@ class ShopController extends Controller
      */
     private function addToCart(int $productId, int $quantity = 1): bool
     {
-        $product = Product::findFirstByid($productId);
-        if ($product === null) {
+        $modelProduct = Product::findFirstByid($productId);
+        if ($modelProduct === null) {
             $this->flashSession->error('Product not found');
             return false;
         }
 
-        $product = $product->toArray();
+        $product = $modelProduct->toArray();
 
         $cart = $this->getProductsOnCart();
 
         $added = false;
-        foreach ($cart as &$product) {
-            if ($product['id'] == $productId) {
-                $product['quantity'] += $quantity;
+        foreach ($cart as &$cartProduct) {
+            if ($cartProduct['id'] == $productId) {
+                $cartProduct['quantity'] += $quantity;
                 $added = true;
                 break;
             }

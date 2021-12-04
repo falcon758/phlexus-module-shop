@@ -70,6 +70,10 @@ class PostCode extends Model
         $newPostcode->post_code = $postcode;
         $newPostcode->localeID = $localeId;
 
-        return $newPostcode->save() ? $newPostcode : null;
+        if (!$newPostcode->save()) {
+            throw new \Exception('Unable to process post code');
+        }
+
+        return $newPostcode;
     }
 }

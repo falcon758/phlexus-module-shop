@@ -51,6 +51,8 @@ class Locale extends Model
      * @param int    $countryId Country id to assign
      *
      * @return Locale
+     * 
+     * @throws Exception
      */
     public static function createLocale(string $name, int $countryId): Locale {
         $locale = self::findFirst([
@@ -70,6 +72,10 @@ class Locale extends Model
         $locale->name = $name;
         $locale->countryID = $countryId;
 
-        return $locale->save() ? $locale : null;
+        if (!$locale->save()) {
+            throw new \Exception('Unable to process local');
+        }
+
+        return $locale;
     }
 }

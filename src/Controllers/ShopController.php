@@ -312,60 +312,60 @@ class ShopController extends Controller
         array $billing, array $shipment, int $paymentMethod,
         int $shippingMethod, int $country
     ): bool {
-        $billingId = Address::createAddress(
-            $billing['address'],
-            $billing['post_code'],
-            $billing['locale'],
-            $country
-        );
+        try {
+            $billingId = Address::createAddress(
+                $billing['address'],
+                $billing['post_code'],
+                $billing['locale'],
+                $country
+            );
 
-        $shipmentId = Address::createAddress(
-            $shipment['address'],
-            $shipment['post_code'],
-            $shipment['locale'],
-            $country
-        );
+            $shipmentId = Address::createAddress(
+                $shipment['address'],
+                $shipment['post_code'],
+                $shipment['locale'],
+                $country
+            );
 
-        // Get current logged user
-        $user = User::getUser();
+            // Get current logged user
+            $user = User::getUser();
 
-        $userId = null;
+            $userId = null;
 
-        if ($user) {
-            $userId = (int) $user->id;
-        } else {
-            // @ToDo: Change to a temp user or force register/login
-            $userId = 1;
-        }
-
-        $billingUserAddress = UserAddress::createUserAddress(
-            $userId,
-            (int) $billingId->id,
-            AddressType::BILLING
-        );
-
-        $shippingUserAddress = UserAddress::createUserAddress(
-            $userId,
-            (int) $shipmentId->id,
-            AddressType::SHIPPING
-        );
-
-        $order = Order::createOrder(
-            $userId, (int) $billingUserAddress->id, (int) $shippingUserAddress->id,
-            $paymentMethod, $shippingMethod
-        );
-
-        if (!$order) {
-            return false;
-        }
-
-        $products = $this->getProductsOnCart();
-
-        foreach ($products as $product) {
-            if (!Item::createItem((int) $product['id'], (int) $order->id)) {
-                $order->delete();
-                return false;
+            if ($user) {
+                $userId = (int) $user->id;
+            } else {
+                // @ToDo: Change to a temp user or force register/login
+                $userId = 1;
             }
+
+            $billingUserAddress = UserAddress::createUserAddress(
+                $userId,
+                (int) $billingId->id,
+                AddressType::BILLING
+            );
+
+            $shippingUserAddress = UserAddress::createUserAddress(
+                $userId,
+                (int) $shipmentId->id,
+                AddressType::SHIPPING
+            );
+
+            $order = Order::createOrder(
+                $userId, (int) $billingUserAddress->id, (int) $shippingUserAddress->id,
+                $paymentMethod, $shippingMethod
+            );
+
+            $products = $this->getProductsOnCart();
+
+            foreach ($products as $product) {
+                if (!Item::createItem((int) $product['id'], (int) $order->id)) {
+                    $order->delete();
+                    return false;
+                }
+            }
+        } catch(\Exception $e) {
+            return false;
         }
         
         return true;

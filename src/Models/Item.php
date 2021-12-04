@@ -72,6 +72,10 @@ class Item extends Model
         $item->productID = $productId;
         $item->orderID = $orderId;
 
-        return $item->save() ? $item : null;
+        if (!$item->save()) {
+            throw new \Exception('Unable to process item');
+        }
+
+        return $item;
     }
 }

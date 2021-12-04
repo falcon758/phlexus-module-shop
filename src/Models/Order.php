@@ -83,6 +83,8 @@ class Order extends Model
      * @param int $shippingMethodID Shipping method id to assign
      *
      * @return Order
+     * 
+     * @throws Exception
      */
     public static function createOrder(
         int $userId, int $billingId, int $shipmentID,
@@ -95,6 +97,10 @@ class Order extends Model
         $order->paymentMethodID = $paymentMethod;
         $order->shippingMethodID = $shippingMethod;
 
-        return $order->save() ? $order : null;
+        if (!$order->save()) {
+            throw new \Exception('Unable to process order');
+        }
+
+        return $order;
     }
 }

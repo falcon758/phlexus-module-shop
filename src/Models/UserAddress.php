@@ -89,6 +89,10 @@ class UserAddress extends Model
         $newUserAddress->addressID     = $addressId;
         $newUserAddress->addressTypeID = $addressTypeId;
 
-        return $newUserAddress->save() ? $newUserAddress : null;
+        if (!$newUserAddress->save()) {
+            throw new \Exception('Unable to process user address');
+        }
+
+        return $newUserAddress;
     }
 }

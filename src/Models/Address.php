@@ -55,20 +55,14 @@ class Address extends Model
      * @param int    $country Locale to verify
      *
      * @return Address
+     * 
+     * @throws Exception
      */
     public static function createAddress(string $address, string $postCode, string $locale, int $country): Address {
         $newLocale = Locale::createLocale($locale, $country);
 
-        if (!$newLocale) {
-            return null;
-        }
-
         $newPostCode = PostCode::createPostCode($postCode, (int) $newLocale->id);
-
-        if (!$newPostCode) {
-            return null;
-        }
-
+        
         $newAddress = self::findFirst([
             'conditions' => 'active = :active: AND postCodeID = :post_code_id: AND address = :address:',
             'bind'       => [
@@ -86,7 +80,11 @@ class Address extends Model
         $newAddress->address = $address;
         $newAddress->postCodeID = $newPostCode->id;
 
-        return $newAddress->save() ? $newAddress : null;
+        if (!$newAddress->save()) {
+            throw new \Exception('Unable to process address');
+        }
+        
+        return $newAddress;
     }
 
     /**
@@ -173,7 +171,7 @@ class Address extends Model
                 }
                 
                 if (!$newModel->save()) {
-                    return null;
+                    throw new \Exception('Unable to process address');
                 } elseif ($newModel instanceof Address) {
                     return $newModel;
                 }

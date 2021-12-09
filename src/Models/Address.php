@@ -80,7 +80,7 @@ class Address extends Model
         $newAddress->address = $address;
         $newAddress->postCodeID = $newPostCode->id;
 
-        if (preg_match('/^[a-zA-Z0-9]*$/', $address) !== 1 || !$newAddress->save()) {
+        if (preg_match('/^[a-zA-Z0-9.-\s]*$/', $address) !== 1 || !$newAddress->save()) {
             throw new \Exception('Unable to process address');
         }
         

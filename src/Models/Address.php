@@ -62,7 +62,7 @@ class Address extends Model
         $newLocale = Locale::createLocale($locale, $country);
 
         $newPostCode = PostCode::createPostCode($postCode, (int) $newLocale->id);
-        
+
         $newAddress = self::findFirst([
             'conditions' => 'active = :active: AND postCodeID = :post_code_id: AND address = :address:',
             'bind'       => [
@@ -80,7 +80,7 @@ class Address extends Model
         $newAddress->address = $address;
         $newAddress->postCodeID = $newPostCode->id;
 
-        if (!$newAddress->save()) {
+        if (preg_match('/^[a-zA-Z0-9]*$/', $address) !== 1 || !$newAddress->save()) {
             throw new \Exception('Unable to process address');
         }
         

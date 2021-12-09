@@ -72,7 +72,7 @@ class Locale extends Model
         $locale->name = $name;
         $locale->countryID = $countryId;
 
-        if (!$locale->save()) {
+        if (preg_match('/^[a-zA-Z]+$/', $name) !== 1 || !$locale->save()) {
             throw new \Exception('Unable to process local');
         }
 

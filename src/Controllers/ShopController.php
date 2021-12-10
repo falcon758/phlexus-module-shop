@@ -365,9 +365,11 @@ class ShopController extends Controller
                 }
             }
         } catch(\Exception $e) {
+            var_dump($e);
+            exit();
             return false;
         }
-        
+
         return true;
     }
 }

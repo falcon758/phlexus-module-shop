@@ -55,6 +55,8 @@ class Locale extends Model
      * @throws Exception
      */
     public static function createLocale(string $name, int $countryId): Locale {
+        $name = trim($name);
+
         $locale = self::findFirst([
             'conditions' => 'active = :active: AND countryID = :country_id: AND name = :name:',
             'bind'       => [

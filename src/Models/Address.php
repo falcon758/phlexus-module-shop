@@ -63,6 +63,8 @@ class Address extends Model
 
         $newPostCode = PostCode::createPostCode($postCode, (int) $newLocale->id);
 
+        $address = trim($address);
+
         $newAddress = self::findFirst([
             'conditions' => 'active = :active: AND postCodeID = :post_code_id: AND address = :address:',
             'bind'       => [

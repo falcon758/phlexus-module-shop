@@ -4,7 +4,8 @@
     "description": "Phlexus Shop Module",
     "require": {
         "falcon758/phlexus-core": "dev-master",
-        "falcon758/phlexus-library-auth": "dev-master"
+        "falcon758/phlexus-library-auth": "dev-master",
+        "paypal/paypal-checkout-sdk": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^8",

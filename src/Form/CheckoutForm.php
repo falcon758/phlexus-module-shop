@@ -20,6 +20,8 @@ use Phlexus\Modules\Shop\Models\ShippingMethod;
 use Phalcon\Forms\Element\Text;
 use Phalcon\Forms\Element\Select;
 use Phalcon\Validation\Validator\PresenceOf;
+use Phalcon\Validation\Validator\InclusionIn;
+use Phalcon\Validation\Validator\Regex;
 
 class checkoutForm extends CaptchaForm
 {
@@ -27,14 +29,13 @@ class checkoutForm extends CaptchaForm
      * Initialize form
      */
     public function initialize()
-    {        
+    {
+        // Fields
         $address = new Text('address', [
             'required' => true,
             'class' => 'form-control',
             'placeholder' => 'Address'
         ]);
-        
-        $address->addValidator(new PresenceOf(['message' => 'Address is required']));
 
         $post_code = new Text('post_code', [
             'required' => true,
@@ -42,46 +43,92 @@ class checkoutForm extends CaptchaForm
             'placeholder' => 'Post Code'
         ]);
 
-        $post_code->addValidator(new PresenceOf(['message' => 'Post Code is required']));
-
+        $country_data = Country::find();
         $country = new Select(
             'country',
-            Country::find(),
+            $country_data,
             [
                 'using' => ['id', 'country'],
                 'required' => true,
                 'class' => 'form-control',
-                'placeholder' => 'Country'
+                'placeholder' => 'Country',
             ]
         );
 
-        $country->addValidator(new PresenceOf(['message' => 'Country is required']));
-
+        $payment_method_data = PaymentMethod::find();
         $payment_method = new Select(
             'payment_method',
-            PaymentMethod::find(),
+            $payment_method_data,
             [
                 'using' => ['id', 'name'],
                 'required' => true,
                 'class' => 'form-control',
-                'placeholder' => 'Payment method'
+                'placeholder' => 'Payment method',
             ]
         );
 
-        $payment_method->addValidator(new PresenceOf(['message' => 'Payment method is required']));
-
+        $shipping_method_data = ShippingMethod::find();
         $shipping_method = new Select(
             'shipping_method',
-            ShippingMethod::find(),
+            $shipping_method_data,
             [
                 'using' => ['id', 'name'],
                 'required' => true,
                 'class' => 'form-control',
-                'placeholder' => 'Shipping method'
+                'placeholder' => 'Shipping method',
             ]
         );
 
-        $shipping_method->addValidator(new PresenceOf(['message' => 'Shipping method is required']));
+        // Validators
+        $address->addValidators([
+            new PresenceOf(['message' => 'Address is required']),
+            new Regex(
+                [
+                    'pattern' => '/^[a-zA-Z0-9\s.-]*$/',
+                    'message' => 'Address has invalid characters',
+                ]
+            )
+        ]);
+
+        $post_code->addValidators([
+            new PresenceOf(['message' => 'Post Code is required']),
+            new Regex(
+                [
+                    'pattern' => '/^[0-9]+-[0-9]+$/',
+                    'message' => 'Post Code has invalid characters',
+                ]
+            )
+        ]);
+
+        $country->addValidators([
+            new PresenceOf(['message' => 'Country is required']),
+            new InclusionIn(
+                [
+                    'message' => 'Country is required',
+                    'domain' => array_column($country_data->toArray(), 'id')
+                ]
+            )
+        ]);
+
+        $payment_method->addValidators([
+            new PresenceOf(['message' => 'Payment method is required']),
+            new InclusionIn(
+                [
+                    'message' => 'Payment Method is required',
+                    'domain' => array_column($payment_method_data->toArray(), 'id')
+                ]
+            )
+        ]);
+
+        $shipping_method->addValidators([
+            new PresenceOf(['message' => 'Shipping method is required']),
+            new InclusionIn(
+                [
+                    'message' => 'Payment Method is required',
+                    'domain' => array_column($shipping_method_data->toArray(), 'id')
+                ]
+            )
+        ]);
 
         $this->add($address);
         $this->add($post_code);

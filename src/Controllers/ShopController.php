@@ -146,6 +146,10 @@ class ShopController extends Controller
         $post = $this->request->getPost();
 
         if (!$form->isValid($post)) {
+            foreach ($form->getMessages() as $message) {
+                $this->flash->error($message->getMessage());
+            }
+
             return $this->response->redirect('checkout');
         }
 
@@ -180,36 +184,6 @@ class ShopController extends Controller
         } else {
             return $this->response->redirect('checkout/cancel');
         }
-    }
-
-    /**
-     * @Post('/checkout/stripe')
-     */
-    public function stripeAction(): ResponseInterface
-    {
-        $checkoutSession = $this->stripeCheckout::create([
-            'payment_method_types' => ['card', 'sepa_debit'],
-            'line_items' => [
-                [
-                    'price_data' => [
-                        'currency' => 'eur',
-                        'unit_amount' => 2000,
-                        'product_data' => [
-                            'name' => 'Stubborn Attachments',
-                            'images' => ["https://i.imgur.com/EHyR2nP.png"],
-                        ],
-                    ],
-                    'quantity' => 1,
-                ]
-            ],
-            'mode' => 'payment',
-            'success_url' => getenv('CHECKOUT_SUCCESS_URL'),
-            'cancel_url' => getenv('CHECKOUT_CANCEL_URL'),
-        ]);
-
-        return $this->response->setJsonContent([
-            'id' => $checkoutSession->id,
-        ]);
     }
 
     /**
@@ -365,6 +339,7 @@ class ShopController extends Controller
                 }
             }
         } catch(\Exception $e) {
+            $this->flash->error($e->getMessage());
             return false;
         }
 

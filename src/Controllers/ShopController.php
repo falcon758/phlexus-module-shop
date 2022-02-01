@@ -14,7 +14,6 @@ use Phlexus\Modules\Shop\Models\Order;
 use Phlexus\Modules\Shop\Models\Item;
 use Phlexus\Modules\Shop\Form\CheckoutForm;
 use Phlexus\Modules\BaseUser\Models\User;
-use Stripe\Checkout\Session;
 
 
 /**
@@ -55,11 +54,13 @@ class ShopController extends Controller
             || !$this->security->checkToken('csrf', $this->request->getPost('csrf', null))) {
             return $this->response->setJsonContent([
                 'success' => false,
+                'message' => 'Unable to add product to cart!',
             ]);
         }
 
         return $this->response->setJsonContent([
             'success' => true,
+            'message' => 'Product was added to cart!',
         ]);
     }
 
@@ -72,6 +73,8 @@ class ShopController extends Controller
     public function buyAction(int $productId): ResponseInterface
     {
         if (!$this->addToCart($productId)) {
+            $this->flash->error('Unable to add product to cart!');
+
             return $this->response->redirect('products');
         }
 
@@ -89,12 +92,14 @@ class ShopController extends Controller
         if (!$this->security->checkToken('csrf', $this->request->getPost('csrf', null))) {
             return $this->response->setJsonContent([
                 'success' => false,
+                'message' => 'Unable to remove product!',
             ]);
         }
 
         $product = Product::findFirst($productId);
         if ($product === null) {
-            //$this->flashSession->error('Product not found');
+            $this->flash->error('Product not found!');
+
             return $this->response->redirect('cart');
         }
 
@@ -109,6 +114,8 @@ class ShopController extends Controller
 
         $this->session->set('cart', $cart);
 
+        $this->flash->success('Product removed successfully!');
+
         return $this->response->redirect('cart');
     }
 
@@ -120,6 +127,8 @@ class ShopController extends Controller
         $products = $this->getProductsOnCart();
 
         if (count($products) === 0) {
+            $this->flash->error('No products on cart!');
+
             return $this->response->redirect('cart');
         }
 
@@ -211,7 +220,6 @@ class ShopController extends Controller
     {
         $modelProduct = Product::findFirstByid($productId);
         if ($modelProduct === null) {
-            $this->flashSession->error('Product not found');
             return false;
         }
 

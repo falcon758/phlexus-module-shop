@@ -12,13 +12,13 @@ use Phalcon\Mvc\Model;
  */
 class AddressType extends Model
 {
-    const DISABLED = 0;
+    public const DISABLED = 0;
 
-    const ENABLED = 1;
+    public const ENABLED = 1;
 
-    const BILLING = 1;
+    public const BILLING = 1;
 
-    const SHIPPING = 2; 
+    public const SHIPPING = 2; 
 
     public $id;
 

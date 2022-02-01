@@ -15,5 +15,11 @@ namespace Phlexus\Modules\Shop\Libraries;
 
 interface PaymentInterface
 {
-    public function isPaid();
+    public function startPayment(): void;
+
+    public function verifyPayment(): bool;
+
+    public function processCallback(): void;
+
+    public function isPaid(): bool;
 }

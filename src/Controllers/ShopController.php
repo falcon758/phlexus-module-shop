@@ -6,6 +6,7 @@ namespace Phlexus\Modules\Shop\Controllers;
 
 use Phalcon\Http\ResponseInterface;
 use Phalcon\Mvc\Controller;
+use Phlexus\Modules\Shop\Libraries\Cart\Cart;
 use Phlexus\Modules\Shop\Models\Product;
 use Phlexus\Modules\Shop\Models\Address;
 use Phlexus\Modules\Shop\Models\AddressType;
@@ -14,6 +15,7 @@ use Phlexus\Modules\Shop\Models\Order;
 use Phlexus\Modules\Shop\Models\Item;
 use Phlexus\Modules\Shop\Form\CheckoutForm;
 use Phlexus\Modules\BaseUser\Models\User;
+use Phlexus\Modules\Shop\Libraries\Payments\PayPal;
 
 
 /**
@@ -22,6 +24,21 @@ use Phlexus\Modules\BaseUser\Models\User;
  */
 class ShopController extends Controller
 {
+    /**
+     * Cart
+     *
+     * @var string
+     */
+    private $cart;
+
+    /**
+     * Initialize
+     */
+    public function initialize(): void
+    {
+        $this->cart = new Cart();
+    }
+
     /**
      * @Get('/')
      */
@@ -131,6 +148,9 @@ class ShopController extends Controller
 
             return $this->response->redirect('cart');
         }
+
+        //$paypal = new Paypal();
+        //$paypal->startPayment();
 
         $this->view->setVar('products', $products);
         $this->view->setVar('orderRoute', '/checkout/order');

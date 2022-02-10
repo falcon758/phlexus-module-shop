@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace Phlexus\Modules\Shop\Libraries;
+namespace Phlexus\Modules\Shop\Libraries\Payments;
 
 interface PaymentInterface
 {

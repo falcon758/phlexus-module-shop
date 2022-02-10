@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Phlexus\Modules\Shop\Providers;
 
 use Phlexus\Providers\AbstractProvider;
+use Phlexus\Helpers;
 use PayPalCheckoutSdk\Core\PayPalHttpClient;
 use PayPalCheckoutSdk\Core\SandboxEnvironment;
 
@@ -22,7 +23,13 @@ class PayPalProvider extends AbstractProvider
      */
     public function register(array $parameters = []): void
     {
-        $configs = Helpers::phlexusConfig($this->providerName)->toArray();
+        $payments = Helpers::phlexusConfig('payments')->toArray();
+
+        if (!isset($payments[$this->providerName])) {
+            return;
+        }
+
+        $configs = $payments[$this->providerName];
 
         $this->di->setShared($this->providerName, function () use ($configs) {
             $clientId = $configs['client_id'];

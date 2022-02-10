@@ -16,11 +16,19 @@ use Phlexus\Modules\Shop\Models\ShippingMethod;
  */
 class Order extends Model
 {
-    const DISABLED = 0;
+    public const DISABLED = 0;
 
-    const ENABLED = 1;
+    public const ENABLED = 1;
+
+    public const CANCELED = 0;
+
+    public const CREATED = 1;
+
+    public const PAID = 2;
 
     public $id;
+
+    public $status;
 
     public $active;
 
@@ -73,6 +81,16 @@ class Order extends Model
         ]);
     }
 
+     /**
+     * Cancel order
+     * 
+     * @return bool
+     */
+    public function cancelOrder(): bool {
+        $this->status = self::CANCELED;
+        return $this->save();
+    }
+
     /**
      * Create order
      * 
@@ -96,6 +114,7 @@ class Order extends Model
         $order->shipmentID = $shipmentID;
         $order->paymentMethodID = $paymentMethod;
         $order->shippingMethodID = $shippingMethod;
+        $order->status = self::CREATED;
 
         if (!$order->save()) {
             throw new \Exception('Unable to process order');

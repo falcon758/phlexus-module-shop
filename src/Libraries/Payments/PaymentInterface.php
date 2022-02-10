@@ -15,11 +15,31 @@ namespace Phlexus\Modules\Shop\Libraries\Payments;
 
 interface PaymentInterface
 {
-    public function startPayment(): void;
+    /**
+     * Start payment process
+     *
+     * @return bool
+     */
+    public function startPayment(): bool;
 
-    public function verifyPayment(): bool;
-
+    /**
+     * Process a paymeny callback
+     *
+     * @return void
+     */
     public function processCallback(): void;
 
+    /**
+     * Verify a payment
+     *
+     * @return bool
+     */
+    public function verifyPayment(): bool;
+
+    /**
+     * Check if it's paid
+     *
+     * @return bool
+     */
     public function isPaid(): bool;
 }

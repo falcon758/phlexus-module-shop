@@ -54,4 +54,11 @@ interface CartInterface
      * @return float
      */
     public function getTotalPrice(): float;
+
+    /**
+     * Remove all product from cart
+     * 
+     * @return bool
+     */
+    public function clear(): bool;
 }

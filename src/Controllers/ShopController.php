@@ -44,12 +44,12 @@ class ShopController extends Controller
      */
     public function cartAction(): void
     {
-        $products = $this->getProductsOnCart();
+        $products = $this->cart->getProducts();
         
         $this->view->setVar('checkoutRoute', '/checkout');
         $this->view->setVar('csrfToken', $this->security->getToken());
         $this->view->setVar('products', $products);
-        $this->view->setVar('total', $this->getProductsTotalPrice());
+        $this->view->setVar('total', $this->cart->getTotalPrice());
     }
 
     public function productsAction(): void
@@ -67,8 +67,10 @@ class ShopController extends Controller
      */
     public function addAction(int $productId): ResponseInterface
     {
-        if (!$this->addToCart($productId) 
-            || !$this->security->checkToken('csrf', $this->request->getPost('csrf', null))) {
+        if (
+            !$this->security->checkToken('csrf', $this->request->getPost('csrf', null))
+            || !$this->cart->addProduct($productId) 
+        ) {
             return $this->response->setJsonContent([
                 'success' => false,
                 'message' => 'Unable to add product to cart!',
@@ -79,23 +81,6 @@ class ShopController extends Controller
             'success' => true,
             'message' => 'Product was added to cart!',
         ]);
-    }
-
-    /**
-     * @Get('/buy/{id:[0-9]+}')
-     *
-     * @param int $productId
-     * @return ResponseInterface
-     */
-    public function buyAction(int $productId): ResponseInterface
-    {
-        if (!$this->addToCart($productId)) {
-            $this->flash->error('Unable to add product to cart!');
-
-            return $this->response->redirect('products');
-        }
-
-        return $this->response->redirect('cart');
     }
 
     /**
@@ -113,23 +98,7 @@ class ShopController extends Controller
             ]);
         }
 
-        $product = Product::findFirst($productId);
-        if ($product === null) {
-            $this->flash->error('Product not found!');
-
-            return $this->response->redirect('cart');
-        }
-
-        $cart = $this->getProductsOnCart();
-
-        foreach ($cart as $key => $product) {
-            if ($product['id'] == $productId) {
-                unset($cart[$key]);
-                break;
-            }
-        }
-
-        $this->session->set('cart', $cart);
+        $this->cart->removeProduct($productId);
 
         $this->flash->success('Product removed successfully!');
 
@@ -141,7 +110,7 @@ class ShopController extends Controller
      */
     public function checkoutAction()
     {
-        $products = $this->getProductsOnCart();
+        $products = $this->cart->getProducts();
 
         if (count($products) === 0) {
             $this->flash->error('No products on cart!');
@@ -149,13 +118,10 @@ class ShopController extends Controller
             return $this->response->redirect('cart');
         }
 
-        //$paypal = new Paypal();
-        //$paypal->startPayment();
-
         $this->view->setVar('products', $products);
         $this->view->setVar('orderRoute', '/checkout/order');
         $this->view->setVar('csrfToken', $this->security->getToken());
-        $this->view->setVar('total', $this->getProductsTotalPrice());
+        $this->view->setVar('total', $this->cart->getTotalPrice());
         $this->view->setVar('checkoutForm', new CheckoutForm());
     }
 
@@ -164,9 +130,7 @@ class ShopController extends Controller
      */
     public function orderAction()
     {
-        $products = $this->getProductsOnCart();
-
-        if (count($products) === 0) {
+        if (!$this->cart->hasProducts()) {
             return $this->response->redirect('cart');
         }
 
@@ -208,7 +172,12 @@ class ShopController extends Controller
             'country'   => $country
         ];
 
-        if ($this->createOrder($billing, $shipment, $paymentMethod, $shippingMethod, $country)) {
+        $order = $this->createOrder($billing, $shipment, $paymentMethod, $shippingMethod, $country);
+
+        if ($order !== null) {
+            $paypal = new Paypal($order);
+            $paypal->startPayment();
+
             return $this->response->redirect('checkout/success');
         } else {
             return $this->response->redirect('checkout/cancel');
@@ -220,7 +189,7 @@ class ShopController extends Controller
      */
     public function successAction()
     {
-        $this->session->remove('cart');
+        $this->cart->clear();
     }
 
     /**
@@ -232,75 +201,6 @@ class ShopController extends Controller
     }
 
     /**
-     * @param int $productId
-     * @param int $quantity
-     * @return bool
-     */
-    private function addToCart(int $productId, int $quantity = 1): bool
-    {
-        $modelProduct = Product::findFirstByid($productId);
-        if ($modelProduct === null) {
-            return false;
-        }
-
-        $product = $modelProduct->toArray();
-
-        $cart = $this->getProductsOnCart();
-
-        $added = false;
-        foreach ($cart as &$cartProduct) {
-            if ($cartProduct['id'] == $productId) {
-                $cartProduct['quantity'] += $quantity;
-                $added = true;
-                break;
-            }
-        }
-
-        if ($added === false) {
-            $product['quantity'] = $quantity;
-            $cart[] = $product;
-        }
-
-        $this->session->set('cart', $cart);
-
-        return true;
-    }
-
-    /**
-     * @return bool
-     */
-    private function hasProductsOnCart(): bool {
-        return count($this->getProductsOnCart) > 0;
-    }
-
-    /**
-     * @return array
-     */
-    private function getProductsOnCart(): array {
-        $products = [];
-
-        if ($this->session->has('cart')) {
-            $products = $this->session->get('cart');
-        }
-
-        return $products;
-    }
-
-    /**
-     * @return float
-     */
-    private function getProductsTotalPrice(): float {
-        $products = $this->getProductsOnCart();
-
-        $total = 0;
-        foreach ($products as $product) {
-            $total += $product['price'] * $product['quantity'];
-        }
-
-        return $total;
-    }
-
-    /**
      * Create order
      * 
      * @param array $billing        Billing address
@@ -308,12 +208,12 @@ class ShopController extends Controller
      * @param array $paymentMethod  Payment method
      * @param array $shippingMethod Shipping address
      * 
-     * @return bool
+     * @return mixed Order or null
      */
     private function createOrder(
         array $billing, array $shipment, int $paymentMethod,
         int $shippingMethod, int $country
-    ): bool {
+    ) {
         try {
             $billingId = Address::createAddress(
                 $billing['address'],
@@ -338,7 +238,7 @@ class ShopController extends Controller
                 $userId = (int) $user->id;
             } else {
                 // @ToDo: Change to a temp user or force register/login
-                $userId = 1;
+                $userId = 0;
             }
 
             $billingUserAddress = UserAddress::createUserAddress(
@@ -358,19 +258,20 @@ class ShopController extends Controller
                 $paymentMethod, $shippingMethod
             );
 
-            $products = $this->getProductsOnCart();
+            $products = $this->cart->getProducts();
 
             foreach ($products as $product) {
                 if (!Item::createItem((int) $product['id'], (int) $order->id)) {
-                    $order->delete();
-                    return false;
+                    $order->cancelOrder();
+
+                    return null;
                 }
             }
         } catch(\Exception $e) {
             $this->flash->error($e->getMessage());
-            return false;
+            return null;
         }
 
-        return true;
+        return $order;
     }
 }

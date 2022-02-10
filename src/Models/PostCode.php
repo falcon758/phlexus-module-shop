@@ -13,9 +13,9 @@ use Phlexus\Modules\Shop\Models\Locale;
  */
 class PostCode extends Model
 {
-    const DISABLED = 0;
+    public const DISABLED = 0;
 
-    const ENABLED = 1;
+    public const ENABLED = 1;
 
     public $id;
 

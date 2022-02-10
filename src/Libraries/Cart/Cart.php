@@ -14,9 +14,17 @@ declare(strict_types=1);
 namespace Phlexus\Modules\Shop\Libraries\Cart;
 
 use Phalcon\Di;
+use Phlexus\Modules\Shop\Models\Product;
 
 class Cart implements CartInterface
 {
+    /**
+     * Session name
+     *
+     * @var string
+     */
+    protected CONST SESSIONNAME = 'cart';
+
     /**
      * Session
      *
@@ -48,7 +56,7 @@ class Cart implements CartInterface
 
         $product = $modelProduct->toArray();
 
-        $cart = $this->getProductsOnCart();
+        $cart = $this->getProducts();
 
         $added = false;
         foreach ($cart as &$cartProduct) {
@@ -64,7 +72,7 @@ class Cart implements CartInterface
             $cart[] = $product;
         }
 
-        $this->session->set('cart', $cart);
+        $this->session->set(self::SESSIONNAME, $cart);
 
         return true;
     }
@@ -78,7 +86,7 @@ class Cart implements CartInterface
      */
     public function removeProduct(int $productId): bool
     {
-        $cart = $this->getProductsOnCart();
+        $cart = $this->getProducts();
 
         foreach ($cart as $key => $product) {
             if ($product['id'] == $productId) {
@@ -87,7 +95,7 @@ class Cart implements CartInterface
             }
         }
 
-        $this->session->set('cart', $cart);
+        $this->session->set(self::SESSIONNAME, $cart);
 
         return true;
     }
@@ -98,7 +106,7 @@ class Cart implements CartInterface
      * @return bool
      */
     public function hasProducts(): bool {
-        return count($this->getProductsOnCart()) > 0;
+        return count($this->getProducts()) > 0;
     }
 
     /**
@@ -109,8 +117,8 @@ class Cart implements CartInterface
     public function getProducts(): array {
         $products = [];
 
-        if ($this->session->has('cart')) {
-            $products = $this->session->get('cart');
+        if ($this->session->has(self::SESSIONNAME)) {
+            $products = $this->session->get(self::SESSIONNAME);
         }
 
         return $products;
@@ -122,7 +130,7 @@ class Cart implements CartInterface
      * @return float
      */
     public function getTotalPrice(): float {
-        $products = $this->getProductsOnCart();
+        $products = $this->getProducts();
 
         $total = 0;
         foreach ($products as $product) {
@@ -130,5 +138,16 @@ class Cart implements CartInterface
         }
 
         return $total;
-    }    
+    }
+    
+    /**
+     * Remove all product from cart
+     * 
+     * @return bool
+     */
+    public function clear(): bool {
+        $this->session->remove('cart');
+
+        return true;
+    }
 }

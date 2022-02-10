@@ -15,9 +15,9 @@ use Phlexus\Modules\Shop\Models\AddressType;
  */
 class UserAddress extends Model
 {
-    const DISABLED = 0;
+    public const DISABLED = 0;
 
-    const ENABLED = 1;
+    public const ENABLED = 1;
 
     public $id;
 

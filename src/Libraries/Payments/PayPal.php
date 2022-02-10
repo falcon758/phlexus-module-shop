@@ -16,11 +16,14 @@ namespace Phlexus\Modules\Shop\Libraries\Payments;
 use Phalcon\Di;
 use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
 
-class Paypal implements PaymentInterface
+class Paypal extends PaymentAbstract
 {
-    public function startPayment(): void {
-        var_dump(Di::getDefault()->getShared('paypal'));
-        exit();
+    /**
+     * Start payment process
+     *
+     * @return bool
+     */
+    public function startPayment(): bool {
         $request = new OrdersCreateRequest();
         $request->prefer('return=representation');
         $request->body = [
@@ -41,8 +44,14 @@ class Paypal implements PaymentInterface
         ];
         
         try {
+            $paypal = Di::getDefault()->getShared('paypal');
+
             // Call API with your client and get a response for your call
-            $response = $this->paypal->execute($request);
+            $response = $paypal->execute($request);
+            
+            if ($response->statusCode !== 201) {
+                return false;
+            }
             
             // If call returns body in response, you can get the deserialized version from the result attribute of the response
             print_r($response);
@@ -54,14 +63,29 @@ class Paypal implements PaymentInterface
         exit();
     }
 
-    public function verifyPayment(): bool {
-
-    }
-
+    /**
+     * Process a paymeny callback
+     *
+     * @return void
+     */
     public function processCallback(): void {
 
     }
 
+    /**
+     * Verify a payment
+     *
+     * @return bool
+     */
+    public function verifyPayment(): bool {
+
+    }
+
+    /**
+     * Check if it's paid
+     *
+     * @return bool
+     */
     public function isPaid(): bool {
 
     }

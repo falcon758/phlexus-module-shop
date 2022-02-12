@@ -4,9 +4,6 @@ declare(strict_types=1);
 namespace Phlexus\Modules\Shop\Models;
 
 use Phalcon\Mvc\Model;
-use Phlexus\Modules\Shop\Models\Address;
-use Phlexus\Modules\Shop\Models\PostCode;
-use Phlexus\Modules\Shop\Models\Locale;
 
 /**
  * Class Address

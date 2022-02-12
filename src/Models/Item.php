@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace Phlexus\Modules\Shop\Models;
 
 use Phalcon\Mvc\Model;
-use Phlexus\Modules\Shop\Models\Order;
-use Phlexus\Modules\Shop\Models\Product;
 
 /**
  * Class Item
@@ -39,12 +37,12 @@ class Item extends Model
     {
         $this->setSource('items');
 
-        $this->hasOne('productId', Product::class, 'id', [
+        $this->hasOne('productID', Product::class, 'id', [
             'alias'    => 'Product',
             'reusable' => true,
         ]);
 
-        $this->hasOne('orderId', Order::class, 'id', [
+        $this->hasOne('orderID', Order::class, 'id', [
             'alias'    => 'Order',
             'reusable' => true,
         ]);

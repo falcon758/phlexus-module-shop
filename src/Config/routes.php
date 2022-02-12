@@ -50,4 +50,9 @@ $routes->addGet('/checkout/cancel', [
     'action' => 'cancel',
 ]);
 
+$routes->addPost('/payment/paypal/{orderHash:[a-zA-Z0-9]+}', [
+    'controller' => 'payment',
+    'action' => 'paypal',
+]);
+
 return $routes;

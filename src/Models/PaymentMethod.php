@@ -16,6 +16,8 @@ class PaymentMethod extends Model
 
     public const ENABLED = 1;
 
+    public const PAYPAL = 1;
+
     public $id;
 
     public $name;

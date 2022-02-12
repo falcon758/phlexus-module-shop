@@ -13,28 +13,30 @@ declare(strict_types=1);
 
 namespace Phlexus\Modules\Shop\Libraries\Payments;
 
+use Phalcon\Http\ResponseInterface;
+
 interface PaymentInterface
 {
     /**
      * Start payment process
      *
-     * @return bool
+     * @return ResponseInterface
      */
-    public function startPayment(): bool;
+    public function startPayment(): ResponseInterface;
 
     /**
      * Process a paymeny callback
      *
-     * @return void
+     * @return ResponseInterface
      */
-    public function processCallback(): void;
+    public function processCallback(): ResponseInterface;
 
     /**
      * Verify a payment
      *
-     * @return bool
+     * @return ResponseInterface
      */
-    public function verifyPayment(): bool;
+    public function verifyPayment(): ResponseInterface;
 
     /**
      * Check if it's paid

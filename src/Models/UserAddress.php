@@ -5,8 +5,6 @@ namespace Phlexus\Modules\Shop\Models;
 
 use Phalcon\Mvc\Model;
 use Phlexus\Modules\BaseUser\Models\User;
-use Phlexus\Modules\Shop\Models\Address;
-use Phlexus\Modules\Shop\Models\AddressType;
 
 /**
  * Class UserAddress

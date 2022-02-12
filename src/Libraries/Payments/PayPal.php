@@ -14,71 +14,92 @@ declare(strict_types=1);
 namespace Phlexus\Modules\Shop\Libraries\Payments;
 
 use Phalcon\Di;
+use Phalcon\Http\ResponseInterface;
 use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
+use PayPalCheckoutSdk\Orders\OrdersCaptureRequest;
 
 class Paypal extends PaymentAbstract
 {
     /**
      * Start payment process
      *
-     * @return bool
+     * @return ResponseInterface
      */
-    public function startPayment(): bool {
+    public function startPayment(): ResponseInterface {
+        $items = $this->order->getItems();
+
+        $arrProd = [];
+
+        foreach ($items as $item) {
+            $arrProd[] = [
+                'reference_id'    => $item['id'],
+                'description'     => $item['name'],
+                'amount' => [
+                    'value'         => $item['price'],
+                    'currency_code' => 'EUR'
+                ]
+            ];
+        }
+
         $request = new OrdersCreateRequest();
         $request->prefer('return=representation');
         $request->body = [
-            "intent" => "CAPTURE",
-            "purchase_units" => [
-                [
-                    "reference_id" => "test_ref_id1",
-                    "amount" => [
-                        "value" => "100.00",
-                        "currency_code" => "USD"
-                    ]
-                ]
-            ],
-            "application_context" => [
-                "cancel_url" => "https://example.com/callback",
-                "return_url" => "https://example.com/cart"
+            'intent'              => 'CAPTURE',
+            'purchase_units'      => $arrProd,
+            'application_context' => [
+                'return_url' => $this->url->get('/payment/paypal/'. $this->order->hashCode),
+                'cancel_url' => $this->url->get('/checkout'),
             ] 
         ];
-        
-        try {
-            $paypal = Di::getDefault()->getShared('paypal');
 
-            // Call API with your client and get a response for your call
-            $response = $paypal->execute($request);
+        try {
+            $response = Di::getDefault()->getShared('paypal')->execute($request);
             
             if ($response->statusCode !== 201) {
-                return false;
+                return $this->response->redirect('checkout');
             }
-            
-            // If call returns body in response, you can get the deserialized version from the result attribute of the response
-            print_r($response);
+
+            foreach ($response->result->links as $link) {
+                if ($link->rel === 'approve') {
+                    return $this->response->redirect($link->href);
+                }
+            }
         } catch (\HttpException $e) {
-            echo $e->statusCode;
-            print_r($e->getMessage());
+            $this->flash->error('Unable to process payment!');
+
+            return $this->response->redirect('checkout');
         }
 
-        exit();
+        $this->flash->error('Unable to process payment!');
+
+        return $this->response->redirect('checkout');
     }
 
     /**
      * Process a paymeny callback
      *
-     * @return void
+     * @return ResponseInterface
      */
-    public function processCallback(): void {
-
+    public function processCallback(): ResponseInterface {
+        return $this->verifyPayment();
     }
 
     /**
      * Verify a payment
      *
-     * @return bool
+     * @return ResponseInterface
      */
-    public function verifyPayment(): bool {
-
+    public function verifyPayment(): ResponseInterface {
+        $request = new OrdersCaptureRequest("APPROVED-ORDER-ID");
+        $request->prefer('return=representation');
+        try {
+            $response = $client->execute($request);
+            
+            print_r($response);
+            exit();
+        } catch (HttpException $e) {
+            return $this->response->redirect('checkout');
+        }
     }
 
     /**

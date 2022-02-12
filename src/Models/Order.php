@@ -5,9 +5,6 @@ namespace Phlexus\Modules\Shop\Models;
 
 use Phalcon\Mvc\Model;
 use Phlexus\Modules\BaseUser\Models\User;
-use Phlexus\Modules\Shop\Models\UserAddress;
-use Phlexus\Modules\Shop\Models\PaymentMethod;
-use Phlexus\Modules\Shop\Models\ShippingMethod;
 
 /**
  * Class Order
@@ -26,7 +23,11 @@ class Order extends Model
 
     public const PAID = 2;
 
+    private const HASHLENGTH = 40;
+
     public $id;
+
+    public $hashCode;
 
     public $status;
 
@@ -79,9 +80,35 @@ class Order extends Model
             'alias'    => 'shipping_method',
             'reusable' => true,
         ]);
+
+        $this->hasMany('id', Item::class, 'orderID', ['alias' => 'items']);
     }
 
-     /**
+    /**
+     * Get order items
+     * 
+     * @return array
+     */
+    public function getItems(): array {
+        $items = [];
+
+        foreach ($this->items as $item) {
+            $items[] = $item->Product->toArray();
+        }
+
+        return $items;
+    }
+
+    /**
+     * Get order total price
+     * 
+     * @return float
+     */
+    public function getOrderTotal(): float {
+        $items = $this->getItems();
+    }
+
+    /**
      * Cancel order
      * 
      * @return bool
@@ -109,10 +136,11 @@ class Order extends Model
         int $paymentMethod, int $shippingMethod
     ): Order {
         $order = new self;
-        $order->userID = $userId;
-        $order->billingID = $billingId;
-        $order->shipmentID = $shipmentID;
-        $order->paymentMethodID = $paymentMethod;
+        $order->hashCode         = $this->security->getRandom()->base64Safe(self::HASHLENGTH);
+        $order->userID           = $userId;
+        $order->billingID        = $billingId;
+        $order->shipmentID       = $shipmentID;
+        $order->paymentMethodID  = $paymentMethod;
         $order->shippingMethodID = $shippingMethod;
         $order->status = self::CREATED;
 

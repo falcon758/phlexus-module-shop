@@ -13,6 +13,7 @@ use Phlexus\Modules\Shop\Models\AddressType;
 use Phlexus\Modules\Shop\Models\UserAddress;
 use Phlexus\Modules\Shop\Models\Order;
 use Phlexus\Modules\Shop\Models\Item;
+use Phlexus\Modules\Shop\Models\PaymentMethod;
 use Phlexus\Modules\Shop\Form\CheckoutForm;
 use Phlexus\Modules\BaseUser\Models\User;
 use Phlexus\Modules\Shop\Libraries\Payments\PayPal;
@@ -174,7 +175,7 @@ class ShopController extends Controller
 
         $order = $this->createOrder($billing, $shipment, $paymentMethod, $shippingMethod, $country);
 
-        if ($order !== null) {
+        if ($order !== null && $paymentMethod === PaymentMethod::Paypal) {
             $paypal = new Paypal($order);
             $paypal->startPayment();
 

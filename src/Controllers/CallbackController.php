@@ -10,13 +10,13 @@ use Phlexus\Modules\Shop\Models\Order;
 use Phlexus\Modules\Shop\Libraries\Payments\PayPal;
 
 /**
- * @RoutePrefix('/payment')
+ * @RoutePrefix('/payment/callback')
  *
  */
-class PaymentController extends Controller
+class CallbackController extends Controller
 {
     /**
-     * @Get('/')
+     * @Get('/payment/callback/paypal')
      */
     public function paypalAction(string $orderHash): ResponseInterface
     {

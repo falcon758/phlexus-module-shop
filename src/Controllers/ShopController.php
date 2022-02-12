@@ -41,7 +41,7 @@ class ShopController extends Controller
     }
 
     /**
-     * @Get('/')
+     * @Get('/cart')
      */
     public function cartAction(): void
     {
@@ -53,6 +53,9 @@ class ShopController extends Controller
         $this->view->setVar('total', $this->cart->getTotalPrice());
     }
 
+    /**
+     * @Get('/products')
+     */
     public function productsAction(): void
     {
         $this->view->setVar('saveRoute', '/cart/add/');
@@ -118,6 +121,9 @@ class ShopController extends Controller
 
             return $this->response->redirect('cart');
         }
+
+        $paypal = new Paypal(Order::findFirstByid(23));
+        $paypal->startPayment();
 
         $this->view->setVar('products', $products);
         $this->view->setVar('orderRoute', '/checkout/order');

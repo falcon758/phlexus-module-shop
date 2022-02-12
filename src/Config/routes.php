@@ -50,8 +50,8 @@ $routes->addGet('/checkout/cancel', [
     'action' => 'cancel',
 ]);
 
-$routes->addPost('/payment/paypal/{orderHash:[a-zA-Z0-9]+}', [
-    'controller' => 'payment',
+$routes->addGet('/payment/callback/paypal/{orderHash:[a-zA-Z0-9]+}', [
+    'controller' => 'callback',
     'action' => 'paypal',
 ]);
 

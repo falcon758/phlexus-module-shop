@@ -47,7 +47,7 @@ class Paypal extends PaymentAbstract
             'intent'              => 'CAPTURE',
             'purchase_units'      => $arrProd,
             'application_context' => [
-                'return_url' => $this->url->get('/payment/paypal/'. $this->order->hashCode),
+                'return_url' => $this->url->get('/payment/callback/paypal/'. $this->order->hashCode),
                 'cancel_url' => $this->url->get('/checkout'),
             ] 
         ];

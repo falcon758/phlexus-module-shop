@@ -15,27 +15,30 @@ namespace Phlexus\Modules\Shop\Libraries\Payments;
 
 use Phlexus\Modules\Shop\Models\Order;
 use Phalcon\Di;
+use Phalcon\Url;
+use Phalcon\Http\Response;
+use Phalcon\Flash\Session as FlashSession;
 
 abstract class PaymentAbstract implements PaymentInterface
 {
     /**
      * Url
      * 
-     * @var UrlInterface
+     * @var URL
      */
-    protected UrlInterface $url;
+    protected URL $url;
 
     /**
      * Response
      * 
-     * @var ResponseInterface
+     * @var Response
      */
-    protected ResponseInterface $response;
+    protected Response $response;
 
     /**
      * Flash
      * 
-     * @var Order
+     * @var FlashSession
      */
     protected FlashSession $flash;
 

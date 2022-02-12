@@ -26,6 +26,12 @@ class CallbackController extends Controller
             return $this->response->redirect('checkout');
         }
 
-        return (new Paypal($order))->processCallback();
+        $token = $this->request->get('token');
+
+        if (preg_match('/^[a-zA-Z0-9]+$/', $token) !== 1) {
+            return $this->response->redirect('checkout');
+        }
+
+        return (new Paypal($order))->processCallback($token);
     }
 }

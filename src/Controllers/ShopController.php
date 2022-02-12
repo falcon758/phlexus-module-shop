@@ -185,14 +185,14 @@ class ShopController extends Controller
             $paypal = new Paypal($order);
             $paypal->startPayment();
 
-            return $this->response->redirect('checkout/success');
+            return $this->response->redirect('order/success');
         } else {
-            return $this->response->redirect('checkout/cancel');
+            return $this->response->redirect('order/cancel');
         }
     }
 
     /**
-     * @Get('/checkout/success')
+     * @Get('/order/success')
      */
     public function successAction()
     {
@@ -200,7 +200,7 @@ class ShopController extends Controller
     }
 
     /**
-     * @Get('/checkout/cancel')
+     * @Get('/order/cancel')
      */
     public function cancelAction()
     {

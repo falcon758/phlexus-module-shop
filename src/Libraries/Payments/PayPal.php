@@ -78,36 +78,51 @@ class Paypal extends PaymentAbstract
     /**
      * Process a paymeny callback
      *
+     * @param string $orderID Order id
+     * 
      * @return ResponseInterface
      */
-    public function processCallback(): ResponseInterface {
-        return $this->verifyPayment();
+    public function processCallback(string $orderID): ResponseInterface {
+        return $this->verifyPayment($orderID);
     }
 
     /**
      * Verify a payment
      *
+     * @param string $orderID Order id to verify
+     * 
      * @return ResponseInterface
      */
-    public function verifyPayment(): ResponseInterface {
-        $request = new OrdersCaptureRequest("APPROVED-ORDER-ID");
-        $request->prefer('return=representation');
-        try {
-            $response = $client->execute($request);
-            
-            print_r($response);
-            exit();
-        } catch (HttpException $e) {
-            return $this->response->redirect('checkout');
+    public function verifyPayment(string $orderID): ResponseInterface {
+        if ($this->isPaid($orderID)) {
+            return $this->response->redirect('/order/success');
         }
+
+        $this->flash->error('Unable to process payment!');
+
+        return $this->response->redirect('/checkout');
     }
 
     /**
      * Check if it's paid
      *
+     * @param string $orderID Order id to verify
+     * 
      * @return bool
      */
-    public function isPaid(): bool {
+    public function isPaid(string $orderID): bool {
+        $request = new OrdersCaptureRequest($orderID);
+        $request->prefer('return=representation');
+        try {
+            $response = Di::getDefault()->getShared('paypal')->execute($request);
+            
+            if ($response->statusCode === 200 && $response->result->status === 'COMPLETED') {
+                return true;
+            }
+        } catch (HttpException $e) {
+            return false;
+        }
 
+        return false;
     }
 }

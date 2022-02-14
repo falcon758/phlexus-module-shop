@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Phlexus\Modules\Shop\Models;
 
 use Phalcon\Mvc\Model;
+use Phalcon\Di;
 use Phlexus\Modules\BaseUser\Models\User;
 
 /**
@@ -28,6 +29,8 @@ class Order extends Model
     public $id;
 
     public $hashCode;
+    
+    public $paid;
 
     public $status;
 
@@ -82,6 +85,8 @@ class Order extends Model
         ]);
 
         $this->hasMany('id', Item::class, 'orderID', ['alias' => 'items']);
+
+        $this->hasMany('id', OrderAttributes::class, 'orderID', ['alias' => 'order_attributes']);
     }
 
     /**
@@ -119,6 +124,25 @@ class Order extends Model
     }
 
     /**
+     * Set order as paid
+     * 
+     * @return bool
+     */
+    public function paidOrder(): bool {
+        $this->paid = 1;
+        return $this->save();
+    }
+
+    /**
+     * Is order paid
+     * 
+     * @return bool
+     */
+    public function isPaid(): bool {
+        return $this->paid === 1;
+    }
+
+    /**
      * Create order
      * 
      * @param int $userId           User to assign order to
@@ -136,7 +160,7 @@ class Order extends Model
         int $paymentMethod, int $shippingMethod
     ): Order {
         $order = new self;
-        $order->hashCode         = $this->security->getRandom()->base64Safe(self::HASHLENGTH);
+        $order->hashCode         = Di::getDefault()->getShared('security')->getRandom()->base64Safe(self::HASHLENGTH);
         $order->userID           = $userId;
         $order->billingID        = $billingId;
         $order->shipmentID       = $shipmentID;
@@ -149,5 +173,39 @@ class Order extends Model
         }
 
         return $order;
+    }
+
+    /**
+     * Get Multiple Attributes
+     * 
+     * @param array $names Array of names to retrieve
+     * 
+     * @return array
+     */
+    public function getAttributes(array $names): array
+    {
+
+    }
+
+    /**
+     * Set Multiple Attributes
+     * 
+     * @param array $attributes Array of names to set
+     * 
+     * @return bool
+     */
+    public function setAttributes(array $attributes): bool
+    {
+        foreach ($attributes as $key => $value) {
+            $attribute          = new OrderAttributes();
+            $attribute->name    = $key;
+            $attribute->value   = $value;
+            $attribute->orderID = $this->id;
+            if (!$attribute->save()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

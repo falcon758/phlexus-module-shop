@@ -16,7 +16,7 @@ use Phlexus\Modules\Shop\Models\Item;
 use Phlexus\Modules\Shop\Models\PaymentMethod;
 use Phlexus\Modules\Shop\Form\CheckoutForm;
 use Phlexus\Modules\BaseUser\Models\User;
-use Phlexus\Modules\Shop\Libraries\Payments\PayPal;
+use Phlexus\Modules\Shop\Libraries\Payments\PaymentFactory;
 
 
 /**
@@ -122,9 +122,6 @@ class ShopController extends Controller
             return $this->response->redirect('cart');
         }
 
-        $paypal = new Paypal(Order::findFirstByid(23));
-        $paypal->startPayment();
-
         $this->view->setVar('products', $products);
         $this->view->setVar('orderRoute', '/checkout/order');
         $this->view->setVar('csrfToken', $this->security->getToken());
@@ -181,11 +178,9 @@ class ShopController extends Controller
 
         $order = $this->createOrder($billing, $shipment, $paymentMethod, $shippingMethod, $country);
 
-        if ($order !== null && $paymentMethod === PaymentMethod::Paypal) {
-            $paypal = new Paypal($order);
-            $paypal->startPayment();
-
-            return $this->response->redirect('order/success');
+        if ($order !== null) {
+            $payment = (new PaymentFactory())->build($order);
+            return $payment->startPayment();
         } else {
             return $this->response->redirect('order/cancel');
         }

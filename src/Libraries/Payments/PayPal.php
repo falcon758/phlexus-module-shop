@@ -20,6 +20,8 @@ use PayPalCheckoutSdk\Orders\OrdersCaptureRequest;
 
 class Paypal extends PaymentAbstract
 {
+    private const PAYPALORDER = 'paypal_order_id';
+
     /**
      * Start payment process
      *
@@ -60,7 +62,9 @@ class Paypal extends PaymentAbstract
             }
 
             foreach ($response->result->links as $link) {
-                if ($link->rel === 'approve') {
+                if ($link->rel === 'approve' && $this->order->setAttributes([
+                    self::PAYPALORDER => $response->result->id
+                ])) {
                     return $this->response->redirect($link->href);
                 }
             }
@@ -94,13 +98,19 @@ class Paypal extends PaymentAbstract
      * @return ResponseInterface
      */
     public function verifyPayment(string $orderID): ResponseInterface {
-        if ($this->isPaid($orderID)) {
-            return $this->response->redirect('/order/success');
+        if ($this->order->isPaid()) {
+            $this->flash->warning('Order already paid!');
+
+            return $this->response->redirect('products');
+        } else if ($this->isPaid($orderID)) {
+            $this->order->paidOrder();
+
+            return $this->response->redirect('order/success');
         }
 
         $this->flash->error('Unable to process payment!');
 
-        return $this->response->redirect('/checkout');
+        return $this->response->redirect('checkout');
     }
 
     /**
@@ -115,8 +125,8 @@ class Paypal extends PaymentAbstract
         $request->prefer('return=representation');
         try {
             $response = Di::getDefault()->getShared('paypal')->execute($request);
-            
-            if ($response->statusCode === 200 && $response->result->status === 'COMPLETED') {
+
+            if ($response->statusCode === 201 && $response->result->status === 'COMPLETED') {
                 return true;
             }
         } catch (HttpException $e) {

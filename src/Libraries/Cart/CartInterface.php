@@ -18,21 +18,21 @@ interface CartInterface
     /**
      * Add product to cart
      * 
-     * @param int $productId
+     * @param int $productID
      * @param int $quantity
      *
      * @return bool
      */
-    public function addProduct(int $productId, int $quantity = 1): bool;
+    public function addProduct(int $productID, int $quantity = 1): bool;
 
     /**
      * Remove product from cart
      *
-     * @param int $productId
+     * @param int $productID
      * 
      * @return bool
      */
-    public function removeProduct(int $productId): bool;
+    public function removeProduct(int $productID): bool;
 
     /**
      * Has products

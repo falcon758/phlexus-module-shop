@@ -42,14 +42,14 @@ class Cart implements CartInterface
     /**
      * Add product to cart
      * 
-     * @param int $productId
+     * @param int $productID
      * @param int $quantity
      *
      * @return bool
      */
-    public function addProduct(int $productId, int $quantity = 1): bool
+    public function addProduct(int $productID, int $quantity = 1): bool
     {
-        $modelProduct = Product::findFirstByid($productId);
+        $modelProduct = Product::findFirstByid($productID);
         if ($modelProduct === null) {
             return false;
         }
@@ -60,7 +60,7 @@ class Cart implements CartInterface
 
         $added = false;
         foreach ($cart as &$cartProduct) {
-            if ($cartProduct['id'] == $productId) {
+            if ($cartProduct['id'] == $productID) {
                 $cartProduct['quantity'] += $quantity;
                 $added = true;
                 break;
@@ -80,16 +80,16 @@ class Cart implements CartInterface
     /**
      * Remove product from cart
      *
-     * @param int $productId
+     * @param int $productID
      * 
      * @return bool
      */
-    public function removeProduct(int $productId): bool
+    public function removeProduct(int $productID): bool
     {
         $cart = $this->getProducts();
 
         foreach ($cart as $key => $product) {
-            if ($product['id'] == $productId) {
+            if ($product['id'] == $productID) {
                 unset($cart[$key]);
                 break;
             }

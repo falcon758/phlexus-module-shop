@@ -51,24 +51,24 @@ class Item extends Model
     /**
      * Create items
      * 
-     * @param int $productId Product id to assign
-     * @param int $orderId   Order id to assign
+     * @param int $productID Product id to assign
+     * @param int $orderID   Order id to assign
      *
      * @return Item
      * 
      * @throws Exception
      */
-    public static function createItem(int $productId, int $orderId): Item {
+    public static function createItem(int $productID, int $orderID): Item {
         $item = new self;
 
-        $product = Product::findFirstByid($productId);
+        $product = Product::findFirstByid($productID);
 
         if (!$product) {
             throw new \Exception('Product doesn\'t exists');
         }
 
-        $item->productID = $productId;
-        $item->orderID = $orderId;
+        $item->productID = $productID;
+        $item->orderID = $orderID;
 
         if (!$item->save()) {
             throw new \Exception('Unable to process item');

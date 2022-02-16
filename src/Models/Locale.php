@@ -47,20 +47,20 @@ class Locale extends Model
      * Create locale or return if exists
      * 
      * @param string $name      Locale to create
-     * @param int    $countryId Country id to assign
+     * @param int    $countryID Country id to assign
      *
      * @return Locale
      * 
      * @throws Exception
      */
-    public static function createLocale(string $name, int $countryId): Locale {
+    public static function createLocale(string $name, int $countryID): Locale {
         $name = trim($name);
 
         $locale = self::findFirst([
             'conditions' => 'active = :active: AND countryID = :country_id: AND name = :name:',
             'bind'       => [
                 'active'     => self::ENABLED,
-                'country_id' => $countryId,
+                'country_id' => $countryID,
                 'name'       => $name,
             ],
         ]);
@@ -71,7 +71,7 @@ class Locale extends Model
 
         $locale = new self;
         $locale->name = $name;
-        $locale->countryID = $countryId;
+        $locale->countryID = $countryID;
 
         if (preg_match('/^[a-zA-Z]+$/', $name) !== 1 || !$locale->save()) {
             throw new \Exception('Unable to process local');

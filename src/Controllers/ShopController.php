@@ -66,14 +66,14 @@ class ShopController extends Controller
     /**
      * @Post('/add/{id:[0-9]+}')
      *
-     * @param int $productId
+     * @param int $productID
      * @return ResponseInterface
      */
-    public function addAction(int $productId): ResponseInterface
+    public function addAction(int $productID): ResponseInterface
     {
         if (
             !$this->security->checkToken('csrf', $this->request->getPost('csrf', null))
-            || !$this->cart->addProduct($productId) 
+            || !$this->cart->addProduct($productID) 
         ) {
             return $this->response->setJsonContent([
                 'success' => false,
@@ -90,10 +90,10 @@ class ShopController extends Controller
     /**
      * @Get('/remove/{id:[0-9]+}')
      *
-     * @param int $productId
+     * @param int $productID
      * @return ResponseInterface
      */
-    public function removeAction(int $productId): ResponseInterface
+    public function removeAction(int $productID): ResponseInterface
     {
         if (!$this->security->checkToken('csrf', $this->request->getPost('csrf', null))) {
             return $this->response->setJsonContent([
@@ -102,7 +102,7 @@ class ShopController extends Controller
             ]);
         }
 
-        $this->cart->removeProduct($productId);
+        $this->cart->removeProduct($productID);
 
         $this->flash->success('Product removed successfully!');
 
@@ -217,14 +217,14 @@ class ShopController extends Controller
         int $shippingMethod, int $country
     ) {
         try {
-            $billingId = Address::createAddress(
+            $billingID = Address::createAddress(
                 $billing['address'],
                 $billing['post_code'],
                 $billing['locale'],
                 $country
             );
 
-            $shipmentId = Address::createAddress(
+            $shipmentID = Address::createAddress(
                 $shipment['address'],
                 $shipment['post_code'],
                 $shipment['locale'],
@@ -234,29 +234,29 @@ class ShopController extends Controller
             // Get current logged user
             $user = User::getUser();
 
-            $userId = null;
+            $userID = null;
 
             if ($user) {
-                $userId = (int) $user->id;
+                $userID = (int) $user->id;
             } else {
                 // @ToDo: Change to a temp user or force register/login
-                $userId = 0;
+                $userID = 0;
             }
 
             $billingUserAddress = UserAddress::createUserAddress(
-                $userId,
-                (int) $billingId->id,
+                $userID,
+                (int) $billingID->id,
                 AddressType::BILLING
             );
 
             $shippingUserAddress = UserAddress::createUserAddress(
-                $userId,
-                (int) $shipmentId->id,
+                $userID,
+                (int) $shipmentID->id,
                 AddressType::SHIPPING
             );
 
             $order = Order::createOrder(
-                $userId, (int) $billingUserAddress->id, (int) $shippingUserAddress->id,
+                $userID, (int) $billingUserAddress->id, (int) $shippingUserAddress->id,
                 $paymentMethod, $shippingMethod
             );
 

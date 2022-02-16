@@ -59,21 +59,21 @@ class UserAddress extends Model
     /**
      * Create user address or return if exists
      * 
-     * @param int $userId        User to assign address to
-     * @param int $addressId     Address id to assign
-     * @param int $addressTypeId Address type id to assign
+     * @param int $userID        User to assign address to
+     * @param int $addressID     Address id to assign
+     * @param int $addressTypeID Address type id to assign
      *
      * @return UserAddress
      */
-    public static function createUserAddress(int $userId, int $addressId, int $addressTypeId): UserAddress {
+    public static function createUserAddress(int $userID, int $addressID, int $addressTypeID): UserAddress {
         $newUserAddress = self::findFirst(
             [
                 'conditions' => 'active = :active: AND addressID = :address_id: 
                                 AND addressTypeID = :address_type_id:',
                 'bind'       => [
                     'active'          => UserAddress::ENABLED,
-                    'address_id'      => $addressId,
-                    'address_type_id' => $addressTypeId
+                    'address_id'      => $addressID,
+                    'address_type_id' => $addressTypeID
                 ],
             ]
         );
@@ -83,9 +83,9 @@ class UserAddress extends Model
         }
 
         $newUserAddress                = new self;
-        $newUserAddress->userID        = $userId;
-        $newUserAddress->addressID     = $addressId;
-        $newUserAddress->addressTypeID = $addressTypeId;
+        $newUserAddress->userID        = $userID;
+        $newUserAddress->addressID     = $addressID;
+        $newUserAddress->addressTypeID = $addressTypeID;
 
         if (!$newUserAddress->save()) {
             throw new \Exception('Unable to process user address');

@@ -102,21 +102,21 @@ class Address extends Model
                 'class' => Address::class,
                 'field' => 'address',
                 'related' => [
-                    'postCodeID' => 'postCodeId'
+                    'postCodeID' => 'postCodeID'
                 ]
             ],
             'postCode' => [
                 'class' => PostCode::class,
                 'field' => 'post_code',
                 'related' => [
-                    'localeID' => 'localeId'
+                    'localeID' => 'localeID'
                 ]
             ],
             'locale'   => [
                 'class' => Locale::class,
                 'field' => 'name',
                 'related' => [
-                    'countryID' => 'countryId'
+                    'countryID' => 'countryID'
                 ]
             ]
         ];
@@ -124,9 +124,9 @@ class Address extends Model
         $orderKeys = array_keys($orderFlow);
 
         $position = 0;
-        $addressId = null;
-        $postCodeId = null;
-        $localeId = null;
+        $addressID = null;
+        $postCodeID = null;
+        $localeID = null;
         while (count($orderFlow) > 0) {
             $value   = key($orderFlow);
             $model   = current($orderFlow);
@@ -152,7 +152,7 @@ class Address extends Model
 
             $isLast = $position === count($orderFlow) - 1;
             if ($record) {
-                ${$value . 'Id'} = $record->id;
+                ${$value . 'ID'} = $record->id;
 
                 if ($isLast) {
                     unset($orderFlow[$value]);

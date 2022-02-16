@@ -145,8 +145,8 @@ class Order extends Model
     /**
      * Create order
      * 
-     * @param int $userId           User to assign order to
-     * @param int $billingId        Billing id to assign
+     * @param int $userID           User to assign order to
+     * @param int $billingID        Billing id to assign
      * @param int $shipmentID       Shipment id to assign
      * @param int $paymentMethodID  Payment method id to assign
      * @param int $shippingMethodID Shipping method id to assign
@@ -156,13 +156,13 @@ class Order extends Model
      * @throws Exception
      */
     public static function createOrder(
-        int $userId, int $billingId, int $shipmentID,
+        int $userID, int $billingID, int $shipmentID,
         int $paymentMethod, int $shippingMethod
     ): Order {
         $order = new self;
         $order->hashCode         = Di::getDefault()->getShared('security')->getRandom()->base64Safe(self::HASHLENGTH);
-        $order->userID           = $userId;
-        $order->billingID        = $billingId;
+        $order->userID           = $userID;
+        $order->billingID        = $billingID;
         $order->shipmentID       = $shipmentID;
         $order->paymentMethodID  = $paymentMethod;
         $order->shippingMethodID = $shippingMethod;

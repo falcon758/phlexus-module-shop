@@ -71,7 +71,7 @@ class PostCode extends Model
         $newPostcode->post_code = $postcode;
         $newPostcode->localeID = $localeID;
 
-        if (preg_match('/^[0-9]+-[0-9]+$/', $post_code) !== 1 || !$newPostcode->save()) {
+        if (preg_match('/^[0-9]+-[0-9]+$/', $postcode) !== 1 || !$newPostcode->save()) {
             throw new \Exception('Unable to process post code');
         }
 

@@ -98,6 +98,12 @@ class Paypal extends PaymentAbstract
      * @return ResponseInterface
      */
     public function verifyPayment(string $orderID): ResponseInterface {
+        $attribute = $this->order->getAttributes([self::PAYPALORDER]);
+
+        if (count($attribute) === 0 || $attribute[0]['value'] !== $orderID) {
+            return $this->response->redirect('products');
+        }
+        
         if ($this->order->isPaid()) {
             $this->flash->warning('Order already paid!');
 

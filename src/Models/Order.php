@@ -184,7 +184,22 @@ class Order extends Model
      */
     public function getAttributes(array $names): array
     {
+        if (count($names) === 0) {
+            return [];
+        }
 
+        $inQuery = '?' . implode(', ?', range(1, count($names)));
+
+        $values = array_merge([$this->id], $names);
+
+        $attributes = OrderAttributes::find(
+            [
+                'orderID = ?0 AND name IN (' . $inQuery . ')',
+                'bind' => $values
+            ]
+        );
+
+        return $attributes->toArray();
     }
 
     /**

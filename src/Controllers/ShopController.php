@@ -104,9 +104,10 @@ class ShopController extends Controller
 
         $this->cart->removeProduct($productID);
 
-        $this->flash->success('Product removed successfully!');
-
-        return $this->response->redirect('cart');
+        return $this->response->setJsonContent([
+            'success' => true,
+            'message' => 'Product removed successfully!',
+        ]);
     }
 
     /**

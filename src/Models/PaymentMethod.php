@@ -18,16 +18,34 @@ class PaymentMethod extends Model
 
     public const PAYPAL = 1;
 
+    /**
+     * @var int
+     */
     public $id;
 
+    /**
+     * @var string
+     */
     public $name;
 
+    /**
+     * @var int
+     */
     public $active;
 
+    /**
+     * @var int
+     */
     public $postCodeID;
 
+    /**
+     * @var string
+     */
     public $createdAt;
 
+    /**
+     * @var string
+     */
     public $modifiedAt;
 
     /**

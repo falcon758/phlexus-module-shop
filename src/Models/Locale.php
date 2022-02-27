@@ -16,16 +16,34 @@ class Locale extends Model
 
     public const ENABLED = 1;
 
+    /**
+     * @var int
+     */
     public $id;
 
+    /**
+     * @var string
+     */
     public $name;
 
+    /**
+     * @var int
+     */
     public $active;
 
+    /**
+     * @var int
+     */
     public $countryID;
 
+    /**
+     * @var string
+     */
     public $createdAt;
 
+    /**
+     * @var string
+     */
     public $modifiedAt;
 
     /**

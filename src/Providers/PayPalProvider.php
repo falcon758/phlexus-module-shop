@@ -19,6 +19,8 @@ class PayPalProvider extends AbstractProvider
     protected $providerName = 'paypal';
 
     /**
+     * Register provider
+     * 
      * @param array $parameters
      */
     public function register(array $parameters = []): void

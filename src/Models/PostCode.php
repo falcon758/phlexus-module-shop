@@ -16,16 +16,34 @@ class PostCode extends Model
 
     public const ENABLED = 1;
 
+    /**
+     * @var int
+     */
     public $id;
 
+    /**
+     * @var string
+     */
     public $post_code;
 
+    /**
+     * @var int
+     */
     public $active;
 
+    /**
+     * @var int
+     */
     public $localeID;
 
+    /**
+     * @var int
+     */
     public $createdAt;
 
+    /**
+     * @var int
+     */
     public $modifiedAt;
 
     /**

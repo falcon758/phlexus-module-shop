@@ -20,14 +20,34 @@ class AddressType extends Model
 
     public const SHIPPING = 2; 
 
+    /**
+     * @var int
+     */
     public $id;
 
+    /**
+     * @var string
+     */
+    public $address_type;
+
+    /**
+     * @var int
+     */
     public $active;
 
+    /**
+     * @var int
+     */
     public $postCodeID;
 
+    /**
+     * @var string
+     */
     public $createdAt;
 
+    /**
+     * @var string
+     */
     public $modifiedAt;
 
     /**

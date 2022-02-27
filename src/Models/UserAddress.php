@@ -17,18 +17,39 @@ class UserAddress extends Model
 
     public const ENABLED = 1;
 
+    /**
+     * @var int
+     */
     public $id;
 
+    /**
+     * @var int
+     */
     public $active;
 
+    /**
+     * @var int
+     */
     public $userID;
 
+    /**
+     * @var int
+     */
     public $addressID;
 
+    /**
+     * @var int
+     */
     public $addressTypeID;
 
+    /**
+     * @var string
+     */
     public $createdAt;
 
+    /**
+     * @var string
+     */
     public $modifiedAt;
 
     /**

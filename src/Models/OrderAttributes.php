@@ -16,18 +16,39 @@ class OrderAttributes extends Model
 
     public const ENABLED = 1;
 
+    /**
+     * @var int
+     */
     public $id;
 
+    /**
+     * @var string
+     */
     public $name;
 
+    /**
+     * @var string
+     */
     public $value;
 
+    /**
+     * @var int
+     */
     public $active;
 
+    /**
+     * @var int
+     */
     public $orderID;
 
+    /**
+     * @var string
+     */
     public $createdAt;
 
+    /**
+     * @var string
+     */
     public $modifiedAt;
 
     /**

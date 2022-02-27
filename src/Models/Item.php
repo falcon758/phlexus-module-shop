@@ -16,16 +16,34 @@ class Item extends Model
 
     public const ENABLED = 1;
 
+    /**
+     * @var int
+     */
     public $id;
 
+    /**
+     * @var int
+     */
     public $active;
 
+    /**
+     * @var int
+     */
     public $productID;
 
+    /**
+     * @var int
+     */
     public $orderID;
 
+    /**
+     * @var string
+     */
     public $createdAt;
 
+    /**
+     * @var string
+     */
     public $modifiedAt;
 
     /**

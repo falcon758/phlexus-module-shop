@@ -26,28 +26,64 @@ class Order extends Model
 
     private const HASHLENGTH = 40;
 
+    /**
+     * @var int
+     */
     public $id;
 
+    /**
+     * @var string
+     */
     public $hashCode;
     
+    /**
+     * @var int
+     */
     public $paid;
 
+    /**
+     * @var int
+     */
     public $status;
 
+    /**
+     * @var int
+     */
     public $active;
 
+    /**
+     * @var int
+     */
     public $userID;
 
+    /**
+     * @var int
+     */
     public $billingID;
 
+    /**
+     * @var int
+     */
     public $shipmentID;
 
+    /**
+     * @var int
+     */
     public $paymentMethodID;
 
+    /**
+     * @var int
+     */
     public $shippingMethodID;
 
+    /**
+     * @var string
+     */
     public $createdAt;
 
+    /**
+     * @var string
+     */
     public $modifiedAt;
 
     /**

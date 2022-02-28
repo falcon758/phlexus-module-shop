@@ -50,6 +50,7 @@ class Module extends PhlexusModule
      * Registers an autoloader related to the module.
      *
      * @param DiInterface $di
+     *
      * @return void
      */
     public function registerAutoloaders(DiInterface $di = null): void
@@ -64,7 +65,10 @@ class Module extends PhlexusModule
     }
 
     /**
+     * Register Services
+     * 
      * @param DiInterface|null $di
+     * 
      * @return void
      */
     public function registerServices(DiInterface $di = null): void

@@ -24,7 +24,7 @@ class PostCode extends Model
     /**
      * @var string
      */
-    public $post_code;
+    public $postCode;
 
     /**
      * @var int
@@ -56,7 +56,7 @@ class PostCode extends Model
         $this->setSource('post_codes');
 
         $this->hasOne('localeID', Locale::class, 'id', [
-            'alias'    => 'Locale',
+            'alias'    => 'locale',
             'reusable' => true,
         ]);
     }
@@ -73,11 +73,11 @@ class PostCode extends Model
         $postcode = trim($postcode);
 
         $newPostcode = self::findFirst([
-            'conditions' => 'active = :active: AND localeID = :locale_id: AND post_code = :post_code:',
+            'conditions' => 'active = :active: AND localeID = :locale_id: AND postCode = :postCode:',
             'bind'       => [
                 'active'    => self::ENABLED,
                 'locale_id' => $localeID,
-                'post_code' => $postcode,
+                'postCode' => $postcode,
             ],
         ]);
 
@@ -86,7 +86,7 @@ class PostCode extends Model
         }
 
         $newPostcode = new self;
-        $newPostcode->post_code = $postcode;
+        $newPostcode->postCode = $postcode;
         $newPostcode->localeID = $localeID;
 
         if (preg_match('/^[0-9]+-[0-9]+$/', $postcode) !== 1 || !$newPostcode->save()) {

@@ -101,28 +101,28 @@ class Order extends Model
         ]);
 
         $this->hasOne('billingID', UserAddress::class, 'id', [
-            'alias'    => 'billing_address',
+            'alias'    => 'billingAddress',
             'reusable' => true,
         ]);
 
         $this->hasOne('shipmentID', UserAddress::class, 'id', [
-            'alias'    => 'shipment_address',
+            'alias'    => 'shipmentAddress',
             'reusable' => true,
         ]);
 
         $this->hasOne('paymentMethodID', PaymentMethod::class, 'id', [
-            'alias'    => 'payment_method',
+            'alias'    => 'paymentMethod',
             'reusable' => true,
         ]);
 
         $this->hasOne('shippingMethodID', ShippingMethod::class, 'id', [
-            'alias'    => 'shipping_method',
+            'alias'    => 'shippingMethod',
             'reusable' => true,
         ]);
 
         $this->hasMany('id', Item::class, 'orderID', ['alias' => 'items']);
 
-        $this->hasMany('id', OrderAttributes::class, 'orderID', ['alias' => 'order_attributes']);
+        $this->hasMany('id', OrderAttributes::class, 'orderID', ['alias' => 'orderAttributes']);
     }
 
     /**
@@ -134,7 +134,7 @@ class Order extends Model
         $items = [];
 
         foreach ($this->items as $item) {
-            $items[] = $item->Product->toArray();
+            $items[] = $item->product->toArray();
         }
 
         return $items;

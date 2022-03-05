@@ -56,7 +56,7 @@ class Address extends Model
         $this->setSource('address');
 
         $this->hasOne('postCodeID', PostCode::class, 'id', [
-            'alias'    => 'PostCode',
+            'alias'    => 'postCode',
             'reusable' => true,
         ]);
     }
@@ -81,10 +81,10 @@ class Address extends Model
         $address = trim($address);
 
         $newAddress = self::findFirst([
-            'conditions' => 'active = :active: AND postCodeID = :post_code_id: AND address = :address:',
+            'conditions' => 'active = :active: AND postCodeID = :postCodeID: AND address = :address:',
             'bind'       => [
                 'active'    => self::ENABLED,
-                'post_code_id' => $newPostCode->id,
+                'postCodeID' => $newPostCode->id,
                 'address' => $address,
             ],
         ]);
@@ -125,7 +125,7 @@ class Address extends Model
             ],
             'postCode' => [
                 'class' => PostCode::class,
-                'field' => 'post_code',
+                'field' => 'postCode',
                 'related' => [
                     'localeID' => 'localeID'
                 ]
@@ -176,8 +176,8 @@ class Address extends Model
                     unset($orderFlow[$value]);
                     reset($orderFlow);
                 } else {
-                    $prev_position = $position - 1;
-                    $orderFlow = array_slice($orderFlow, 0, $prev_position >= 0 ? $prev_position : 0);
+                    $prevPosition = $position - 1;
+                    $orderFlow = array_slice($orderFlow, 0, $prevPosition >= 0 ? $prevPosition : 0);
                 }
             } elseif ($isLast) {
                 $newModel = new $class;

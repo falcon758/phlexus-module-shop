@@ -56,7 +56,7 @@ class Locale extends Model
         $this->setSource('locale');
 
         $this->hasOne('countryID', Country::class, 'id', [
-            'alias'    => 'Country',
+            'alias'    => 'country',
             'reusable' => true,
         ]);
     }

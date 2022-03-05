@@ -28,7 +28,7 @@ class AddressType extends Model
     /**
      * @var string
      */
-    public $address_type;
+    public $addressType;
 
     /**
      * @var int

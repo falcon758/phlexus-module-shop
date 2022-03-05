@@ -165,14 +165,14 @@ class ShopController extends Controller
 
         $billing = [
             'address'   => $address,
-            'post_code' => $postCode,
+            'postCode'  => $postCode,
             'locale'    => $locale,
             'country'   => $country
         ];
 
         $shipment = [
             'address'   => $address,
-            'post_code' => $postCode,
+            'postCode'  => $postCode,
             'locale'    => $locale,
             'country'   => $country
         ];
@@ -220,14 +220,14 @@ class ShopController extends Controller
         try {
             $billingID = Address::createAddress(
                 $billing['address'],
-                $billing['post_code'],
+                $billing['postCode'],
                 $billing['locale'],
                 $country
             );
 
             $shipmentID = Address::createAddress(
                 $shipment['address'],
-                $shipment['post_code'],
+                $shipment['postCode'],
                 $shipment['locale'],
                 $country
             );

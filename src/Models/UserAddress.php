@@ -72,7 +72,7 @@ class UserAddress extends Model
         ]);
 
         $this->hasOne('addressTypeID', AddressType::class, 'id', [
-            'alias'    => 'address_type',
+            'alias'    => 'addressType',
             'reusable' => true,
         ]);
     }
@@ -89,12 +89,12 @@ class UserAddress extends Model
     public static function createUserAddress(int $userID, int $addressID, int $addressTypeID): UserAddress {
         $newUserAddress = self::findFirst(
             [
-                'conditions' => 'active = :active: AND addressID = :address_id: 
-                                AND addressTypeID = :address_type_id:',
+                'conditions' => 'active = :active: AND addressID = :addressID: 
+                                AND addressTypeID = :addressTypeID:',
                 'bind'       => [
                     'active'          => UserAddress::ENABLED,
-                    'address_id'      => $addressID,
-                    'address_type_id' => $addressTypeID
+                    'addressID'      => $addressID,
+                    'addressTypeID' => $addressTypeID
                 ],
             ]
         );

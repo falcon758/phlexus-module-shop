@@ -37,16 +37,16 @@ class checkoutForm extends CaptchaForm
             'placeholder' => 'Address'
         ]);
 
-        $post_code = new Text('post_code', [
+        $postCode = new Text('post_code', [
             'required' => true,
             'class' => 'form-control',
             'placeholder' => 'Post Code'
         ]);
 
-        $country_data = Country::find();
+        $countryData = Country::find();
         $country = new Select(
             'country',
-            $country_data,
+            $countryData,
             [
                 'using' => ['id', 'country'],
                 'required' => true,
@@ -55,10 +55,10 @@ class checkoutForm extends CaptchaForm
             ]
         );
 
-        $payment_method_data = PaymentMethod::find();
-        $payment_method = new Select(
+        $paymentMethodData = PaymentMethod::find();
+        $paymentMethod = new Select(
             'payment_method',
-            $payment_method_data,
+            $paymentMethodData,
             [
                 'using' => ['id', 'name'],
                 'required' => true,
@@ -67,10 +67,10 @@ class checkoutForm extends CaptchaForm
             ]
         );
 
-        $shipping_method_data = ShippingMethod::find();
-        $shipping_method = new Select(
+        $shippingMethodData = ShippingMethod::find();
+        $shippingMethod = new Select(
             'shipping_method',
-            $shipping_method_data,
+            $shippingMethodData,
             [
                 'using' => ['id', 'name'],
                 'required' => true,
@@ -90,7 +90,7 @@ class checkoutForm extends CaptchaForm
             )
         ]);
 
-        $post_code->addValidators([
+        $postCode->addValidators([
             new PresenceOf(['message' => 'Post Code is required']),
             new Regex(
                 [
@@ -105,35 +105,35 @@ class checkoutForm extends CaptchaForm
             new InclusionIn(
                 [
                     'message' => 'Country is required',
-                    'domain' => array_column($country_data->toArray(), 'id')
+                    'domain' => array_column($countryData->toArray(), 'id')
                 ]
             )
         ]);
 
-        $payment_method->addValidators([
+        $paymentMethod->addValidators([
             new PresenceOf(['message' => 'Payment method is required']),
             new InclusionIn(
                 [
                     'message' => 'Payment Method is required',
-                    'domain' => array_column($payment_method_data->toArray(), 'id')
+                    'domain' => array_column($paymentMethodData->toArray(), 'id')
                 ]
             )
         ]);
 
-        $shipping_method->addValidators([
+        $shippingMethod->addValidators([
             new PresenceOf(['message' => 'Shipping method is required']),
             new InclusionIn(
                 [
                     'message' => 'Payment Method is required',
-                    'domain' => array_column($shipping_method_data->toArray(), 'id')
+                    'domain' => array_column($shippingMethodData->toArray(), 'id')
                 ]
             )
         ]);
 
         $this->add($address);
-        $this->add($post_code);
+        $this->add($postCode);
         $this->add($country);
-        $this->add($payment_method);
-        $this->add($shipping_method);
+        $this->add($paymentMethod);
+        $this->add($shippingMethod);
     }
 }

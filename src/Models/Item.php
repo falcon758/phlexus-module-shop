@@ -56,12 +56,12 @@ class Item extends Model
         $this->setSource('items');
 
         $this->hasOne('productID', Product::class, 'id', [
-            'alias'    => 'Product',
+            'alias'    => 'product',
             'reusable' => true,
         ]);
 
         $this->hasOne('orderID', Order::class, 'id', [
-            'alias'    => 'Order',
+            'alias'    => 'order',
             'reusable' => true,
         ]);
     }

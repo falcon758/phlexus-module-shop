@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Phlexus\Modules\Shop\Models;
 
+use Phlexus\Libraries\Media\Models\Media;
 use Phalcon\Mvc\Model;
 
 /**
@@ -59,5 +60,10 @@ class Product extends Model
     public function initialize()
     {
         $this->setSource('products');
+        
+        $this->hasOne('imageID', Media::class, 'id', [
+            'alias'    => 'media',
+            'reusable' => true,
+        ]);
     }
 }

@@ -19,7 +19,7 @@ class OrderAttributes extends Model
     /**
      * @var int
      */
-    public int $id;
+    public $id;
 
     /**
      * @var string
@@ -32,9 +32,9 @@ class OrderAttributes extends Model
     public string $value;
 
     /**
-     * @var int
+     * @var int|null
      */
-    public int $active;
+    public $active;
 
     /**
      * @var int
@@ -42,14 +42,14 @@ class OrderAttributes extends Model
     public int $orderID;
 
     /**
-     * @var string
+     * @var string|null
      */
-    public string $createdAt;
+    public $createdAt;
 
     /**
-     * @var string
+     * @var string|null
      */
-    public string $modifiedAt;
+    public $modifiedAt;
 
     /**
      * Initialize

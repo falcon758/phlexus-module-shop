@@ -20,12 +20,12 @@ class UserAddress extends Model
     /**
      * @var int
      */
-    public int $id;
+    public $id;
 
     /**
-     * @var int
+     * @var int|null
      */
-    public int $active;
+    public $active;
 
     /**
      * @var int
@@ -43,14 +43,14 @@ class UserAddress extends Model
     public int $addressTypeID;
 
     /**
-     * @var string
+     * @var string|null
      */
-    public string $createdAt;
+    public $createdAt;
 
     /**
-     * @var string
+     * @var string|null
      */
-    public string $modifiedAt;
+    public $modifiedAt;
 
     /**
      * Initialize

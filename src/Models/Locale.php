@@ -19,7 +19,7 @@ class Locale extends Model
     /**
      * @var int
      */
-    public int $id;
+    public $id;
 
     /**
      * @var string
@@ -27,9 +27,9 @@ class Locale extends Model
     public string $name;
 
     /**
-     * @var int
+     * @var int|null
      */
-    public int $active;
+    public $active;
 
     /**
      * @var int
@@ -37,14 +37,14 @@ class Locale extends Model
     public int $countryID;
 
     /**
-     * @var string
+     * @var string|null
      */
-    public string $createdAt;
+    public $createdAt;
 
     /**
-     * @var string
+     * @var string|null
      */
-    public string $modifiedAt;
+    public $modifiedAt;
 
     /**
      * Initialize

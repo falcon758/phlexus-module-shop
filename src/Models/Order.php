@@ -29,7 +29,7 @@ class Order extends Model
     /**
      * @var int
      */
-    public int $id;
+    public $id;
 
     /**
      * @var string
@@ -37,19 +37,19 @@ class Order extends Model
     public string $hashCode;
     
     /**
-     * @var int
+     * @var int|null
      */
-    public int $paid;
+    public $paid;
 
     /**
-     * @var int
+     * @var int|null
      */
-    public int $status;
+    public $status;
 
     /**
-     * @var int
+     * @var int|null
      */
-    public int $active;
+    public $active;
 
     /**
      * @var int
@@ -77,14 +77,14 @@ class Order extends Model
     public int $shippingMethodID;
 
     /**
-     * @var string
+     * @var string|null
      */
-    public string $createdAt;
+    public $createdAt;
 
     /**
-     * @var string
+     * @var string|null
      */
-    public string $modifiedAt;
+    public $modifiedAt;
 
     /**
      * Initialize

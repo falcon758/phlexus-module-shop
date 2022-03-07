@@ -19,7 +19,7 @@ class PostCode extends Model
     /**
      * @var int
      */
-    public int $id;
+    public $id;
 
     /**
      * @var string
@@ -27,9 +27,9 @@ class PostCode extends Model
     public string $postCode;
 
     /**
-     * @var int
+     * @var int|null
      */
-    public int $active;
+    public $active;
 
     /**
      * @var int
@@ -37,14 +37,14 @@ class PostCode extends Model
     public int $localeID;
 
     /**
-     * @var int
+     * @var string|null
      */
-    public int $createdAt;
+    public $createdAt;
 
     /**
-     * @var int
+     * @var string|null
      */
-    public int $modifiedAt;
+    public $modifiedAt;
 
     /**
      * Initialize

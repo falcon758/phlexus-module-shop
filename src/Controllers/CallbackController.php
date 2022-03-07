@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Phlexus\Modules\Shop\Controllers;
 
 use Phalcon\Http\ResponseInterface;
-use Phalcon\Mvc\Controller;
 use Phlexus\Modules\Shop\Models\Order;
 use Phlexus\Modules\Shop\Libraries\Payments\PayPal;
 
@@ -13,7 +12,7 @@ use Phlexus\Modules\Shop\Libraries\Payments\PayPal;
  * @RoutePrefix('/payment/callback')
  *
  */
-class CallbackController extends Controller
+class CallbackController extends AbstractController
 {
     /**
      * @Get('/payment/callback/paypal')

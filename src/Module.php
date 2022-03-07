@@ -18,6 +18,7 @@ use Phalcon\Loader;
 use Phalcon\Mvc\View\Engine\Volt;
 use Phlexus\Module as PhlexusModule;
 use Phlexus\Helpers;
+use Phlexus\Modules\BaseUser\Acl\DefaultAcl;
 
 /**
  * User Module
@@ -95,5 +96,9 @@ class Module extends PhlexusModule
 
         $view->setMainView($themePath . '/layouts/public');
         $view->setViewsDir($themePath . '/');
+
+        // Default Acl
+        $acl = new DefaultAcl();
+        $di->set('acl', $acl);
     }
 }

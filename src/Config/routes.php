@@ -10,6 +10,33 @@ $routes = new RouterGroup([
     'action' => 'index',
 ]);
 
+$routes->addGet('/shop/product', [
+    'controller' => 'product',
+    'action' => 'view',
+]);
+
+foreach (['create', 'view'] as $action) {
+    $routes->addGet('/shop/product/' . $action, [
+        'controller' => 'product',
+        'action' => $action,
+    ]);
+}
+
+$routes->addGet('/shop/product/edit/{id:[0-9]+}', [
+    'controller' => 'product',
+    'action' => 'edit',
+]);
+
+$routes->addPost('/shop/product/save', [
+    'controller' => 'product',
+    'action' => 'save',
+]);
+
+$routes->addPost('/shop/product/delete/{id:[0-9]+}', [
+    'controller' => 'product',
+    'action' => 'delete',
+]);
+
 $routes->addGet('/cart', [
     'controller' => 'shop',
     'action' => 'cart',

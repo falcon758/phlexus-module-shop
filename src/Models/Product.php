@@ -27,9 +27,19 @@ class Product extends Model
     public string $name;
 
     /**
+     * @var string
+     */
+    public string $price;
+
+    /**
      * @var int|null
      */
     public $active;
+
+    /**
+     * @var int|null
+     */
+    public $imageID;
 
     /**
      * @var string|null

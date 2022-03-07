@@ -23,7 +23,7 @@ use Phlexus\Modules\Shop\Libraries\Payments\PaymentFactory;
  * @RoutePrefix('/shop')
  *
  */
-class ShopController extends Controller
+class ShopController extends AbstractController
 {
     /**
      * Cart
@@ -37,6 +37,8 @@ class ShopController extends Controller
      */
     public function initialize(): void
     {
+        parent::initialize();
+
         $this->cart = new Cart();
     }
 

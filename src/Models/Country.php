@@ -19,32 +19,32 @@ class Country extends Model
     /**
      * @var int
      */
-    public $id;
+    public int $id;
 
     /**
      * @var string
      */
-    public $iso;
+    public string $iso;
 
     /**
      * @var string
      */
-    public $country;
+    public string $country;
 
     /**
      * @var int
      */
-    public $active;
+    public int $active;
 
     /**
      * @var string
      */
-    public $createdAt;
+    public string $createdAt;
 
     /**
      * @var string
      */
-    public $modifiedAt;
+    public string $modifiedAt;
 
     /**
      * Initialize

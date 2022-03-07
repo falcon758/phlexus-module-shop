@@ -19,32 +19,32 @@ class Item extends Model
     /**
      * @var int
      */
-    public $id;
+    public int $id;
 
     /**
      * @var int
      */
-    public $active;
+    public int $active;
 
     /**
      * @var int
      */
-    public $productID;
+    public int $productID;
 
     /**
      * @var int
      */
-    public $orderID;
+    public int $orderID;
 
     /**
      * @var string
      */
-    public $createdAt;
+    public string $createdAt;
 
     /**
      * @var string
      */
-    public $modifiedAt;
+    public string $modifiedAt;
 
     /**
      * Initialize

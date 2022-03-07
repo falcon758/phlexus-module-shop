@@ -15,6 +15,7 @@ namespace Phlexus\Modules\Shop\Libraries\Cart;
 
 use Phalcon\Di;
 use Phlexus\Modules\Shop\Models\Product;
+use Phalcon\Session\Manager;
 
 class Cart implements CartInterface
 {
@@ -30,7 +31,7 @@ class Cart implements CartInterface
      *
      * @var \Phalcon\Session\Manager
      */
-    protected $session;
+    protected Manager $session;
 
     /**
      * Initialize cart

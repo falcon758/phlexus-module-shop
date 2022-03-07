@@ -19,37 +19,37 @@ class OrderAttributes extends Model
     /**
      * @var int
      */
-    public $id;
+    public int $id;
 
     /**
      * @var string
      */
-    public $name;
+    public string $name;
 
     /**
      * @var string
      */
-    public $value;
+    public string $value;
 
     /**
      * @var int
      */
-    public $active;
+    public int $active;
 
     /**
      * @var int
      */
-    public $orderID;
+    public int $orderID;
 
     /**
      * @var string
      */
-    public $createdAt;
+    public string $createdAt;
 
     /**
      * @var string
      */
-    public $modifiedAt;
+    public string $modifiedAt;
 
     /**
      * Initialize

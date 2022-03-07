@@ -23,32 +23,32 @@ class AddressType extends Model
     /**
      * @var int
      */
-    public $id;
+    public int $id;
 
     /**
      * @var string
      */
-    public $addressType;
+    public string $addressType;
 
     /**
      * @var int
      */
-    public $active;
+    public int $active;
 
     /**
      * @var int
      */
-    public $postCodeID;
+    public int $postCodeID;
 
     /**
      * @var string
      */
-    public $createdAt;
+    public string $createdAt;
 
     /**
      * @var string
      */
-    public $modifiedAt;
+    public string $modifiedAt;
 
     /**
      * Initialize

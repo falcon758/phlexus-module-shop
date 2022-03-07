@@ -28,9 +28,9 @@ class ShopController extends Controller
     /**
      * Cart
      *
-     * @var string
+     * @var Cart
      */
-    private $cart;
+    private Cart $cart;
 
     /**
      * Initialize

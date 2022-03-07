@@ -16,7 +16,7 @@ class PayPalProvider extends AbstractProvider
      *
      * @var string
      */
-    protected $providerName = 'paypal';
+    protected string $providerName = 'paypal';
 
     /**
      * Register provider

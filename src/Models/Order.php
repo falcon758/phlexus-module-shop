@@ -29,62 +29,62 @@ class Order extends Model
     /**
      * @var int
      */
-    public $id;
+    public int $id;
 
     /**
      * @var string
      */
-    public $hashCode;
+    public string $hashCode;
     
     /**
      * @var int
      */
-    public $paid;
+    public int $paid;
 
     /**
      * @var int
      */
-    public $status;
+    public int $status;
 
     /**
      * @var int
      */
-    public $active;
+    public int $active;
 
     /**
      * @var int
      */
-    public $userID;
+    public int $userID;
 
     /**
      * @var int
      */
-    public $billingID;
+    public int $billingID;
 
     /**
      * @var int
      */
-    public $shipmentID;
+    public int $shipmentID;
 
     /**
      * @var int
      */
-    public $paymentMethodID;
+    public int $paymentMethodID;
 
     /**
      * @var int
      */
-    public $shippingMethodID;
+    public int $shippingMethodID;
 
     /**
      * @var string
      */
-    public $createdAt;
+    public string $createdAt;
 
     /**
      * @var string
      */
-    public $modifiedAt;
+    public string $modifiedAt;
 
     /**
      * Initialize

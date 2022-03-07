@@ -251,7 +251,7 @@ class Order extends Model
             $attribute          = new OrderAttributes();
             $attribute->name    = $key;
             $attribute->value   = $value;
-            $attribute->orderID = $this->id;
+            $attribute->orderID = (int) $this->id;
             if (!$attribute->save()) {
                 return false;
             }

@@ -86,7 +86,7 @@ class Item extends Model
         }
 
         $item->productID = $productID;
-        $item->orderID = $orderID;
+        $item->orderID   = $orderID;
 
         if (!$item->save()) {
             throw new \Exception('Unable to process item');

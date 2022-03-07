@@ -87,8 +87,8 @@ class Locale extends Model
             return $locale;
         }
 
-        $locale = new self;
-        $locale->name = $name;
+        $locale            = new self;
+        $locale->name      = $name;
         $locale->countryID = $countryID;
 
         if (preg_match('/^[a-zA-Z]+$/', $name) !== 1 || !$locale->save()) {

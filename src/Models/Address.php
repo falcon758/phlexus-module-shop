@@ -93,9 +93,9 @@ class Address extends Model
             return $newAddress;
         }
 
-        $newAddress          = new self;
-        $newAddress->address = $address;
-        $newAddress->postCodeID = $newPostCode->id;
+        $newAddress             = new self;
+        $newAddress->address    = $address;
+        $newAddress->postCodeID = (int) $newPostCode->id;
 
         if (preg_match('/^[a-zA-Z0-9\s.-]*$/', $address) !== 1 || !$newAddress->save()) {
             throw new \Exception('Unable to process address');
@@ -141,10 +141,10 @@ class Address extends Model
         
         $orderKeys = array_keys($orderFlow);
 
-        $position = 0;
-        $addressID = null;
+        $position   = 0;
+        $addressID  = null;
         $postCodeID = null;
-        $localeID = null;
+        $localeID   = null;
         while (count($orderFlow) > 0) {
             $value   = key($orderFlow);
             $model   = current($orderFlow);

@@ -34,11 +34,11 @@ class PayPalProvider extends AbstractProvider
         $configs = $payments[$this->providerName];
 
         $this->di->setShared($this->providerName, function () use ($configs) {
-            $clientID = $configs['client_id'];
+            $clientID     = $configs['client_id'];
             $clientSecret = $configs['client_secret'];
     
             $environment = new SandboxEnvironment($clientID, $clientSecret);
-            $client = new PayPalHttpClient($environment);
+            $client      = new PayPalHttpClient($environment);
 
             return $client;
         });

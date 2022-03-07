@@ -92,8 +92,8 @@ class UserAddress extends Model
                 'conditions' => 'active = :active: AND addressID = :addressID: 
                                 AND addressTypeID = :addressTypeID:',
                 'bind'       => [
-                    'active'          => UserAddress::ENABLED,
-                    'addressID'      => $addressID,
+                    'active'        => UserAddress::ENABLED,
+                    'addressID'     => $addressID,
                     'addressTypeID' => $addressTypeID
                 ],
             ]

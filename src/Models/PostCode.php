@@ -77,7 +77,7 @@ class PostCode extends Model
             'bind'       => [
                 'active'    => self::ENABLED,
                 'locale_id' => $localeID,
-                'postCode' => $postcode,
+                'postCode'  => $postcode,
             ],
         ]);
 
@@ -85,7 +85,7 @@ class PostCode extends Model
             return $newPostcode;
         }
 
-        $newPostcode = new self;
+        $newPostcode           = new self;
         $newPostcode->postCode = $postcode;
         $newPostcode->localeID = $localeID;
 

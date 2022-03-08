@@ -125,6 +125,14 @@ class ShopController extends AbstractController
             return $this->response->redirect('cart');
         }
 
+        $user = User::getUser();
+        
+        if (!isset($user->id)) {
+            $this->flash->warning('Please login before checkout!');
+
+            return $this->response->redirect('/user');
+        }
+
         $this->view->setVar('products', $products);
         $this->view->setVar('orderRoute', '/checkout/order');
         $this->view->setVar('csrfToken', $this->security->getToken());
@@ -239,11 +247,10 @@ class ShopController extends AbstractController
 
             $userID = null;
 
-            if ($user) {
+            if (isset($user->id)) {
                 $userID = (int) $user->id;
             } else {
-                // @ToDo: Change to a temp user or force register/login
-                $userID = 0;
+                return null;
             }
 
             $billingUserAddress = UserAddress::createUserAddress(

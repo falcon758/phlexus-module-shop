@@ -19,6 +19,7 @@ use Phalcon\Mvc\View\Engine\Volt;
 use Phlexus\Module as PhlexusModule;
 use Phlexus\Helpers;
 use Phlexus\Modules\BaseUser\Acl\DefaultAcl;
+use Phlexus\Modules\BaseUser\Events\Listeners\DispatcherListener;
 use Phlexus\Modules\BaseUser\Events\Listeners\AuthorizationListener;
 
 /**
@@ -102,6 +103,7 @@ class Module extends PhlexusModule
         $acl = new DefaultAcl();
         $di->set('acl', $acl);
 
+        $di->getShared('eventsManager')->attach('dispatch', new DispatcherListener());
         $di->getShared('eventsManager')->attach('dispatch:beforeDispatchLoop', new AuthorizationListener());
     }
 }

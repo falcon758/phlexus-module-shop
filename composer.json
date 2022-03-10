@@ -3,9 +3,9 @@
     "license": "BSD-3-Clause",
     "description": "Phlexus Shop Module",
     "require": {
-        "falcon758/phlexus-core": "dev-master",
-        "falcon758/phlexus-module-users": "dev-main",
-        "falcon758/phlexus-library-media": "dev-master",
+        "falcon758/phlexus-phlexus": "^1.10.0",
+        "falcon758/phlexus-module-users": "^1.7.0",
+        "falcon758/phlexus-library-media": "^1.1.0",
         "paypal/paypal-checkout-sdk": "^1.0"
     },
     "require-dev": {
@@ -21,7 +21,5 @@
         "psr-4": {
             "Tests\\": "tests/"
         }
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    }
 }

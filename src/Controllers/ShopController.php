@@ -119,8 +119,10 @@ class ShopController extends AbstractController
     {
         $products = $this->cart->getProducts();
 
+        $translationMessage = $this->translation->setTypeMessage();
+
         if (count($products) === 0) {
-            $this->flash->error('No products on cart!');
+            $this->flash->error($translationMessage->_('empty-cart'));
 
             return $this->response->redirect('cart');
         }
@@ -128,7 +130,7 @@ class ShopController extends AbstractController
         $user = User::getUser();
         
         if (!isset($user->id)) {
-            $this->flash->warning('Please login before checkout!');
+            $this->flash->warning($translationMessage->_('login-before-checkout'));
 
             return $this->response->redirect('/user');
         }
@@ -155,7 +157,10 @@ class ShopController extends AbstractController
 
         if (!$form->isValid($post)) {
             foreach ($form->getMessages() as $message) {
-                $this->flash->error($message->getMessage());
+                $errorMessage = $this->translation->setTypeMessage()
+                                                  ->_($message->getMessage());
+
+                $this->flash->error($errorMessage);
             }
 
             return $this->response->redirect('checkout');
@@ -280,7 +285,11 @@ class ShopController extends AbstractController
                 }
             }
         } catch(\Exception $e) {
-            $this->flash->error($e->getMessage());
+            $errorMessage = $this->translation->setTypeMessage()
+                                              ->_($e->getMessage());
+
+            $this->flash->error($errorMessage);
+
             return null;
         }
 

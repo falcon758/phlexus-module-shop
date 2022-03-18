@@ -54,6 +54,8 @@ class Paypal extends PaymentAbstract
             ] 
         ];
 
+        $translationMessage = $this->translation->setTypeMessage();
+
         try {
             $response = Di::getDefault()->getShared('paypal')->execute($request);
             
@@ -69,12 +71,12 @@ class Paypal extends PaymentAbstract
                 }
             }
         } catch (\HttpException $e) {
-            $this->flash->error('Unable to process payment!');
-
+            $this->flash->error($translationMessage->_('unable-to-process-payment'));
+    
             return $this->response->redirect('checkout');
         }
 
-        $this->flash->error('Unable to process payment!');
+        $this->flash->error($translationMessage->_('unable-to-process-payment'));
 
         return $this->response->redirect('checkout');
     }
@@ -104,8 +106,10 @@ class Paypal extends PaymentAbstract
             return $this->response->redirect('products');
         }
         
+        $translationMessage = $this->translation->setTypeMessage();
+
         if ($this->order->isPaid()) {
-            $this->flash->warning('Order already paid!');
+            $this->flash->warning($translationMessage->_('order-already-paid'));
 
             return $this->response->redirect('products');
         } else if ($this->isPaid($orderID)) {
@@ -114,7 +118,7 @@ class Paypal extends PaymentAbstract
             return $this->response->redirect('order/success');
         }
 
-        $this->flash->error('Unable to process payment!');
+        $this->flash->error($translationMessage->_('unable-to-process-payment'));
 
         return $this->response->redirect('checkout');
     }

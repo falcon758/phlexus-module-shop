@@ -157,10 +157,7 @@ class ShopController extends AbstractController
 
         if (!$form->isValid($post)) {
             foreach ($form->getMessages() as $message) {
-                $errorMessage = $this->translation->setTypeMessage()
-                                                  ->_($message->getMessage());
-
-                $this->flash->error($errorMessage);
+                $this->flash->error($message->getMessage());
             }
 
             return $this->response->redirect('checkout');
@@ -286,7 +283,7 @@ class ShopController extends AbstractController
             }
         } catch(\Exception $e) {
             $errorMessage = $this->translation->setTypeMessage()
-                                              ->_($e->getMessage());
+                                              ->_('unable-to-create-order');
 
             $this->flash->error($errorMessage);
 

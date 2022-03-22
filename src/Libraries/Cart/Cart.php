@@ -36,7 +36,8 @@ class Cart implements CartInterface
     /**
      * Initialize cart
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->session = Di::getDefault()->getShared('session');
     }
 
@@ -106,7 +107,8 @@ class Cart implements CartInterface
      * 
      * @return bool
      */
-    public function hasProducts(): bool {
+    public function hasProducts(): bool
+    {
         return count($this->getProducts()) > 0;
     }
 
@@ -115,7 +117,8 @@ class Cart implements CartInterface
      * 
      * @return array
      */
-    public function getProducts(): array {
+    public function getProducts(): array
+    {
         $products = [];
 
         if ($this->session->has(self::SESSIONNAME)) {
@@ -130,7 +133,8 @@ class Cart implements CartInterface
      * 
      * @return float
      */
-    public function getTotalPrice(): float {
+    public function getTotalPrice(): float
+    {
         $products = $this->getProducts();
 
         $total = 0;
@@ -146,7 +150,8 @@ class Cart implements CartInterface
      * 
      * @return bool
      */
-    public function clear(): bool {
+    public function clear(): bool
+    {
         $this->session->remove('cart');
 
         return true;

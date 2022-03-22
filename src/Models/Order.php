@@ -130,7 +130,8 @@ class Order extends Model
      * 
      * @return array
      */
-    public function getItems(): array {
+    public function getItems(): array
+    {
         $items = [];
 
         foreach ($this->items as $item) {
@@ -145,7 +146,8 @@ class Order extends Model
      * 
      * @return float
      */
-    public function getOrderTotal(): float {
+    public function getOrderTotal(): float
+    {
         $items = $this->getItems();
     }
 
@@ -154,7 +156,8 @@ class Order extends Model
      * 
      * @return bool
      */
-    public function cancelOrder(): bool {
+    public function cancelOrder(): bool
+    {
         $this->status = self::CANCELED;
         return $this->save();
     }
@@ -164,7 +167,8 @@ class Order extends Model
      * 
      * @return bool
      */
-    public function paidOrder(): bool {
+    public function paidOrder(): bool
+    {
         $this->paid = 1;
         return $this->save();
     }
@@ -174,7 +178,8 @@ class Order extends Model
      * 
      * @return bool
      */
-    public function isPaid(): bool {
+    public function isPaid(): bool
+    {
         return $this->paid === 1;
     }
 
@@ -194,7 +199,8 @@ class Order extends Model
     public static function createOrder(
         int $userID, int $billingID, int $shipmentID,
         int $paymentMethod, int $shippingMethod
-    ): Order {
+    ): Order
+    {
         $order = new self;
         $order->hashCode         = Di::getDefault()->getShared('security')->getRandom()->base64Safe(self::HASHLENGTH);
         $order->userID           = $userID;

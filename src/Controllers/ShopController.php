@@ -73,19 +73,21 @@ class ShopController extends AbstractController
      */
     public function addAction(int $productID): ResponseInterface
     {
+        $translationMessage = $this->translation->setTypeMessage();
+
         if (
             !$this->security->checkToken('csrf', $this->request->getPost('csrf', null))
             || !$this->cart->addProduct($productID) 
         ) {
             return $this->response->setJsonContent([
                 'success' => false,
-                'message' => 'Unable to add product to cart!',
+                'message' => $translationMessage->_('unable-to-add-product'),
             ]);
         }
 
         return $this->response->setJsonContent([
             'success' => true,
-            'message' => 'Product was added to cart!',
+            'message' => $translationMessage->_('product-added-successfully'),
         ]);
     }
 
@@ -97,10 +99,12 @@ class ShopController extends AbstractController
      */
     public function removeAction(int $productID): ResponseInterface
     {
+        $translationMessage = $this->translation->setTypeMessage();
+
         if (!$this->security->checkToken('csrf', $this->request->getPost('csrf', null))) {
             return $this->response->setJsonContent([
                 'success' => false,
-                'message' => 'Unable to remove product!',
+                'message' => $translationMessage->_('unable-to-remove-product'),
             ]);
         }
 
@@ -108,7 +112,7 @@ class ShopController extends AbstractController
 
         return $this->response->setJsonContent([
             'success' => true,
-            'message' => 'Product removed successfully!',
+            'message' => $translationMessage->_('product-successfully-removed'),
         ]);
     }
 

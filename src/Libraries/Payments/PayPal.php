@@ -54,10 +54,12 @@ class Paypal extends PaymentAbstract
             ] 
         ];
 
-        $translationMessage = $this->translation->setTypeMessage();
+        $di = Di::getDefault();
+
+        $translationMessage = $di->getShared('translation')->setTypeMessage();
 
         try {
-            $response = Di::getDefault()->getShared('paypal')->execute($request);
+            $response = $di->getShared('paypal')->execute($request);
             
             if ($response->statusCode !== 201) {
                 return $this->response->redirect('checkout');
@@ -106,7 +108,7 @@ class Paypal extends PaymentAbstract
             return $this->response->redirect('products');
         }
         
-        $translationMessage = $this->translation->setTypeMessage();
+        $translationMessage = Di::getDefault()->getShared('translation')->setTypeMessage();
 
         if ($this->order->isPaid()) {
             $this->flash->warning($translationMessage->_('order-already-paid'));
@@ -114,6 +116,8 @@ class Paypal extends PaymentAbstract
             return $this->response->redirect('products');
         } else if ($this->isPaid($orderID)) {
             $this->order->paidOrder();
+
+            $this->flash->success($translationMessage->_('payment-processed-successfully'));
 
             return $this->response->redirect('order/success');
         }

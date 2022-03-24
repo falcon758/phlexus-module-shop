@@ -30,7 +30,7 @@ class checkoutForm extends CaptchaForm
      */
     public function initialize()
     {
-        $translationForm = $this->translation->setTypeForm();   
+        $translationForm = $this->translation->setPage()->setTypeForm();   
 
         // Fields
         $address = new Text('address', [

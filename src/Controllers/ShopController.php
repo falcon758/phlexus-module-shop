@@ -26,20 +26,11 @@ use Phlexus\Modules\Shop\Libraries\Payments\PaymentFactory;
 class ShopController extends AbstractController
 {
     /**
-     * Cart
-     *
-     * @var Cart
-     */
-    private Cart $cart;
-
-    /**
      * Initialize
      */
     public function initialize(): void
     {
         parent::initialize();
-
-        $this->cart = new Cart();
     }
 
     /**

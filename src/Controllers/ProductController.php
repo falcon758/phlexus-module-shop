@@ -30,7 +30,9 @@ final class ProductController extends AbstractController
      */
     public function initialize(): void
     {
-        parent::initialize();
+        $title = $this->translation->setTypePage()->_('title-products-manager');
+
+        $this->tag->setTitle($title);
 
         $mainView = $this->view->getMainView();
 

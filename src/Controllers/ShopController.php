@@ -26,18 +26,14 @@ use Phlexus\Modules\Shop\Libraries\Payments\PaymentFactory;
 class ShopController extends AbstractController
 {
     /**
-     * Initialize
-     */
-    public function initialize(): void
-    {
-        parent::initialize();
-    }
-
-    /**
      * @Get('/cart')
      */
     public function cartAction(): void
     {
+        $title = $this->translation->setTypePage()->_('title-shop-cart');
+
+        $this->tag->setTitle($title);
+
         $products = $this->cart->getProducts();
         
         $this->view->setVar('checkoutRoute', '/checkout');
@@ -51,6 +47,10 @@ class ShopController extends AbstractController
      */
     public function productsAction(): void
     {
+        $title = $this->translation->setTypePage()->_('title-shop-products');
+
+        $this->tag->setTitle($title);
+
         $this->view->setVar('saveRoute', '/cart/add/');
         $this->view->setVar('csrfToken', $this->security->getToken());
         $this->view->setVar('products', Product::find());
@@ -64,6 +64,8 @@ class ShopController extends AbstractController
      */
     public function addAction(int $productID): ResponseInterface
     {
+        $this->view->disable();
+
         $translationMessage = $this->translation->setTypeMessage();
 
         if (
@@ -90,6 +92,8 @@ class ShopController extends AbstractController
      */
     public function removeAction(int $productID): ResponseInterface
     {
+        $this->view->disable();
+
         $translationMessage = $this->translation->setTypeMessage();
 
         if (!$this->security->checkToken('csrf', $this->request->getPost('csrf', null))) {
@@ -112,6 +116,10 @@ class ShopController extends AbstractController
      */
     public function checkoutAction()
     {
+        $title = $this->translation->setTypePage()->_('title-shop-checkout');
+
+        $this->tag->setTitle($title);
+
         $products = $this->cart->getProducts();
 
         $translationMessage = $this->translation->setTypeMessage();
@@ -142,6 +150,8 @@ class ShopController extends AbstractController
      */
     public function orderAction()
     {
+        $this->view->disable();
+
         if (!$this->cart->hasProducts()) {
             return $this->response->redirect('cart');
         }
@@ -199,6 +209,10 @@ class ShopController extends AbstractController
      */
     public function successAction()
     {
+        $title = $this->translation->setTypePage()->_('title-order-success');
+
+        $this->tag->setTitle($title);
+
         $this->cart->clear();
     }
 
@@ -207,6 +221,8 @@ class ShopController extends AbstractController
      */
     public function cancelAction()
     {
+        $this->view->disable();
+
         return $this->response->redirect('cart');
     }
 

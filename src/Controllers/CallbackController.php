@@ -19,6 +19,10 @@ class CallbackController extends AbstractController
      */
     public function paypalAction(string $orderHash): ResponseInterface
     {
+        $title = $this->translation->setTypePage()->_('title-shop-callback-paypal');
+
+        $this->tag->setTitle($title);
+
         $order = Order::findFirstByhashCode($orderHash);
 
         if (!$order) {

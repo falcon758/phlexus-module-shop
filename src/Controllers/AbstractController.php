@@ -13,14 +13,6 @@ use Phalcon\Mvc\Controller;
 abstract class AbstractController extends Controller
 {
     /**
-     * @return void
-     */
-    public function initialize(): void
-    {
-        $this->tag->appendTitle(' - Phlexus Shop');
-    }
-
-    /**
      * Get Base Position
      *
      * @return string Current base position (module/controller)

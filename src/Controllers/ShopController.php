@@ -132,7 +132,7 @@ class ShopController extends AbstractController
 
         $user = User::getUser();
         
-        if (!isset($user->id)) {
+        if ($user === null) {
             $this->flash->warning($translationMessage->_('login-before-checkout'));
 
             return $this->response->redirect('/user');
@@ -260,7 +260,7 @@ class ShopController extends AbstractController
 
             $userID = null;
 
-            if (isset($user->id)) {
+            if ($user !== null) {
                 $userID = (int) $user->id;
             } else {
                 return null;

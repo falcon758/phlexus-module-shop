@@ -6,6 +6,7 @@ namespace Phlexus\Modules\Shop\Controllers;
 use Phlexus\Modules\Shop\Models\Product;
 use Phlexus\Modules\Generic\Forms\BaseForm;
 use Phalcon\Forms\Element\Text;
+use Phalcon\Forms\Element\Check;
 use Phalcon\Forms\Element\File;
 use Phalcon\Forms\Element\Hidden;
 use Phlexus\Libraries\Media\Models\Media;
@@ -52,18 +53,23 @@ final class ProductController extends AbstractController
                 'type' => Hidden::class
             ],
             [
-                'name' => 'name',
-                'type' => Text::class,
+                'name'     => 'name',
+                'type'     => Text::class,
                 'required' => true
             ],
             [
-                'name' => 'price',
-                'type' => Text::class,
+                'name'     => 'price',
+                'type'     => Text::class,
                 'required' => true
             ],
             [
-                'name' => 'imageID',
-                'type' => File::class,
+                'name'     => 'isSubscription',
+                'type'     => Check::class,
+                'required' => true
+            ],
+            [
+                'name'    => 'imageID',
+                'type'    => File::class,
                 'related' => Media::class
             ]
         ];
@@ -74,7 +80,7 @@ final class ProductController extends AbstractController
 
         $this->setForm($form);
 
-        $this->setViewFields(['id', 'name', 'price']);
+        $this->setViewFields(['id', 'name', 'price', 'isSubscription']);
     }
 
     /**

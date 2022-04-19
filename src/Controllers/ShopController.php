@@ -13,7 +13,9 @@ use Phlexus\Modules\Shop\Models\AddressType;
 use Phlexus\Modules\Shop\Models\UserAddress;
 use Phlexus\Modules\Shop\Models\Order;
 use Phlexus\Modules\Shop\Models\Item;
+use Phlexus\Modules\Shop\Models\Payment;
 use Phlexus\Modules\Shop\Models\PaymentMethod;
+use Phlexus\Modules\Shop\Models\PaymentType;
 use Phlexus\Modules\Shop\Form\CheckoutForm;
 use Phlexus\Modules\BaseUser\Models\User;
 use Phlexus\Modules\Shop\Libraries\Payments\PaymentFactory;
@@ -172,33 +174,46 @@ class ShopController extends AbstractController
 
         $postCode = $post['post_code'];
 
-        $country = (int) $post['country'];        
+        $countryID = (int) $post['country'];        
 
         $locale = 'Unknown' /*$post['local']*/;
 
-        $paymentMethod = (int) $post['payment_method'];
+        $paymentMethodID = (int) $post['payment_method'];
 
-        $shippingMethod = (int )$post['shipping_method'];
+        $shippingMethodID = (int )$post['shipping_method'];
 
         $billing = [
             'address'   => $address,
             'postCode'  => $postCode,
             'locale'    => $locale,
-            'country'   => $country
+            'country'   => $countryID
         ];
 
         $shipment = [
             'address'   => $address,
             'postCode'  => $postCode,
             'locale'    => $locale,
-            'country'   => $country
+            'country'   => $countryID
         ];
 
-        $order = $this->createOrder($billing, $shipment, $paymentMethod, $shippingMethod, $country);
+        $order = $this->createOrder(
+            $billing, $shipment, $paymentMethodID,
+            $shippingMethodID, $countryID
+        );
 
+        $payment = null;
         if ($order !== null) {
-            $payment = (new PaymentFactory())->build($order);
-            return $payment->startPayment();
+            $paymentTypeID = PaymentType::PAYMENT;
+            if ($this->cart->hasSubscriptionProducts()) {
+                $paymentTypeID = PaymentType::RENEWAL;
+            }
+
+            $payment = Payment::createPayment($paymentTypeID, $paymentMethodID, (int) $order->id);
+        }
+
+        if ($payment !== null) {
+            $paymentProcess = (new PaymentFactory())->build($payment);
+            return $paymentProcess->startPayment();
         } else {
             return $this->response->redirect('order/cancel');
         }
@@ -229,30 +244,31 @@ class ShopController extends AbstractController
     /**
      * Create order
      * 
-     * @param array $billing        Billing address
-     * @param array $shipment       Shipment address
-     * @param array $paymentMethod  Payment method
-     * @param array $shippingMethod Shipping address
+     * @param array $billing          Billing address
+     * @param array $shipment         Shipment address
+     * @param array $paymentMethodID  Payment method
+     * @param array $shippingMethodID Shipping address
+     * @param array $countryID        Address country
      * 
      * @return mixed Order or null
      */
     private function createOrder(
-        array $billing, array $shipment, int $paymentMethod,
-        int $shippingMethod, int $country
+        array $billing, array $shipment, int $paymentMethodID,
+        int $shippingMethodID, int $countryID
     ) {
         try {
             $billingID = Address::createAddress(
                 $billing['address'],
                 $billing['postCode'],
                 $billing['locale'],
-                $country
+                $countryID
             );
 
             $shipmentID = Address::createAddress(
                 $shipment['address'],
                 $shipment['postCode'],
                 $shipment['locale'],
-                $country
+                $countryID
             );
 
             // Get current logged user
@@ -280,7 +296,7 @@ class ShopController extends AbstractController
 
             $order = Order::createOrder(
                 $userID, (int) $billingUserAddress->id, (int) $shippingUserAddress->id,
-                $paymentMethod, $shippingMethod
+                $paymentMethodID, $shippingMethodID
             );
 
             $products = $this->cart->getProducts();

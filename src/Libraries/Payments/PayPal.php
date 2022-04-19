@@ -16,7 +16,7 @@ namespace Phlexus\Modules\Shop\Libraries\Payments;
 use Phalcon\Di;
 use Phalcon\Http\ResponseInterface;
 use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
-use PayPalCheckoutSdk\Orders\OrdersCaptureRequest;
+use PayPalCheckoutSdk\Orders\OrdersGetRequest;
 
 class Paypal extends PaymentAbstract
 {
@@ -28,7 +28,10 @@ class Paypal extends PaymentAbstract
      * @return ResponseInterface
      */
     public function startPayment(): ResponseInterface {
-        $items = $this->order->getItems();
+        $payment = $this->payment;
+        $order   = $payment->order;
+
+        $items = $order->getItems();
 
         $arrProd = [];
 
@@ -49,7 +52,7 @@ class Paypal extends PaymentAbstract
             'intent'              => 'CAPTURE',
             'purchase_units'      => $arrProd,
             'application_context' => [
-                'return_url' => $this->url->get('/payment/callback/paypal/'. $this->order->hashCode),
+                'return_url' => $this->url->get('/payment/callback/paypal/'. $payment->hashCode),
                 'cancel_url' => $this->url->get('/checkout'),
             ] 
         ];
@@ -66,7 +69,7 @@ class Paypal extends PaymentAbstract
             }
 
             foreach ($response->result->links as $link) {
-                if ($link->rel === 'approve' && $this->order->setAttributes([
+                if ($link->rel === 'approve' && $payment->setAttributes([
                     self::PAYPALORDER => $response->result->id
                 ])) {
                     return $this->response->redirect($link->href);
@@ -86,36 +89,39 @@ class Paypal extends PaymentAbstract
     /**
      * Process a paymeny callback
      *
-     * @param string $orderID Order id
+     * @param string $paymentID Payment id
      * 
      * @return ResponseInterface
      */
-    public function processCallback(string $orderID): ResponseInterface {
-        return $this->verifyPayment($orderID);
+    public function processCallback(string $paymentID): ResponseInterface {
+        return $this->verifyPayment($paymentID);
     }
 
     /**
      * Verify a payment
      *
-     * @param string $orderID Order id to verify
+     * @param string $paymentID Payment id
      * 
      * @return ResponseInterface
      */
-    public function verifyPayment(string $orderID): ResponseInterface {
-        $attribute = $this->order->getAttributes([self::PAYPALORDER]);
+    public function verifyPayment(string $paymentID): ResponseInterface {
+        $payment = $this->payment;
+        $order   = $payment->order;
 
-        if (count($attribute) === 0 || $attribute[0]['value'] !== $orderID) {
+        $attribute = $payment->getAttributes([self::PAYPALORDER]);
+
+        if (count($attribute) === 0 || $attribute[0]['value'] !== $paymentID) {
             return $this->response->redirect('products');
         }
         
         $translationMessage = Di::getDefault()->getShared('translation')->setTypeMessage();
 
-        if ($this->order->isPaid()) {
+        if ($payment->isPaid()) {
             $this->flash->warning($translationMessage->_('order-already-paid'));
 
             return $this->response->redirect('products');
-        } else if ($this->isPaid($orderID)) {
-            $this->order->paidOrder();
+        } else if ($this->isPaid($paymentID)) {
+            $payment->paid();
 
             $this->flash->success($translationMessage->_('payment-processed-successfully'));
 
@@ -130,20 +136,22 @@ class Paypal extends PaymentAbstract
     /**
      * Check if it's paid
      *
-     * @param string $orderID Order id to verify
+     * @param string $paymentID Payment id
      * 
      * @return bool
      */
-    public function isPaid(string $orderID): bool {
-        $request = new OrdersCaptureRequest($orderID);
-        $request->prefer('return=representation');
+    public function isPaid(string $paymentID): bool {
+        $request = new OrdersGetRequest($paymentID);
+
         try {
             $response = Di::getDefault()->getShared('paypal')->execute($request);
 
-            if ($response->statusCode === 201 && $response->result->status === 'COMPLETED') {
+            if ($response->statusCode === 200 && $response->result->status === 'COMPLETED') {
                 return true;
             }
         } catch (HttpException $e) {
+            return false;
+        } catch (\Exception $e) {
             return false;
         }
 

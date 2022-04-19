@@ -60,16 +60,16 @@ class Cart implements CartInterface
 
         $cart = $this->getProducts();
 
-        $added = false;
+        $hasProduct = false;
         foreach ($cart as &$cartProduct) {
             if ($cartProduct['id'] == $productID) {
                 $cartProduct['quantity'] += $quantity;
-                $added = true;
+                $hasProduct = true;
                 break;
             }
         }
 
-        if ($added === false) {
+        if ($hasProduct === false) {
             $product['quantity'] = $quantity;
             $cart[] = $product;
         }
@@ -100,6 +100,24 @@ class Cart implements CartInterface
         $this->session->set(self::SESSIONNAME, $cart);
 
         return true;
+    }
+
+    /**
+     * Has subscription products
+     * 
+     * @return bool
+     */
+    public function hasSubscriptionProducts(): bool
+    {
+        $cart = $this->getProducts();
+
+        foreach ($cart as $product) {
+            if (((int) $product['isSubscription']) === 1) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

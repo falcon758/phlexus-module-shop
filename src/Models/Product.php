@@ -33,6 +33,11 @@ class Product extends Model
     public string $price;
 
     /**
+     * @var int
+     */
+    public int $isSubscription;
+
+    /**
      * @var int|null
      */
     public $active;
@@ -65,5 +70,15 @@ class Product extends Model
             'alias'    => 'media',
             'reusable' => true,
         ]);
+    }
+
+    /**
+     * Has subscription
+     * 
+     * @return bool
+     */
+    public function hasSubscription(): bool
+    {
+        return ((int) $this->isSubscription) === 1;
     }
 }

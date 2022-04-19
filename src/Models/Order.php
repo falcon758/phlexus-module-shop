@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Phlexus\Modules\Shop\Models;
 
+use Phlexus\Modules\BaseUser\Models\User;
 use Phalcon\Mvc\Model;
 use Phalcon\Di;
-use Phlexus\Modules\BaseUser\Models\User;
 
 /**
  * Class Order
@@ -18,11 +18,15 @@ class Order extends Model
 
     public const ENABLED = 1;
 
+    public const PAID = 1;
+
     public const CANCELED = 0;
 
     public const CREATED = 1;
 
-    public const PAID = 2;
+    public const RENEWAL = 2;
+
+    public const DONE = 3;
 
     private const HASHLENGTH = 40;
 
@@ -122,7 +126,7 @@ class Order extends Model
 
         $this->hasMany('id', Item::class, 'orderID', ['alias' => 'items']);
 
-        $this->hasMany('id', OrderAttributes::class, 'orderID', ['alias' => 'orderAttributes']);
+        $this->hasMany('id', Payment::class, 'orderID', ['alias' => 'payments']);
     }
 
     /**
@@ -133,7 +137,6 @@ class Order extends Model
     public function getItems(): array
     {
         $items = [];
-
         foreach ($this->items as $item) {
             $items[] = $item->product->toArray();
         }
@@ -169,7 +172,8 @@ class Order extends Model
      */
     public function paidOrder(): bool
     {
-        $this->paid = 1;
+        $this->status = self::CANCELED;
+        $this->paid = self::PAID;
         return $this->save();
     }
 
@@ -180,7 +184,7 @@ class Order extends Model
      */
     public function isPaid(): bool
     {
-        return $this->paid === 1;
+        return ((int) $this->paid) === self::PAID;
     }
 
     /**
@@ -199,8 +203,7 @@ class Order extends Model
     public static function createOrder(
         int $userID, int $billingID, int $shipmentID,
         int $paymentMethod, int $shippingMethod
-    ): Order
-    {
+    ): Order {
         $order = new self;
         $order->hashCode         = Di::getDefault()->getShared('security')->getRandom()->base64Safe(self::HASHLENGTH);
         $order->userID           = $userID;
@@ -215,54 +218,5 @@ class Order extends Model
         }
 
         return $order;
-    }
-
-    /**
-     * Get Multiple Attributes
-     * 
-     * @param array $names Array of names to retrieve
-     * 
-     * @return array
-     */
-    public function getAttributes(array $names): array
-    {
-        if (count($names) === 0) {
-            return [];
-        }
-
-        $inQuery = '?' . implode(', ?', range(1, count($names)));
-
-        $values = array_merge([$this->id], $names);
-
-        $attributes = OrderAttributes::find(
-            [
-                'orderID = ?0 AND name IN (' . $inQuery . ')',
-                'bind' => $values
-            ]
-        );
-
-        return $attributes->toArray();
-    }
-
-    /**
-     * Set Multiple Attributes
-     * 
-     * @param array $attributes Array of names to set
-     * 
-     * @return bool
-     */
-    public function setAttributes(array $attributes): bool
-    {
-        foreach ($attributes as $key => $value) {
-            $attribute          = new OrderAttributes();
-            $attribute->name    = $key;
-            $attribute->value   = $value;
-            $attribute->orderID = (int) $this->id;
-            if (!$attribute->save()) {
-                return false;
-            }
-        }
-
-        return true;
     }
 }

@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Phlexus\Modules\Shop\Libraries\Payments;
 
 use Phlexus\Helpers;
-use Phlexus\Modules\Shop\Models\Order;
+use Phlexus\Modules\Shop\Models\Payment;
 use Phlexus\Modules\Shop\Models\PaymentMethod;
 
 class PaymentFactory
@@ -22,13 +22,13 @@ class PaymentFactory
     /**
      * Build Payments
      * 
-     * @return Order
+     * @return PaymentInterface
      */
-    public function build(Order $order): PaymentInterface {
-        switch ($order->paymentMethodID) {
+    public function build(Payment $payment): PaymentInterface {
+        switch ($payment->paymentMethodID) {
             case PaymentMethod::PAYPAL:
             default:
-                return new PayPal($order);
+                return new PayPal($payment);
                 break;
         }
     }

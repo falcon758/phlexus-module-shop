@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Phlexus\Modules\Shop\Libraries\Payments;
 
-use Phlexus\Modules\Shop\Models\Order;
+use Phlexus\Modules\Shop\Models\Payment;
 use Phalcon\Di;
 use Phalcon\Url;
 use Phalcon\Http\Response;
@@ -43,18 +43,18 @@ abstract class PaymentAbstract implements PaymentInterface
     protected FlashSession $flash;
 
     /**
-     * Order
+     * Payment
      * 
-     * @var Order
+     * @var Payment
      */
-    protected Order $order;
+    protected Payment $payment;
 
     /**
      * Construct Payment
      * 
-     * @param string $order Order to process
+     * @param string $order Payment to process
      */
-    public function __construct(Order $order) {
+    public function __construct(Payment $payment) {
         $di = Di::getDefault();
 
         $url          = $di->getShared('url');
@@ -64,6 +64,6 @@ abstract class PaymentAbstract implements PaymentInterface
         $this->url      = $url;
         $this->response = $httpResponse;
         $this->flash    = $flash;
-        $this->order    = $order;
+        $this->payment  = $payment;
     }
 }

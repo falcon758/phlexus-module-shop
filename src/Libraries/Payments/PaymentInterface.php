@@ -27,27 +27,27 @@ interface PaymentInterface
     /**
      * Process a paymeny callback
      *
-     * @param string $orderID Order id
+     * @param string $paymentID Order id
      * 
      * @return ResponseInterface
      */
-    public function processCallback(string $orderID): ResponseInterface;
+    public function processCallback(string $paymentID): ResponseInterface;
 
     /**
      * Verify a payment
      *
-     * @param string $orderID Order id to verify
+     * @param string $paymentID Order id to verify
      * 
      * @return ResponseInterface
      */
-    public function verifyPayment(string $orderID): ResponseInterface;
+    public function verifyPayment(string $paymentID): ResponseInterface;
 
     /**
      * Check if it's paid
      *
-     * @param string $orderID Order id to verify
+     * @param string $paymentID Order id to verify
      * 
      * @return bool
      */
-    public function isPaid(string $orderID): bool;
+    public function isPaid(string $paymentID): bool;
 }

@@ -4,82 +4,82 @@ declare(strict_types=1);
 use Phalcon\Mvc\Router\Group as RouterGroup;
 
 $routes = new RouterGroup([
-    'module' => \Phlexus\Modules\Shop\Module::getModuleName(),
-    'namespace' => \Phlexus\Modules\Shop\Module::getHandlersNamespace() . '\\Controllers',
+    'module'     => \Phlexus\Modules\Shop\Module::getModuleName(),
+    'namespace'  => \Phlexus\Modules\Shop\Module::getHandlersNamespace() . '\\Controllers',
     'controller' => 'cart',
-    'action' => 'index',
+    'action'     => 'index',
 ]);
 
 $routes->addGet('/shop/product', [
     'controller' => 'product',
-    'action' => 'view',
+    'action'     => 'view',
 ]);
 
 foreach (['create', 'view'] as $action) {
     $routes->addGet('/shop/product/' . $action, [
         'controller' => 'product',
-        'action' => $action,
+        'action'     => $action,
     ]);
 }
 
 $routes->addGet('/shop/product/edit/{id:[0-9]+}', [
     'controller' => 'product',
-    'action' => 'edit',
+    'action'     => 'edit',
 ]);
 
 $routes->addPost('/shop/product/save', [
     'controller' => 'product',
-    'action' => 'save',
+    'action'     => 'save',
 ]);
 
 $routes->addPost('/shop/product/delete/{id:[0-9]+}', [
     'controller' => 'product',
-    'action' => 'delete',
+    'action'     => 'delete',
 ]);
 
 $routes->addGet('/cart', [
     'controller' => 'shop',
-    'action' => 'cart',
+    'action'     => 'cart',
 ]);
 
 $routes->addGet('/products', [
     'controller' => 'shop',
-    'action' => 'products',
+    'action'     => 'products',
 ]);
 
 $routes->addPost('/cart/add/{id:[0-9]+}', [
     'controller' => 'shop',
-    'action' => 'add',
+    'action'     => 'add',
 ]);
 
 $routes->addPost('/cart/delete/{id:[0-9]+}', [
     'controller' => 'shop',
-    'action' => 'remove',
+    'action'     => 'remove',
 ]);
 
 $routes->addGet('/checkout', [
     'controller' => 'shop',
-    'action' => 'checkout',
+    'action'     => 'checkout',
 ]);
 
 $routes->addPost('/checkout/order', [
     'controller' => 'shop',
-    'action' => 'order',
+    'action'     => 'order',
 ]);
 
 $routes->addGet('/order/success', [
     'controller' => 'shop',
-    'action' => 'success',
+    'action'     => 'success',
 ]);
 
 $routes->addGet('/order/cancel', [
     'controller' => 'shop',
-    'action' => 'cancel',
+    'action'     => 'cancel',
 ]);
 
-$routes->addGet('/payment/callback/paypal/{orderHash:[a-zA-Z0-9]+}', [
+$routes->addGet('/payment/callback/paypal/{paymentHash:[a-zA-Z0-9]+}', [
     'controller' => 'callback',
-    'action' => 'paypal',
+    'action'     => 'paypal',
 ]);
 
 return $routes;

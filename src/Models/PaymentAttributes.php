@@ -6,11 +6,11 @@ namespace Phlexus\Modules\Shop\Models;
 use Phalcon\Mvc\Model;
 
 /**
- * Class OrderAttributes
+ * Class PaymentAttributes
  *
  * @package Phlexus\Modules\Shop\Models
  */
-class OrderAttributes extends Model
+class PaymentAttributes extends Model
 {
     public const DISABLED = 0;
 
@@ -39,7 +39,7 @@ class OrderAttributes extends Model
     /**
      * @var int
      */
-    public int $orderID;
+    public int $paymentID;
 
     /**
      * @var string|null
@@ -58,10 +58,10 @@ class OrderAttributes extends Model
      */
     public function initialize()
     {
-        $this->setSource('order_attributes');
+        $this->setSource('payment_attributes');
 
-        $this->hasOne('orderID', Order::class, 'id', [
-            'alias'    => 'order',
+        $this->hasOne('paymentID', Payment::class, 'id', [
+            'alias'    => 'payment',
             'reusable' => true,
         ]);
     }

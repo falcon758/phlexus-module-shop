@@ -64,17 +64,20 @@ class Address extends Model
     /**
      * Create address or return if exists
      * 
-     * @param string $address Address to create
-     * @param string $postCode Post code to create
-     * @param string $locale Locale to create
-     * @param int    $country Locale to verify
+     * @param string $address    Address to create
+     * @param string $postCode   Post code to create
+     * @param string $locale     Locale to create
+     * @param int    $countryID  Locale to verify
      *
      * @return Address
      * 
      * @throws Exception
      */
-    public static function createAddress(string $address, string $postCode, string $locale, int $country): Address {
-        $newLocale = Locale::createLocale($locale, $country);
+    public static function createAddress(
+        string $address, string $postCode,
+        string $locale, int $countryID
+    ): Address {
+        $newLocale = Locale::createLocale($locale, $countryID);
 
         $newPostCode = PostCode::createPostCode($postCode, (int) $newLocale->id);
 

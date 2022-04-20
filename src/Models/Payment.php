@@ -17,12 +17,6 @@ class Payment extends Model
 
     public const ENABLED = 1;
 
-    public const CANCELED = 0;
-
-    public const CREATED = 1;
-
-    public const PAID = 2;
-
     private const HASHLENGTH = 40;
 
     /**
@@ -38,7 +32,7 @@ class Payment extends Model
     /**
      * @var int|null
      */
-    public $status;
+    public $statusID;
 
     /**
      * @var int|null
@@ -79,6 +73,11 @@ class Payment extends Model
     {
         $this->setSource('payments');
 
+        $this->hasOne('statusID', OrderStatus::class, 'id', [
+            'alias'    => 'orderStatus',
+            'reusable' => true,
+        ]);
+
         $this->hasOne('paymentMethodID', PaymentMethod::class, 'id', [
             'alias'    => 'paymentMethod',
             'reusable' => true,
@@ -104,7 +103,7 @@ class Payment extends Model
      */
     public function cancelPayment(): bool
     {
-        $this->status = self::CANCELED;
+        $this->statusID = PaymentStatus::CANCELED;
         return $this->save();
     }
 
@@ -115,7 +114,7 @@ class Payment extends Model
      */
     public function paid(): bool
     {
-        $this->status = self::PAID;
+        $this->statusID = PaymentStatus::PAID;
         $this->order->paidOrder();
 
         return $this->save();
@@ -128,7 +127,7 @@ class Payment extends Model
      */
     public function isPaid(): bool
     {
-        return $this->status === self::PAID;
+        return $this->statusID === PaymentStatus::PAID;
     }
 
     /**
@@ -149,7 +148,7 @@ class Payment extends Model
         $payment->paymentTypeID    = $paymentTypeID;
         $payment->paymentMethodID  = $paymentMethodID;
         $payment->orderID          = $orderID;
-        $payment->status           = self::CREATED;
+        $payment->statusID         = PaymentStatus::CREATED;
 
         if (!$payment->save()) {
             throw new \Exception('Unable to process payment');
@@ -199,6 +198,7 @@ class Payment extends Model
             $attribute->name    = $key;
             $attribute->value   = $value;
             $attribute->paymentID = (int) $this->id;
+
             if (!$attribute->save()) {
                 return false;
             }

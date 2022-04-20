@@ -18,16 +18,6 @@ class Order extends Model
 
     public const ENABLED = 1;
 
-    public const PAID = 1;
-
-    public const CANCELED = 0;
-
-    public const CREATED = 1;
-
-    public const RENEWAL = 2;
-
-    public const DONE = 3;
-
     private const HASHLENGTH = 40;
 
     /**
@@ -48,7 +38,7 @@ class Order extends Model
     /**
      * @var int|null
      */
-    public $status;
+    public $statusID;
 
     /**
      * @var int|null
@@ -161,7 +151,9 @@ class Order extends Model
      */
     public function cancelOrder(): bool
     {
-        $this->status = self::CANCELED;
+        $this->statusID = OrderStatus::CANCELED;
+        $this->paid = self::DISABLED;
+
         return $this->save();
     }
 
@@ -172,8 +164,14 @@ class Order extends Model
      */
     public function paidOrder(): bool
     {
-        $this->status = self::CANCELED;
-        $this->paid = self::PAID;
+        $this->statusID = OrderStatus::DONE;
+
+        if ($this->hasSubscriptionItem()) {
+            $this->statusID = OrderStatus::RENEWAL;
+        }
+
+        $this->paid = self::ENABLED;
+
         return $this->save();
     }
 
@@ -211,12 +209,101 @@ class Order extends Model
         $order->shipmentID       = $shipmentID;
         $order->paymentMethodID  = $paymentMethod;
         $order->shippingMethodID = $shippingMethod;
-        $order->status = self::CREATED;
+        $order->statusID         = OrderStatus::CREATED;
 
         if (!$order->save()) {
             throw new \Exception('Unable to process order');
         }
 
         return $order;
+    }
+
+    /**
+     * Has subscription item
+     * 
+     * @return bool
+     */
+    public function hasSubscriptionItem(): bool
+    {
+        $items = $this->items;
+
+        if (!$items) {
+            return false;
+        }
+
+        foreach ($items as $item) {
+            if ($item->hasSubscriptionProduct()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Has subscription active
+     * 
+     * @param int $productID Product to search for
+     * 
+     * @return bool
+     */
+    public function hasSubscriptionActive(int $productID = 0): bool
+    {
+        $items = $this->getSubscriptionItems();
+        if (count($items) === 0) {
+            return false;
+        }
+
+        foreach ($items as $item) {
+            
+        }
+
+        return false;
+    }
+
+    /**
+     * Get subscription items
+     * 
+     * @return array
+     */
+    public function getSubscriptionItems(): array
+    {
+        $items = $this->items;
+
+        if (!$items) {
+            return [];
+        }
+
+        $subscriptions = [];
+        foreach ($items as $item) {
+            if ($item->hasSubscriptionProduct()) {
+                $subscriptions[] = $item;
+            }
+        }
+
+        return $subscriptions;
+    }
+
+    /**
+     * Get last payment
+     * 
+     * @return Payment|null
+     */
+    public function getLastPayment()
+    {
+        return $this->payment->first();
+    }
+
+    /**
+     * Get last payment by product
+     * 
+     * @param int $productID Product to search for
+     *
+     * @return Payment|null
+     */
+    public function getLastPaymentByProduct(int $productID)
+    {
+        return null;
+        //return $this->payment->first();
     }
 }

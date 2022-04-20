@@ -94,4 +94,14 @@ class Item extends Model
 
         return $item;
     }
+
+    /**
+     * Has subscription product
+     * 
+     * @return bool
+     */
+    public function hasSubscriptionProduct(): bool
+    {
+        return $this->product->hasSubscription();
+    }
 }

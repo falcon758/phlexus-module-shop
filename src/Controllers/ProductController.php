@@ -22,7 +22,9 @@ final class ProductController extends AbstractController
     use \Phlexus\Modules\Generic\Actions\EditAction;
     use \Phlexus\Modules\Generic\Actions\DeleteAction;
     use \Phlexus\Modules\Generic\Actions\ViewAction;
-    use \Phlexus\Modules\Generic\Actions\SaveAction;
+    use \Phlexus\Modules\Generic\Actions\SaveAction {
+        saveAction as protected traitSaveAction;
+    }
 
     /**
      * Initialize
@@ -65,7 +67,7 @@ final class ProductController extends AbstractController
             [
                 'name'     => 'isSubscription',
                 'type'     => Check::class,
-                'required' => true
+                'value'    => 1
             ],
             [
                 'name'    => 'imageID',
@@ -91,5 +93,22 @@ final class ProductController extends AbstractController
     private function isSave()
     {
         return $this->dispatcher->getActionName() === 'save';
+    }
+
+    /**
+     * Override Save Action
+     *
+     * @return ResponseInterface
+     */
+    public function saveAction() {
+        if ($this->request->isPost()) {
+            $isSubscription = $this->request->getPost('isSubscription', null);
+            
+            if ($isSubscription === null) {
+                $_POST['isSubscription'] = '0';
+            }
+        }
+
+        return $this->traitSaveAction();
     }
 }

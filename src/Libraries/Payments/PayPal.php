@@ -146,7 +146,7 @@ class Paypal extends PaymentAbstract
         try {
             $response = Di::getDefault()->getShared('paypal')->execute($request);
 
-            if ($response->statusCode === 200 && $response->result->status === 'COMPLETED') {
+            if ($response->statusCode === 200 && in_array($response->result->status, ['APPROVED', 'COMPLETED'])) {
                 return true;
             }
         } catch (HttpException $e) {

@@ -103,7 +103,7 @@ class Product extends Model
 
         $attributes = ProductAttributes::find(
             [
-                'paymentID = ?0 AND name IN (' . $inQuery . ')',
+                'productID = ?0 AND name IN (' . $inQuery . ')',
                 'bind' => $values
             ]
         );

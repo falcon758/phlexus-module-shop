@@ -225,19 +225,15 @@ class Order extends Model
      */
     public function hasSubscriptionItem(): bool
     {
-        $items = $this->items;
-
-        if (!$items) {
-            return false;
-        }
-
-        foreach ($items as $item) {
-            if ($item->hasSubscriptionProduct()) {
-                return true;
-            }
-        }
-
-        return false;
+        return self::query()
+            ->innerJoin(Item::class, null, 'I')
+            ->innerJoin(Product::class, 'I.productID = PR.id', 'PR')
+            ->where('I.orderID = :orderID: AND PR.isSubscription = :isSubscription:', [
+                'isSubscription' => 1,
+                'orderID'        => $this->id
+            ])
+            ->execute()
+            ->count() > 0;
     }
 
     /**
@@ -255,7 +251,17 @@ class Order extends Model
         }
 
         foreach ($items as $item) {
+            $productAttr = $item->product->getAttributes([
+                ProductAttributes::SUBSCRIPTION_PERIOD,
+                ProductAttributes::SUBSCRIPTION_PAYMENT_OFFSET,
+                ProductAttributes::SUBSCRIPTION_MAX_DELAY
+            ]);
             
+            if (count($productAttr) === 0) {
+                return false;
+            }
+
+            /** Proceed with subscription verification **/
         }
 
         return false;
@@ -266,22 +272,19 @@ class Order extends Model
      * 
      * @return array
      */
-    public function getSubscriptionItems(): array
+    public function getSubscriptionItems()
     {
-        $items = $this->items;
-
-        if (!$items) {
-            return [];
-        }
-
-        $subscriptions = [];
-        foreach ($items as $item) {
-            if ($item->hasSubscriptionProduct()) {
-                $subscriptions[] = $item;
-            }
-        }
-
-        return $subscriptions;
+        return self::query()
+            ->columns(
+                'I.*'
+            )
+            ->innerJoin(Item::class, null, 'I')
+            ->innerJoin(Product::class, 'I.productID = PR.id', 'PR')
+            ->where('I.orderID = :orderID: AND PR.isSubscription = :isSubscription:', [
+                'isSubscription' => 1,
+                'orderID'        => $this->id
+            ])
+            ->execute();
     }
 
     /**
@@ -291,7 +294,17 @@ class Order extends Model
      */
     public function getLastPayment()
     {
-        return $this->payment->first();
+        return self::query()
+            ->columns(
+                'P.*'
+            )
+            ->innerJoin(Payment::class, null, 'P')
+            ->where('P.orderID = :orderID:', [
+                'orderID' => $this->id
+            ])
+            ->orderBy('P.id DESC')
+            ->execute()
+            ->getFirst();
     }
 
     /**
@@ -303,7 +316,6 @@ class Order extends Model
      */
     public function getLastPaymentByProduct(int $productID)
     {
-        return null;
-        //return $this->payment->first();
+        /** Recursive order is needed for this case **/
     }
 }

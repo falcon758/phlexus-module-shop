@@ -32,6 +32,13 @@ class ShopController extends AbstractController
      */
     public function cartAction(): void
     {
+        
+        
+        $order = Order::findFirstByid(76);
+
+        var_dump($order->getLastPayment());
+        exit('teste');
+
         $title = $this->translation->setTypePage()->_('title-shop-cart');
 
         $this->tag->setTitle($title);

@@ -71,6 +71,11 @@ class Order extends Model
     public int $shippingMethodID;
 
     /**
+     * @var int|null
+     */
+    public $parentID;
+
+    /**
      * @var string|null
      */
     public $createdAt;
@@ -219,6 +224,48 @@ class Order extends Model
     }
 
     /**
+     * Get last order
+     * 
+     * @return Order
+     */
+    public function getLastOrder(): Order
+    {
+        $lastOrder = $this->getDi()->getShared('db')->prepare('
+            WITH RECURSIVE orderRecursive AS (
+                SELECT id, parentID
+                FROM orders
+                where id = :orderID
+                UNION ALL
+                SELECT secondOrder.id, orderRecursive.parentID
+                FROM orderRecursive INNER JOIN orders secondOrder
+                on secondOrder.parentID = orderRecursive.id
+            )
+            SELECT id
+            FROM orderRecursive
+            ORDER BY id DESC
+            LIMIT 1;
+        ');
+
+        $lastOrder->bindParam(':orderID', $this->id);
+        $lastOrder->execute();
+        $result = $lastOrder->fetch(\PDO::FETCH_ASSOC);
+        
+        return ($result['id'] === $this->id) ? $this : self::findFirstByid($result['id']);
+    }
+
+    /**
+     * Get last order by product
+     * 
+     * @param int $productID Product to search for
+     *
+     * @return Order|null
+     */
+    public function getLastOrderByProduct(int $productID)
+    {
+        /** Recursive order is needed for this case **/
+    }
+
+    /**
      * Has subscription item
      * 
      * @return bool
@@ -242,24 +289,28 @@ class Order extends Model
      * @param int $productID Product to search for
      * 
      * @return bool
+     * 
+     * @throws Exception
      */
     public function hasSubscriptionActive(int $productID = 0): bool
     {
-        $items = $this->getSubscriptionItems();
+        $items = $this->getSubscriptionItems($productID);
         if (count($items) === 0) {
             return false;
         }
 
         foreach ($items as $item) {
-            $productAttr = $item->product->getAttributes([
-                ProductAttributes::SUBSCRIPTION_PERIOD,
-                ProductAttributes::SUBSCRIPTION_PAYMENT_OFFSET,
-                ProductAttributes::SUBSCRIPTION_MAX_DELAY
-            ]);
+            $productSubsAttr = $item->product->getSubscriptionAttributes();
             
-            if (count($productAttr) === 0) {
+            if (count($productSubsAttr) === 0) {
                 return false;
             }
+
+            $lastPayment = $this->getLastPaymentByProduct((int) $item->product->id);
+
+            var_dump($lastPayment);
+            exit();
+
 
             /** Proceed with subscription verification **/
         }
@@ -270,20 +321,30 @@ class Order extends Model
     /**
      * Get subscription items
      * 
+     * @param int $productID Product to search for
+     * 
      * @return array
      */
-    public function getSubscriptionItems()
+    public function getSubscriptionItems(int $productID = 0)
     {
+        $whereCond   = 'I.orderID = :orderID: AND PR.isSubscription = :isSubscription:';
+        $whereValues = [
+            'isSubscription' => 1,
+            'orderID'        => $this->id
+        ];
+
+        if ($productID !== 0) {
+            $whereCond .= ' AND PR.id = :productID:';
+            $whereValues['productID'] = $productID;
+        }
+
         return self::query()
             ->columns(
                 'I.*'
             )
             ->innerJoin(Item::class, null, 'I')
             ->innerJoin(Product::class, 'I.productID = PR.id', 'PR')
-            ->where('I.orderID = :orderID: AND PR.isSubscription = :isSubscription:', [
-                'isSubscription' => 1,
-                'orderID'        => $this->id
-            ])
+            ->where($whereCond, $whereValues)
             ->execute();
     }
 
@@ -316,6 +377,17 @@ class Order extends Model
      */
     public function getLastPaymentByProduct(int $productID)
     {
+        return self::query()
+            ->columns(
+                'P.*'
+            )
+            ->innerJoin(Payment::class, null, 'P')
+            ->where('P.orderID = :orderID:', [
+                'orderID' => $this->id
+            ])
+            ->orderBy('P.id DESC')
+            ->execute()
+            ->getFirst();
         /** Recursive order is needed for this case **/
     }
 }

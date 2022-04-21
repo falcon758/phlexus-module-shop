@@ -112,6 +112,49 @@ class Product extends Model
     }
 
     /**
+     * Get Subscription Attributes
+     *
+     * @return array
+     */
+    public function getSubscriptionAttributes(): array
+    {
+        $productAttr = $this->getAttributes([
+            ProductAttributes::SUBSCRIPTION_PERIOD,
+            ProductAttributes::SUBSCRIPTION_PAYMENT_OFFSET,
+            ProductAttributes::SUBSCRIPTION_MAX_DELAY
+        ]);
+        
+        if (count($productAttr) === 0) {
+            return false;
+        }
+
+        $subscriptionAttr = [
+            'period'    => 0,
+            'offset'    => 0,
+            'max_delay' => 0
+        ];
+
+        foreach ($productAttr as $attr) {
+            switch ($attr['name']) {
+                case ProductAttributes::SUBSCRIPTION_PERIOD:
+                    $subscriptionAttr['period'] = $attr['value'];
+                    break;
+                case ProductAttributes::SUBSCRIPTION_PAYMENT_OFFSET:
+                    $subscriptionAttr['offset'] = $attr['value'];
+                    break;
+                case ProductAttributes::SUBSCRIPTION_MAX_DELAY:
+                    $subscriptionAttr['max_delay'] = $attr['value'];
+                    break;
+                default:
+                    throw new \Exception('Attribute not implemented');
+                    break;
+            }
+        }
+
+        return $subscriptionAttr;
+    }
+
+    /**
      * Set Multiple Attributes
      * 
      * @param array $attributes Array of names to set

@@ -36,7 +36,7 @@ class ShopController extends AbstractController
         
         $order = Order::findFirstByid(76);
 
-        var_dump($order->getLastPayment());
+        var_dump($order->getLastOrder());
         exit('teste');
 
         $title = $this->translation->setTypePage()->_('title-shop-cart');

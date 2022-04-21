@@ -5,6 +5,7 @@ namespace Phlexus\Modules\Shop\Models;
 
 use Phlexus\Modules\BaseUser\Models\User;
 use Phalcon\Mvc\Model;
+use Phalcon\Mvc\Model\Resultset\Simple;
 use Phalcon\Di;
 
 /**
@@ -254,18 +255,6 @@ class Order extends Model
     }
 
     /**
-     * Get last order by product
-     * 
-     * @param int $productID Product to search for
-     *
-     * @return Order|null
-     */
-    public function getLastOrderByProduct(int $productID)
-    {
-        /** Recursive order is needed for this case **/
-    }
-
-    /**
      * Has subscription item
      * 
      * @return bool
@@ -288,17 +277,18 @@ class Order extends Model
      * 
      * @param int $productID Product to search for
      * 
-     * @return bool
+     * @return array|bool
      * 
      * @throws Exception
      */
-    public function hasSubscriptionActive(int $productID = 0): bool
+    public function hasSubscriptionActive(int $productID = 0)
     {
         $items = $this->getSubscriptionItems($productID);
         if (count($items) === 0) {
             return false;
         }
 
+        $subscriptions = [];
         foreach ($items as $item) {
             $productSubsAttr = $item->product->getSubscriptionAttributes();
             
@@ -306,16 +296,16 @@ class Order extends Model
                 return false;
             }
 
-            $lastPayment = $this->getLastPaymentByProduct((int) $item->product->id);
+            $lastPayment = Payment::getLastPaidByUserProduct((int) $this->userID, (int) $item->productID);
 
-            var_dump($lastPayment);
-            exit();
+            $paymentDay = strtotime($lastPayment->createdAt);
 
-
-            /** Proceed with subscription verification **/
+            $daysPassed = (time() - $paymentDay) / (60 * 60 * 24);
+            $limitDays  = ($productSubsAttr['period'] ?? 0) + ($productSubsAttr['max_delay'] ?? 0);
+            $subscriptions[$item->productID] = $daysPassed <= $limitDays;
         }
 
-        return false;
+        return $productID !== 0 ? $subscriptions[$productID] : $subscriptions;
     }
 
     /**
@@ -323,9 +313,9 @@ class Order extends Model
      * 
      * @param int $productID Product to search for
      * 
-     * @return array
+     * @return Simple
      */
-    public function getSubscriptionItems(int $productID = 0)
+    public function getSubscriptionItems(int $productID = 0): Simple
     {
         $whereCond   = 'I.orderID = :orderID: AND PR.isSubscription = :isSubscription:';
         $whereValues = [
@@ -339,9 +329,7 @@ class Order extends Model
         }
 
         return self::query()
-            ->columns(
-                'I.*'
-            )
+            ->columns('I.*')
             ->innerJoin(Item::class, null, 'I')
             ->innerJoin(Product::class, 'I.productID = PR.id', 'PR')
             ->where($whereCond, $whereValues)
@@ -356,9 +344,7 @@ class Order extends Model
     public function getLastPayment()
     {
         return self::query()
-            ->columns(
-                'P.*'
-            )
+            ->columns('P.*')
             ->innerJoin(Payment::class, null, 'P')
             ->where('P.orderID = :orderID:', [
                 'orderID' => $this->id
@@ -369,25 +355,24 @@ class Order extends Model
     }
 
     /**
-     * Get last payment by product
+     * Get last order by product
      * 
+     * @param int $userID    User assigned to
      * @param int $productID Product to search for
      *
-     * @return Payment|null
+     * @return Order|null
      */
-    public function getLastPaymentByProduct(int $productID)
+    public static function getLastOrderByUserProduct(int $userID, int $productID)
     {
         return self::query()
-            ->columns(
-                'P.*'
-            )
-            ->innerJoin(Payment::class, null, 'P')
-            ->where('P.orderID = :orderID:', [
-                'orderID' => $this->id
+            ->innerJoin(User::class, null, 'U')
+            ->innerJoin(Item::class, null, 'I')
+            ->where('U.id = :userID: AND I.productID = :productID:', [
+                'userID'    => $userID,
+                'productID' => $productID
             ])
-            ->orderBy('P.id DESC')
+            ->orderBy(self::class . '.id DESC')
             ->execute()
             ->getFirst();
-        /** Recursive order is needed for this case **/
     }
 }

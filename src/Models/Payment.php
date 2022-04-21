@@ -206,4 +206,30 @@ class Payment extends Model
 
         return true;
     }
+
+    /**
+     * Get last paid by product
+     * 
+     * @param int $userID    User assigned to
+     * @param int $productID Product to search for
+     *
+     * @return Payment|null
+     */
+    public static function getLastPaidByUserProduct(int $userID, int $productID)
+    {
+        $p_model = self::class;
+
+        return self::query()
+            ->columns($p_model . '.*')
+            ->innerJoin(Order::class, null, 'O')
+            ->innerJoin(Item::class, 'O.id = I.orderID', 'I')
+            ->where("O.userID = :userID: AND I.productID = :productID: AND $p_model.statusID = :status:", [
+                'userID'    => $userID,
+                'productID' => $productID,
+                'status'    => PaymentStatus::PAID
+            ])
+            ->orderBy($p_model . '.id DESC')
+            ->execute()
+            ->getFirst();
+    }
 }

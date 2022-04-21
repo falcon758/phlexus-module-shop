@@ -32,13 +32,6 @@ class ShopController extends AbstractController
      */
     public function cartAction(): void
     {
-        
-        
-        $order = Order::findFirstByid(76);
-
-        var_dump($order->getSubscriptionItems());
-        exit('teste');
-
         $title = $this->translation->setTypePage()->_('title-shop-cart');
 
         $this->tag->setTitle($title);
@@ -308,12 +301,10 @@ class ShopController extends AbstractController
 
             $products = $this->cart->getProducts();
 
-            foreach ($products as $product) {
-                if (!Item::createItem((int) $product['id'], (int) $order->id)) {
-                    $order->cancelOrder();
+            if (!$order->createItems(array_column($products, 'id'))) {
+                $order->cancelOrder();
 
-                    return null;
-                }
+                return null;
             }
         } catch(\Exception $e) {
             $errorMessage = $this->translation->setTypeMessage()

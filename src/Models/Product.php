@@ -5,6 +5,8 @@ namespace Phlexus\Modules\Shop\Models;
 
 use Phlexus\Libraries\Media\Models\Media;
 use Phalcon\Mvc\Model;
+use Phalcon\Mvc\Model\Transaction\Manager as TxManager;
+use Phalcon\Mvc\Model\Transaction\Failed as TxFailed;
 
 /**
  * Class Product
@@ -163,15 +165,30 @@ class Product extends Model
      */
     public function setAttributes(array $attributes): bool
     {
-        foreach ($attributes as $key => $value) {
-            $attribute          = new ProductAttributes();
-            $attribute->name    = $key;
-            $attribute->value   = $value;
-            $attribute->paymentID = (int) $this->id;
+        // Create a transaction manager
+        $manager = new TxManager();
 
-            if (!$attribute->save()) {
-                return false;
+        // Request a transaction
+        $transaction = $manager->get();
+        
+        try {
+            foreach ($attributes as $key => $value) {
+                $attribute = new ProductAttributes();
+                $attribute->setTransaction($transaction);
+                $attribute->name      = $key;
+                $attribute->value     = $value;
+                $attribute->paymentID = (int) $this->id;
+
+                if (!$attribute->save()) {
+                    $transaction->rollback();
+                    return false;
+                }
             }
+
+            $transaction->commit();
+        } catch (TxFailed $e) {
+            $transaction->rollback();
+            return false;
         }
 
         return true;

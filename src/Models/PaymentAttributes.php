@@ -16,6 +16,10 @@ class PaymentAttributes extends Model
 
     public const ENABLED = 1;
 
+    public const SUBSCRIPTION_DATE_LIMIT = 'subscription_date_limit';
+
+    public const SUBSCRIPTION_MAX_DELAY = 'subscription_max_delay';
+
     /**
      * @var int
      */

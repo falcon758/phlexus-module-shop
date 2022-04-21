@@ -5,6 +5,8 @@ namespace Phlexus\Modules\Shop\Models;
 
 use Phlexus\Modules\BaseUser\Models\User;
 use Phalcon\Mvc\Model;
+use Phalcon\Mvc\Model\Transaction\Manager as TxManager;
+use Phalcon\Mvc\Model\Transaction\Failed as TxFailed;
 use Phalcon\Mvc\Model\Resultset\Simple;
 use Phalcon\Di;
 
@@ -225,6 +227,49 @@ class Order extends Model
     }
 
     /**
+     * Create items
+     * 
+     * @param array $productsID Products id to assign
+     *
+     * @return bool
+     */
+    public function createItems(array $productsID): bool {
+        // Create a transaction manager
+        $manager = new TxManager();
+
+        // Request a transaction
+        $transaction = $manager->get();
+
+        try {
+            foreach ($productsID as $prodID) {
+                $item = new Item;
+                $item->setTransaction($transaction);
+
+                $product = Product::findFirstByid((int) $prodID);
+
+                if (!$product) {
+                    throw new \Exception('Product doesn\'t exists');
+                }
+
+                $item->productID = (int) $product->id;
+                $item->orderID   = (int) $this->id;
+
+                if (!$item->save()) {
+                    $transaction->rollback();
+                    return false;
+                }
+            }
+
+            $transaction->commit();
+        } catch (TxFailed $e) {
+            $transaction->rollback();
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Get last order
      * 
      * @return Order
@@ -354,6 +399,26 @@ class Order extends Model
             ->getFirst();
     }
 
+
+    /**
+     * Get last paid payment
+     * 
+     * @return Payment|null
+     */
+    public function getLastPaidPayment()
+    {
+        return self::query()
+            ->columns('P.*')
+            ->innerJoin(Payment::class, null, 'P')
+            ->where('P.status = :status: AND P.orderID = :orderID:', [
+                'status'  => PaymentStatus::PAID,
+                'orderID' => $this->id
+            ])
+            ->orderBy('P.id DESC')
+            ->execute()
+            ->getFirst();
+    }
+
     /**
      * Get last order by product
      * 
@@ -374,5 +439,21 @@ class Order extends Model
             ->orderBy(self::class . '.id DESC')
             ->execute()
             ->getFirst();
+    }
+
+    /**
+     * Get all renewals
+     *
+     * @return Simple
+     */
+    public static function getAllRenewals(): Simple
+    {
+        return self::find([
+            'status = :status: AND active = :active:',
+            'bind' => [
+                'status' => OrderStatus::RENEWAL,
+                'active' => 1
+            ]
+        ]);
     }
 }

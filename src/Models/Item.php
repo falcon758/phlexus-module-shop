@@ -67,7 +67,7 @@ class Item extends Model
     }
 
     /**
-     * Create items
+     * Create item
      * 
      * @param int $productID Product id to assign
      * @param int $orderID   Order id to assign

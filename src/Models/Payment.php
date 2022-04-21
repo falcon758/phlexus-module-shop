@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Phlexus\Modules\Shop\Models;
 
 use Phalcon\Mvc\Model;
+use Phalcon\Mvc\Model\Transaction\Manager as TxManager;
+use Phalcon\Mvc\Model\Transaction\Failed as TxFailed;
 use Phalcon\Di;
 
 /**
@@ -193,15 +195,30 @@ class Payment extends Model
      */
     public function setAttributes(array $attributes): bool
     {
-        foreach ($attributes as $key => $value) {
-            $attribute          = new PaymentAttributes();
-            $attribute->name    = $key;
-            $attribute->value   = $value;
-            $attribute->paymentID = (int) $this->id;
+        // Create a transaction manager
+        $manager = new TxManager();
 
-            if (!$attribute->save()) {
-                return false;
+        // Request a transaction
+        $transaction = $manager->get();
+        
+        try {
+            foreach ($attributes as $key => $value) {
+                $attribute = new PaymentAttributes();
+                $attribute->setTransaction($transaction);
+                $attribute->name      = $key;
+                $attribute->value     = $value;
+                $attribute->paymentID = (int) $this->id;
+
+                if (!$attribute->save()) {
+                    $transaction->rollback();
+                    return false;
+                }
             }
+
+            $transaction->commit();
+        } catch (TxFailed $e) {
+            $transaction->rollback();
+            return false;
         }
 
         return true;

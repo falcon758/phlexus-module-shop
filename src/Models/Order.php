@@ -354,6 +354,26 @@ class Order extends Model
             ->getFirst();
     }
 
+
+    /**
+     * Get last payment paid
+     * 
+     * @return Payment|null
+     */
+    public function getLastPaymentPaid()
+    {
+        return self::query()
+            ->columns('P.*')
+            ->innerJoin(Payment::class, null, 'P')
+            ->where('P.status = :status: AND P.orderID = :orderID:', [
+                'status'  => PaymentStatus::PAID,
+                'orderID' => $this->id
+            ])
+            ->orderBy('P.id DESC')
+            ->execute()
+            ->getFirst();
+    }
+
     /**
      * Get last order by product
      * 
@@ -374,5 +394,21 @@ class Order extends Model
             ->orderBy(self::class . '.id DESC')
             ->execute()
             ->getFirst();
+    }
+
+    /**
+     * Get all renewals
+     *
+     * @return Simple
+     */
+    public static function getAllRenewals(): Simple
+    {
+        return self::find([
+            'status = :status: AND active = :active:',
+            'bind' => [
+                'status' => OrderStatus::RENEWAL,
+                'active' => 1
+            ]
+        ]);
     }
 }

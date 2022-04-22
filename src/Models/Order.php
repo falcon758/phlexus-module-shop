@@ -399,7 +399,6 @@ class Order extends Model
             ->getFirst();
     }
 
-
     /**
      * Get last paid payment
      * 

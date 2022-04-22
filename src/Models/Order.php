@@ -326,31 +326,44 @@ class Order extends Model
      * 
      * @throws Exception
      */
-    public function hasSubscriptionActive(int $productID = 0)
+    public function hasSubscriptionActive(int $productID)
     {
-        $items = $this->getSubscriptionItems($productID);
-        if (count($items) === 0) {
-            return false;
-        }
+        $p_model = self::class;
 
-        $subscriptions = [];
-        foreach ($items as $item) {
-            $productSubsAttr = $item->product->getSubscriptionAttributes();
-            
-            if (count($productSubsAttr) === 0) {
-                return false;
-            }
-
-            $lastPayment = Payment::getLastPaidByUserProduct((int) $this->userID, (int) $item->productID);
-
-            $paymentDay = strtotime($lastPayment->createdAt);
-
-            $daysPassed = (time() - $paymentDay) / (60 * 60 * 24);
-            $limitDays  = ($productSubsAttr['period'] ?? 0) + ($productSubsAttr['max_delay'] ?? 0);
-            $subscriptions[$item->productID] = $daysPassed <= $limitDays;
-        }
-
-        return $productID !== 0 ? $subscriptions[$productID] : $subscriptions;
+        return self::query()
+            ->columns($p_model . '.*')
+            ->innerJoin(Item::class, null, 'I')
+            ->innerJoin(Product::class, 'I.productID = PR.id', 'PR')
+            ->innerJoin(ProductAttributes::class, 'PR.id = Period.productID AND Period.name = "' . ProductAttributes::SUBSCRIPTION_PERIOD . '"', 'Period')
+            ->innerJoin(ProductAttributes::class, 'PR.id = MaxDelay.productID AND MaxDelay.name = "' .ProductAttributes::SUBSCRIPTION_MAX_DELAY . '"', 'MaxDelay')
+            ->innerJoin(Payment::class, "$p_model.id = PST.orderID", 'PST')
+            ->leftJoin(Payment::class, "
+                $p_model.id = PSD.orderID
+            AND 
+                (
+                        PST.createdAt < PSD.createdAt 
+                    OR (
+                        PST.createdAt = PSD.createdAt AND PST.id < PSD.id
+                    )
+                )", 'PSD')
+            ->where(
+                "$p_model.active = :active: 
+                AND $p_model.id = :orderID:
+                AND I.active = :active: 
+                AND $p_model.statusID = :status: 
+                AND PR.id = :productID:
+                AND PR.isSubscription = :isSubscription:
+                AND DATEDIFF(CURRENT_DATE(), PST.createdAt) <= Period.value + MaxDelay.value",
+                [
+                    'active'         => self::ENABLED,
+                    'orderID'        => $this->id,
+                    'status'         => OrderStatus::RENEWAL,
+                    'productID'      => $productID,
+                    'isSubscription' => 1
+                ]
+            )->orderBy($p_model . '.id DESC')
+            ->execute()
+            ->count() === 1;
     }
 
     /**

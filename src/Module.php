@@ -62,6 +62,7 @@ class Module extends PhlexusModule
                 self::getHandlersNamespace() . '\\Models' => __DIR__ . '/Models/',
                 self::getHandlersNamespace() . '\\Controllers' => __DIR__ . '/Controllers/',
                 self::getHandlersNamespace() . '\\Providers' => __DIR__ . '/Providers/',
+                self::getHandlersNamespace() . '\\Tasks' => __DIR__ . '/Tasks/',
             ])
             ->register();
     }

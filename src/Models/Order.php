@@ -447,12 +447,18 @@ class Order extends Model
      */
     public static function getAllRenewals(): Simple
     {
-        return self::find([
-            'status = :status: AND active = :active:',
-            'bind' => [
-                'status' => OrderStatus::RENEWAL,
-                'active' => 1
-            ]
-        ]);
+        $p_model = self::class;
+
+        return self::query()
+            ->columns($p_model . '.*')
+            ->innerJoin(Item::class, null, 'I')
+            ->innerJoin(Product::class, 'I.productID = PR.id', 'PR')
+            ->where("$p_model.active = :active: AND $p_model.statusID = :status: AND PR.isSubscription = :isSubscription:", [
+                'active'         => self::ENABLED,
+                'status'         => OrderStatus::RENEWAL,
+                'isSubscription' => 1
+            ])
+            ->orderBy($p_model . '.id DESC')
+            ->execute();
     }
 }

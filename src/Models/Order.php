@@ -453,12 +453,30 @@ class Order extends Model
             ->columns($p_model . '.*')
             ->innerJoin(Item::class, null, 'I')
             ->innerJoin(Product::class, 'I.productID = PR.id', 'PR')
-            ->where("$p_model.active = :active: AND $p_model.statusID = :status: AND PR.isSubscription = :isSubscription:", [
-                'active'         => self::ENABLED,
-                'status'         => OrderStatus::RENEWAL,
-                'isSubscription' => 1
-            ])
-            ->orderBy($p_model . '.id DESC')
+            ->innerJoin(ProductAttributes::class, 'PR.id = Period.productID AND Period.name = "' . ProductAttributes::SUBSCRIPTION_PERIOD . '"', 'Period')
+            ->innerJoin(ProductAttributes::class, 'PR.id = SOffset.productID AND SOffset.name = "' .ProductAttributes::SUBSCRIPTION_PAYMENT_OFFSET . '"', 'SOffset')
+            ->innerJoin(Payment::class, "$p_model.id = PST.orderID", 'PST')
+            ->leftJoin(Payment::class, "
+                $p_model.id = PSD.orderID
+            AND 
+                (
+                        PST.createdAt < PSD.createdAt 
+                    OR (
+                        PST.createdAt = PSD.createdAt AND PST.id < PSD.id
+                    )
+                )", 'PSD')
+            ->where(
+                "$p_model.active = :active: 
+                AND I.active = :active: 
+                AND $p_model.statusID = :status: 
+                AND PR.isSubscription = :isSubscription:
+                AND DATEDIFF(CURRENT_DATE(), PST.createdAt) >= Period.value - SOffset.value",
+                [
+                    'active'         => self::ENABLED,
+                    'status'         => OrderStatus::RENEWAL,
+                    'isSubscription' => 1
+                ]
+            )->orderBy($p_model . '.id DESC')
             ->execute();
     }
 }

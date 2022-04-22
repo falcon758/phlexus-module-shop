@@ -12,7 +12,10 @@ class SubscriptionTask extends Task
     public function createPaymentsAction()
     {
         $allOrders = Order::getAllRenewals();
-        var_dump(count($allOrders));
+
+        foreach ($allOrders as $order) {
+
+        }
     }
 
     public function verifySubscriptionAction()

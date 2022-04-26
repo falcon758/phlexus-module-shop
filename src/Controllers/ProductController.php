@@ -83,6 +83,10 @@ final class ProductController extends AbstractController
         $this->setForm($form);
 
         $this->setViewFields(['id', 'name', 'price', 'isSubscription']);
+
+        $this->setRelatedViews([
+            'link-product-attributes' => $this->url->get('shop/product-attributes')
+        ]);
     }
 
     /**

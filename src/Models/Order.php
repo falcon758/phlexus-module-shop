@@ -209,7 +209,7 @@ class Order extends Model
     public static function createOrder(
         int $userID, int $billingID, int $shipmentID,
         int $paymentMethodID, int $shippingMethodID,
-        int $relatedOrder = 0
+        int $relatedOrder = 0, int $statusID = OrderStatus::CREATED
     ): Order {
         $order = new self;
         $order->hashCode         = Di::getDefault()->getShared('security')->getRandom()->base64Safe(self::HASHLENGTH);
@@ -229,6 +229,31 @@ class Order extends Model
         }
 
         return $order;
+    }
+
+    /**
+     * Renewal order
+     * 
+     * @param int $userID           User to assign order to
+     * @param int $billingID        Billing id to assign
+     * @param int $shipmentID       Shipment id to assign
+     * @param int $paymentMethodID  Payment method id to assign
+     * @param int $shippingMethodID Shipping method id to assign
+     *
+     * @return Order
+     * 
+     * @throws Exception
+     */
+    public static function renewalOrder(
+        int $userID, int $billingID, int $shipmentID,
+        int $paymentMethodID, int $shippingMethodID,
+        int $relatedOrder = 0, int $statusID = OrderStatus::CREATED
+    ): Order {
+        return self::createOrder(
+            $userID, $billingID, $shipmentID,
+            $paymentMethodID, $shippingMethodID,
+            $relatedOrder = 0, OrderStatus::RENEWAL
+        );
     }
 
     /**
@@ -353,10 +378,10 @@ class Order extends Model
             ->where(
                 "$p_model.active = :active: 
                 AND $p_model.id = :orderID:
-                AND I.active = :active: 
                 AND $p_model.statusID = :status: 
+                AND I.active = :active: 
                 AND PR.id = :productID:
-                AND PR.isSubscription = :isSubscription:
+                AND PR.isSubscription = :isSubscription: 
                 AND DATEDIFF(CURRENT_DATE(), PST.createdAt) <= Period.value + MaxDelay.value",
                 [
                     'active'         => self::ENABLED,
@@ -495,14 +520,56 @@ class Order extends Model
                 )", 'PSD')
             ->where(
                 "$p_model.active = :active: 
-                AND I.active = :active: 
                 AND $p_model.statusID = :status: 
-                AND PR.isSubscription = :isSubscription:
+                AND I.active = :active: 
+                AND PR.isSubscription = :isSubscription: 
                 AND DATEDIFF(CURRENT_DATE(), PST.createdAt) >= Period.value - SOffset.value",
                 [
                     'active'         => self::ENABLED,
                     'status'         => OrderStatus::RENEWAL,
                     'isSubscription' => 1
+                ]
+            )->orderBy($p_model . '.id DESC')
+            ->execute();
+    }
+
+    /**
+     * Get all expired
+     *
+     * @return Simple
+     */
+    public static function getAllExpired(): Simple
+    {
+        $p_model = self::class;
+
+        return self::query()
+            ->columns('I.*')
+            ->innerJoin(Item::class, null, 'I')
+            ->innerJoin(Product::class, 'I.productID = PR.id', 'PR')
+            ->innerJoin(ProductAttributes::class, 'PR.id = Period.productID AND Period.name = "' . ProductAttributes::SUBSCRIPTION_PERIOD . '"', 'Period')
+            ->innerJoin(ProductAttributes::class, 'PR.id = MaxDelay.productID AND MaxDelay.name = "' .ProductAttributes::SUBSCRIPTION_MAX_DELAY . '"', 'MaxDelay')
+            ->innerJoin(Payment::class, "$p_model.id = PST.orderID", 'PST')
+            ->leftJoin(Payment::class, "
+                $p_model.id = PSD.orderID
+            AND 
+                (
+                        PST.createdAt < PSD.createdAt 
+                    OR (
+                        PST.createdAt = PSD.createdAt AND PST.id < PSD.id
+                    )
+                )", 'PSD')
+            ->where(
+                "$p_model.active = :active: 
+                AND $p_model.statusID = :status: 
+                AND I.active = :active: 
+                AND PR.isSubscription = :isSubscription: 
+                AND PST.statusID != :paymentStatus:
+                AND DATEDIFF(CURRENT_DATE(), PST.createdAt) > MaxDelay.value",
+                [
+                    'active'         => self::ENABLED,
+                    'status'         => OrderStatus::RENEWAL,
+                    'isSubscription' => 1,
+                    'paymentStatus'  => PaymentStatus::PAID
                 ]
             )->orderBy($p_model . '.id DESC')
             ->execute();

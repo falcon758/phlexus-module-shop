@@ -26,7 +26,7 @@ class SubscriptionTask extends Task
                         continue;
                     }
 
-                    $newOrder = Order::createOrder(
+                    $newOrder = Order::renewalOrder(
                         (int) $order->userID,
                         (int) $order->billingID,
                         (int) $order->shipmentID,
@@ -57,5 +57,12 @@ class SubscriptionTask extends Task
 
     public function verifySubscriptionAction()
     {
+        $allExpired = Order::getAllExpired();
+
+        foreach ($allExpired as $expired) {
+            if (!$expired->disableItem()) {
+                error_log('Failed to disable item!', 0);
+            }
+        }
     }
 }

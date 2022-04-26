@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Phlexus\Modules\Shop\Models;
 
+use Phalcon\Di;
 use Phalcon\Mvc\Model;
 
 /**
@@ -67,6 +68,26 @@ class Item extends Model
     }
 
     /**
+     * Has subscription product
+     * 
+     * @return bool
+     */
+    public function hasSubscriptionProduct(): bool
+    {
+        return $this->product->hasSubscription();
+    }
+
+    /**
+     * Disable item
+     *
+     * @return bool
+     */
+    public function disableItem(): bool {
+        $this->active = self::DISABLED;
+        return $this->save();
+    }
+
+    /**
      * Create item
      * 
      * @param int $productID Product id to assign
@@ -96,12 +117,24 @@ class Item extends Model
     }
 
     /**
-     * Has subscription product
+     * Disable item by order
+     *
+     * @param int $itemID    Item id to disable
+     * @param int $orderID   Order id associated
      * 
      * @return bool
      */
-    public function hasSubscriptionProduct(): bool
-    {
-        return $this->product->hasSubscription();
+    public static function disableOrderItem(int $itemID, int $orderID): bool {
+        $disableItem = Di::getDefault()->getShared('db')->prepare('
+            UPDATE items SET active = :active WHERE id = :id AND orderID = :orderID
+        ');
+
+        $active = self::DISABLED;
+
+        $disableItem->bindParam(':active', $active);
+        $disableItem->bindParam(':id', $itemID);
+        $disableItem->bindParam(':orderID', $orderID);
+
+        return $disableItem->execute();
     }
 }

@@ -208,16 +208,21 @@ class Order extends Model
      */
     public static function createOrder(
         int $userID, int $billingID, int $shipmentID,
-        int $paymentMethod, int $shippingMethod
+        int $paymentMethodID, int $shippingMethodID,
+        int $relatedOrder = 0
     ): Order {
         $order = new self;
         $order->hashCode         = Di::getDefault()->getShared('security')->getRandom()->base64Safe(self::HASHLENGTH);
         $order->userID           = $userID;
         $order->billingID        = $billingID;
         $order->shipmentID       = $shipmentID;
-        $order->paymentMethodID  = $paymentMethod;
-        $order->shippingMethodID = $shippingMethod;
+        $order->paymentMethodID  = $paymentMethodID;
+        $order->shippingMethodID = $shippingMethodID;
         $order->statusID         = OrderStatus::CREATED;
+
+        if ($relatedOrder > 0) {
+            $order->parentID = $relatedOrder;
+        }
 
         if (!$order->save()) {
             throw new \Exception('Unable to process order');
@@ -331,7 +336,6 @@ class Order extends Model
         $p_model = self::class;
 
         return self::query()
-            ->columns($p_model . '.*')
             ->innerJoin(Item::class, null, 'I')
             ->innerJoin(Product::class, 'I.productID = PR.id', 'PR')
             ->innerJoin(ProductAttributes::class, 'PR.id = Period.productID AND Period.name = "' . ProductAttributes::SUBSCRIPTION_PERIOD . '"', 'Period')
@@ -461,10 +465,21 @@ class Order extends Model
     public static function getAllRenewals(): Simple
     {
         $p_model = self::class;
+        $i_model = Item::class;
 
         return self::query()
-            ->columns($p_model . '.*')
-            ->innerJoin(Item::class, null, 'I')
+            ->columns("
+                $p_model.id AS orderID,
+                $p_model.userID,
+                $p_model.billingID,
+                $p_model.shipmentID,
+                $p_model.paymentMethodID,
+                $p_model.shippingMethodID,
+                I.id AS itemID,
+                I.productID,
+                (SELECT COUNT($i_model.id) FROM $i_model WHERE $i_model.orderID = $p_model.id) AS itemsCount
+            ")
+            ->innerJoin($i_model, null, 'I')
             ->innerJoin(Product::class, 'I.productID = PR.id', 'PR')
             ->innerJoin(ProductAttributes::class, 'PR.id = Period.productID AND Period.name = "' . ProductAttributes::SUBSCRIPTION_PERIOD . '"', 'Period')
             ->innerJoin(ProductAttributes::class, 'PR.id = SOffset.productID AND SOffset.name = "' .ProductAttributes::SUBSCRIPTION_PAYMENT_OFFSET . '"', 'SOffset')

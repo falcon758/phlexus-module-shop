@@ -3,21 +3,20 @@ declare(strict_types=1);
 
 namespace Phlexus\Modules\Shop\Controllers;
 
-use Phlexus\Modules\Shop\Models\Product;
 use Phlexus\Modules\Shop\Models\ProductAttribute;
 use Phlexus\Modules\Generic\Forms\BaseForm;
 use Phalcon\Forms\Element\Text;
 use Phalcon\Forms\Element\Check;
 use Phalcon\Forms\Element\File;
 use Phalcon\Forms\Element\Hidden;
-use Phlexus\Libraries\Media\Models\Media;
+use Phalcon\Http\ResponseInterface;
 
 /**
- * Class Product
+ * Class ProductAttribute
  *
  * @package Phlexus\Modules\Shop\Controllers
  */
-final class ProductController extends AbstractController
+final class ProductAttributeController extends AbstractController
 {
     use \Phlexus\Modules\Generic\Actions\CreateAction;
     use \Phlexus\Modules\Generic\Actions\EditAction;
@@ -34,7 +33,7 @@ final class ProductController extends AbstractController
      */
     public function initialize(): void
     {
-        $title = $this->translation->setTypePage()->_('title-products-manager');
+        $title = $this->translation->setTypePage()->_('title-product-attributes-manager');
 
         $this->tag->setTitle($title);
 
@@ -42,7 +41,9 @@ final class ProductController extends AbstractController
 
         $this->view->setMainView(preg_replace('/\/public$/', '/default', $mainView));
 
-        $this->setModel(new Product);
+        $this->setModel(new ProductAttribute);
+
+        $this->setRecords(ProductAttribute::findByproductID($this->request->get('related', null, 0)));
 
         $form = new BaseForm(!$this->isSave());
 
@@ -61,19 +62,9 @@ final class ProductController extends AbstractController
                 'required' => true
             ],
             [
-                'name'     => 'price',
+                'name'     => 'value',
                 'type'     => Text::class,
                 'required' => true
-            ],
-            [
-                'name'     => 'isSubscription',
-                'type'     => Check::class,
-                'value'    => 1
-            ],
-            [
-                'name'    => 'imageID',
-                'type'    => File::class,
-                'related' => Media::class
             ]
         ];
 
@@ -83,11 +74,29 @@ final class ProductController extends AbstractController
 
         $this->setForm($form);
 
-        $this->setViewFields(['id', 'name', 'price', 'isSubscription']);
+        $this->setViewFields(['id', 'name', 'value']);
+    }
 
-        $this->setRelatedViews([
-            'link-product-attributes' => $this->url->get('shop/product_attribute')
-        ]);
+
+
+    /**
+     * Override Save Action
+     *
+     * @return ResponseInterface
+     */
+    public function saveAction(): ResponseInterface
+    {
+        $response = $this->traitSaveAction();
+
+        $model = $this->getModel();
+
+        $productID = (isset($model->productID) ? $model->productID : 0);
+
+        if ($productID === 0) {
+            return $response;
+        }
+
+        return $this->response->redirect('/shop/product_attribute?related=' . $productID);
     }
 
     /**
@@ -98,34 +107,5 @@ final class ProductController extends AbstractController
     private function isSave()
     {
         return $this->dispatcher->getActionName() === 'save';
-    }
-
-    /**
-     * Override Save Action
-     *
-     * @return ResponseInterface
-     */
-    public function saveAction(): ResponseInterface
-    {
-        $isSubscription = null;
-
-        if ($this->request->isPost()) {
-            $isSubscription = $this->request->getPost('isSubscription', null, null);
-            
-            if ($isSubscription === null) {
-                $_POST['isSubscription'] = '0';
-            }
-        }
-
-        $response = $this->traitSaveAction();
-
-        if (!$this->isModelEdit() && $isSubscription === '1') {
-            $product = $this->getModel();
-
-            $productAttributes = ProductAttribute::getSubscriptionAttributes();
-            $this->getModel()->setAttributes($productAttributes);
-        }
-
-        return $response;
     }
 }

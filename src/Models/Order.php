@@ -363,8 +363,8 @@ class Order extends Model
         return self::query()
             ->innerJoin(Item::class, null, 'I')
             ->innerJoin(Product::class, 'I.productID = PR.id', 'PR')
-            ->innerJoin(ProductAttributes::class, 'PR.id = Period.productID AND Period.name = "' . ProductAttributes::SUBSCRIPTION_PERIOD . '"', 'Period')
-            ->innerJoin(ProductAttributes::class, 'PR.id = MaxDelay.productID AND MaxDelay.name = "' .ProductAttributes::SUBSCRIPTION_MAX_DELAY . '"', 'MaxDelay')
+            ->innerJoin(ProductAttribute::class, 'PR.id = Period.productID AND Period.name = "' . ProductAttribute::SUBSCRIPTION_PERIOD . '"', 'Period')
+            ->innerJoin(ProductAttribute::class, 'PR.id = MaxDelay.productID AND MaxDelay.name = "' . ProductAttribute::SUBSCRIPTION_MAX_DELAY . '"', 'MaxDelay')
             ->innerJoin(Payment::class, "$p_model.id = PST.orderID", 'PST')
             ->leftJoin(Payment::class, "
                 $p_model.id = PSD.orderID
@@ -506,8 +506,8 @@ class Order extends Model
             ")
             ->innerJoin($i_model, null, 'I')
             ->innerJoin(Product::class, 'I.productID = PR.id', 'PR')
-            ->innerJoin(ProductAttributes::class, 'PR.id = Period.productID AND Period.name = "' . ProductAttributes::SUBSCRIPTION_PERIOD . '"', 'Period')
-            ->innerJoin(ProductAttributes::class, 'PR.id = SOffset.productID AND SOffset.name = "' .ProductAttributes::SUBSCRIPTION_PAYMENT_OFFSET . '"', 'SOffset')
+            ->innerJoin(ProductAttribute::class, 'PR.id = Period.productID AND Period.name = "' . ProductAttribute::SUBSCRIPTION_PERIOD . '"', 'Period')
+            ->innerJoin(ProductAttribute::class, 'PR.id = SOffset.productID AND SOffset.name = "' . ProductAttribute::SUBSCRIPTION_PAYMENT_OFFSET . '"', 'SOffset')
             ->innerJoin(Payment::class, "$p_model.id = PST.orderID", 'PST')
             ->leftJoin(Payment::class, "
                 $p_model.id = PSD.orderID
@@ -546,8 +546,8 @@ class Order extends Model
             ->columns('I.*')
             ->innerJoin(Item::class, null, 'I')
             ->innerJoin(Product::class, 'I.productID = PR.id', 'PR')
-            ->innerJoin(ProductAttributes::class, 'PR.id = Period.productID AND Period.name = "' . ProductAttributes::SUBSCRIPTION_PERIOD . '"', 'Period')
-            ->innerJoin(ProductAttributes::class, 'PR.id = MaxDelay.productID AND MaxDelay.name = "' .ProductAttributes::SUBSCRIPTION_MAX_DELAY . '"', 'MaxDelay')
+            ->innerJoin(ProductAttribute::class, 'PR.id = Period.productID AND Period.name = "' . ProductAttribute::SUBSCRIPTION_PERIOD . '"', 'Period')
+            ->innerJoin(ProductAttribute::class, 'PR.id = MaxDelay.productID AND MaxDelay.name = "' . ProductAttribute::SUBSCRIPTION_MAX_DELAY . '"', 'MaxDelay')
             ->innerJoin(Payment::class, "$p_model.id = PST.orderID", 'PST')
             ->leftJoin(Payment::class, "
                 $p_model.id = PSD.orderID

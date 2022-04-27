@@ -71,7 +71,7 @@ class ShopController extends AbstractController
         $translationMessage = $this->translation->setTypeMessage();
 
         if (
-            !$this->security->checkToken('csrf', $this->request->getPost('csrf', null))
+            !$this->security->checkToken('csrf', $this->request->getPost('csrf', null, null))
             || !$this->cart->addProduct($productID) 
         ) {
             return $this->response->setJsonContent([
@@ -98,7 +98,7 @@ class ShopController extends AbstractController
 
         $translationMessage = $this->translation->setTypeMessage();
 
-        if (!$this->security->checkToken('csrf', $this->request->getPost('csrf', null))) {
+        if (!$this->security->checkToken('csrf', $this->request->getPost('csrf', null, null))) {
             return $this->response->setJsonContent([
                 'success' => false,
                 'message' => $translationMessage->_('unable-to-remove-product'),

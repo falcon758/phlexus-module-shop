@@ -73,7 +73,7 @@ class Product extends Model
             'reusable' => true,
         ]);
 
-        $this->hasMany('id', ProductAttributes::class, 'productID', ['alias' => 'productAttributes']);
+        $this->hasMany('id', ProductAttribute::class, 'productID', ['alias' => 'productAttribute']);
     }
 
     /**
@@ -103,7 +103,7 @@ class Product extends Model
 
         $values = array_merge([$this->id], $names);
 
-        $attributes = ProductAttributes::find(
+        $attributes = ProductAttribute::find(
             [
                 'productID = ?0 AND name IN (' . $inQuery . ')',
                 'bind' => $values
@@ -121,9 +121,9 @@ class Product extends Model
     public function getSubscriptionAttributes(): array
     {
         $productAttr = $this->getAttributes([
-            ProductAttributes::SUBSCRIPTION_PERIOD,
-            ProductAttributes::SUBSCRIPTION_PAYMENT_OFFSET,
-            ProductAttributes::SUBSCRIPTION_MAX_DELAY
+            ProductAttribute::SUBSCRIPTION_PERIOD,
+            ProductAttribute::SUBSCRIPTION_PAYMENT_OFFSET,
+            ProductAttribute::SUBSCRIPTION_MAX_DELAY
         ]);
         
         if (count($productAttr) === 0) {
@@ -138,13 +138,13 @@ class Product extends Model
 
         foreach ($productAttr as $attr) {
             switch ($attr['name']) {
-                case ProductAttributes::SUBSCRIPTION_PERIOD:
+                case ProductAttribute::SUBSCRIPTION_PERIOD:
                     $subscriptionAttr['period'] = $attr['value'];
                     break;
-                case ProductAttributes::SUBSCRIPTION_PAYMENT_OFFSET:
+                case ProductAttribute::SUBSCRIPTION_PAYMENT_OFFSET:
                     $subscriptionAttr['offset'] = $attr['value'];
                     break;
-                case ProductAttributes::SUBSCRIPTION_MAX_DELAY:
+                case ProductAttribute::SUBSCRIPTION_MAX_DELAY:
                     $subscriptionAttr['max_delay'] = $attr['value'];
                     break;
                 default:
@@ -173,11 +173,11 @@ class Product extends Model
         
         try {
             foreach ($attributes as $key => $value) {
-                $attribute = new ProductAttributes();
+                $attribute = new ProductAttribute();
                 $attribute->setTransaction($transaction);
-                $attribute->name      = $key;
-                $attribute->value     = $value;
-                $attribute->paymentID = (int) $this->id;
+                $attribute->name      = (string) $key;
+                $attribute->value     = (string) $value;
+                $attribute->productID = (int) $this->id;
 
                 if (!$attribute->save()) {
                     $transaction->rollback();

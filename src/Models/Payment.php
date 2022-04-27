@@ -95,7 +95,7 @@ class Payment extends Model
             'reusable' => true,
         ]);
 
-        $this->hasMany('id', PaymentAttributes::class, 'paymentID', ['alias' => 'paymentAttributes']);
+        $this->hasMany('id', PaymentAttribute::class, 'paymentID', ['alias' => 'paymentAttribute']);
     }
 
     /**
@@ -176,7 +176,7 @@ class Payment extends Model
 
         $values = array_merge([$this->id], $names);
 
-        $attributes = PaymentAttributes::find(
+        $attributes = PaymentAttribute::find(
             [
                 'paymentID = ?0 AND name IN (' . $inQuery . ')',
                 'bind' => $values
@@ -203,10 +203,10 @@ class Payment extends Model
         
         try {
             foreach ($attributes as $key => $value) {
-                $attribute = new PaymentAttributes();
+                $attribute = new PaymentAttribute();
                 $attribute->setTransaction($transaction);
-                $attribute->name      = $key;
-                $attribute->value     = $value;
+                $attribute->name      = (string) $key;
+                $attribute->value     = (string) $value;
                 $attribute->paymentID = (int) $this->id;
 
                 if (!$attribute->save()) {

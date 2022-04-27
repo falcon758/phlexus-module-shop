@@ -10,32 +10,34 @@ $routes = new RouterGroup([
     'action'     => 'index',
 ]);
 
-$routes->addGet('/shop/product', [
-    'controller' => 'product',
-    'action'     => 'view',
-]);
+foreach (['product', 'product_attribute'] as $controller) {
+    $routes->addGet('/shop/' . $controller, [
+        'controller' => $controller,
+        'action'     => 'view',
+    ]);
 
-foreach (['create', 'view'] as $action) {
-    $routes->addGet('/shop/product/' . $action, [
-        'controller' => 'product',
-        'action'     => $action,
+    foreach (['create', 'view'] as $action) {
+        $routes->addGet('/shop/' . $controller .'/' . $action, [
+            'controller' => $controller,
+            'action'     => $action,
+        ]);
+    }
+
+    $routes->addGet('/shop/' . $controller . '/edit/{id:[0-9]+}', [
+        'controller' => $controller,
+        'action'     => 'edit',
+    ]);
+
+    $routes->addPost('/shop/' . $controller . '/save', [
+        'controller' => $controller,
+        'action'     => 'save',
+    ]);
+
+    $routes->addPost('/shop/' . $controller . '/delete/{id:[0-9]+}', [
+        'controller' => $controller,
+        'action'     => 'delete',
     ]);
 }
-
-$routes->addGet('/shop/product/edit/{id:[0-9]+}', [
-    'controller' => 'product',
-    'action'     => 'edit',
-]);
-
-$routes->addPost('/shop/product/save', [
-    'controller' => 'product',
-    'action'     => 'save',
-]);
-
-$routes->addPost('/shop/product/delete/{id:[0-9]+}', [
-    'controller' => 'product',
-    'action'     => 'delete',
-]);
 
 $routes->addGet('/cart', [
     'controller' => 'shop',

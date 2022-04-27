@@ -6,11 +6,11 @@ namespace Phlexus\Modules\Shop\Models;
 use Phalcon\Mvc\Model;
 
 /**
- * Class PaymentAttributes
+ * Class PaymentAttribute
  *
  * @package Phlexus\Modules\Shop\Models
  */
-class PaymentAttributes extends Model
+class PaymentAttribute extends Model
 {
     public const DISABLED = 0;
 

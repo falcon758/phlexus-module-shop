@@ -3,9 +3,12 @@ declare(strict_types=1);
 
 namespace Phlexus\Modules\Shop\Models;
 
+
+use Phlexus\Modules\BaseUser\Models\User;
 use Phalcon\Mvc\Model;
 use Phalcon\Mvc\Model\Transaction\Manager as TxManager;
 use Phalcon\Mvc\Model\Transaction\Failed as TxFailed;
+use Phalcon\Mvc\Model\Resultset\Simple;
 use Phalcon\Di;
 
 /**
@@ -240,13 +243,50 @@ class Payment extends Model
             ->columns($p_model . '.*')
             ->innerJoin(Order::class, null, 'O')
             ->innerJoin(Item::class, 'O.id = I.orderID', 'I')
-            ->where("O.userID = :userID: AND I.productID = :productID: AND $p_model.statusID = :status:", [
+            ->where(" $p_model.statusID = :status: AND O.userID = :userID: AND I.productID = :productID:", [
+                'status'    => PaymentStatus::PAID,
                 'userID'    => $userID,
                 'productID' => $productID,
-                'status'    => PaymentStatus::PAID
             ])
             ->orderBy($p_model . '.id DESC')
             ->execute()
             ->getFirst();
+    }
+
+    /**
+     * Get all in payment
+     * 
+     * @return Simple
+     * 
+     * @throws Exception
+     */
+    public static function getInPayment()
+    {
+        $user = User::getUser();
+
+        if (!$user) {
+            throw new \Exception('User not found!');
+        }
+
+        $p_model = self::class;
+
+        return self::query()
+            ->columns($p_model . '.*')
+            ->innerJoin(Order::class, null, 'O')
+            ->where("
+                $p_model.active = :paymentActive:
+                $p_model.statusID = :paymentStatus:
+                AND O.active = :orderActive:  
+                AND O.statudID = :orderStatus: 
+                O.userID = :userID:
+            ", [
+                'paymentActive' => self::ENABLED,
+                'paymentStatus' => PaymentStatus::CREATED,
+                'orderActive'   => Order::ENABLED,
+                'orderStatus'   => OrderStatus::RENEWAL,
+                'userID'        => $user->id,
+            ])
+            ->orderBy($p_model . '.id DESC')
+            ->execute();
     }
 }

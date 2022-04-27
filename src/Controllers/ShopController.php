@@ -23,7 +23,6 @@ use Phlexus\Modules\Shop\Libraries\Payments\PaymentFactory;
 
 /**
  * @RoutePrefix('/shop')
- *
  */
 class ShopController extends AbstractController
 {

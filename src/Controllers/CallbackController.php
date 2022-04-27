@@ -10,7 +10,6 @@ use Phlexus\Modules\Shop\Libraries\Payments\PayPal;
 
 /**
  * @RoutePrefix('/payment/callback')
- *
  */
 class CallbackController extends AbstractController
 {

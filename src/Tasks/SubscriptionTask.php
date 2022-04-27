@@ -55,6 +55,11 @@ class SubscriptionTask extends Task
         }
     }
 
+    public function verifyPaymentsAction()
+    {
+        // Verify payments in case something went wrong
+    }
+
     public function verifySubscriptionAction()
     {
         $allExpired = Order::getAllExpired();

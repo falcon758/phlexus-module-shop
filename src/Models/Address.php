@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Phlexus\Modules\Shop\Models;
 
-use Phalcon\Mvc\Model;
+use Phlexus\Models\Model;
 
 /**
  * Class Address

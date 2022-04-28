@@ -5,7 +5,7 @@ namespace Phlexus\Modules\Shop\Models;
 
 
 use Phlexus\Modules\BaseUser\Models\User;
-use Phalcon\Mvc\Model;
+use Phlexus\Models\Model;
 use Phalcon\Mvc\Model\Transaction\Manager as TxManager;
 use Phalcon\Mvc\Model\Transaction\Failed as TxFailed;
 use Phalcon\Di;

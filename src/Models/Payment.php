@@ -36,7 +36,7 @@ class Payment extends Model
     /**
      * @var string
      */
-    public string $totalPrice;
+    public float $totalPrice;
 
     /**
      * @var int|null
@@ -279,11 +279,20 @@ class Payment extends Model
         return self::query()
             ->columns("
                 $p_model.id as paymentID,
-                $p_model.orderID,
+                $p_model.orderID AS orderID,
+                I.productID AS productID,
+                I.quantity AS quantity,
+                I.price AS price,
+                Period.value - DATEDIFF(CURRENT_DATE(), P.createdAt) AS due_days,
+                DATE_FORMAT(FROM_UNIXTIME(UNIX_TIMESTAMP(P.createdAt) + (Period.value * 86400)), '%d-%m-%Y') AS due_date,
+                (Period.value + MaxDelay.value) - DATEDIFF(CURRENT_DATE(), P.createdAt) AS cancelation_days,
+                DATE_FORMAT(FROM_UNIXTIME(UNIX_TIMESTAMP(P.createdAt)  + ((Period.value + MaxDelay.value) * 86400)), '%d-%m-%Y') AS cancelation_date
             ")
             ->innerJoin(Order::class, null, 'O')
             ->innerJoin(Item::class, 'O.id = I.orderID', 'I')
             ->innerJoin(Product::class, 'I.productID = P.id', 'P')
+            ->innerJoin(ProductAttribute::class, 'P.id = Period.productID AND Period.name = "' . ProductAttribute::SUBSCRIPTION_PERIOD . '"', 'Period')
+            ->innerJoin(ProductAttribute::class, 'P.id = MaxDelay.productID AND MaxDelay.name = "' . ProductAttribute::SUBSCRIPTION_MAX_DELAY . '"', 'MaxDelay')
             ->where("
                 $p_model.statusID = :paymentStatus: 
                 AND $p_model.active = :paymentActive:

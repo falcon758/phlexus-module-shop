@@ -78,6 +78,8 @@ class SubscriptionTask extends Task
             if (!$expired->disableItem()) {
                 error_log('Failed to disable item!', 0);
             }
+            
+            // Also cancel payments
         }
     }
 }

@@ -574,7 +574,7 @@ class Order extends Model
             ->columns('I.*')
             ->innerJoin(Item::class, null, 'I')
             ->innerJoin(Product::class, 'I.productID = PR.id', 'PR')
-            ->innerJoin(ProductAttribute::class, 'PR.id = Period.productID AND Period.name = "' . ProductAttribute::SUBSCRIPTION_PERIOD . '"', 'Period')
+            ->innerJoin(ProductAttribute::class, 'PR.id = SOffset.productID AND SOffset.name = "' . ProductAttribute::SUBSCRIPTION_PAYMENT_OFFSET . '"', 'SOffset')
             ->innerJoin(ProductAttribute::class, 'PR.id = MaxDelay.productID AND MaxDelay.name = "' . ProductAttribute::SUBSCRIPTION_MAX_DELAY . '"', 'MaxDelay')
             ->innerJoin(Payment::class, "$p_model.id = PST.orderID", 'PST')
             ->leftJoin(Payment::class, "
@@ -592,7 +592,7 @@ class Order extends Model
                 AND I.active = :active: 
                 AND PR.isSubscription = :isSubscription: 
                 AND PST.statusID != :paymentStatus:
-                AND DATEDIFF(CURRENT_DATE(), PST.createdAt) > MaxDelay.value",
+                AND DATEDIFF(CURRENT_DATE(), PST.createdAt) > (SOffset.value + MaxDelay.value)",
                 [
                     'active'         => self::ENABLED,
                     'status'         => OrderStatus::RENEWAL,

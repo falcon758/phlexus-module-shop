@@ -52,7 +52,7 @@ class ShopController extends AbstractController
 
         $this->tag->setTitle($title);
 
-        $this->view->setVar('saveRoute', '/cart/add/');
+        $this->view->setVar('addRoute', '/cart/add/');
         $this->view->setVar('csrfToken', $this->security->getToken());
         $this->view->setVar('products', Product::find());
     }

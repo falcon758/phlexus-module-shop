@@ -157,7 +157,7 @@ class Cart implements CartInterface
 
         $total = 0;
         foreach ($products as $product) {
-            $total += $product['price'] * $product['quantity'];
+            $total += $product['quantity'] * $product['price'];
         }
 
         return $total;

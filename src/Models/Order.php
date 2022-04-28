@@ -134,12 +134,31 @@ class Order extends Model
      */
     public function getItems(): array
     {
-        $items = [];
-        foreach ($this->items as $item) {
-            $items[] = $item->product->toArray();
-        }
+        $p_model = self::class;
 
-        return $items;
+        return self::query()
+            ->columns("
+                I.productID,
+                I.name AS productName,
+                I.quantity,
+                I.price,
+                (I.quantity * I.price) AS totalPrice
+            ")
+            ->innerJoin(Item::class, null, 'I')
+            ->innerJoin(Product::class, 'I.productID = PR.id', 'PR')
+            ->where("
+                $p_model.active = :active: 
+                AND $p_model.id = :orderID:
+                AND I.active = :active:
+            ",
+                [
+                    'active'         => self::ENABLED,
+                    'orderID'        => $this->id
+                ]
+            )
+            ->orderBy("$p_model.id DESC")
+            ->execute()
+            ->toArray();
     }
 
     /**
@@ -149,7 +168,12 @@ class Order extends Model
      */
     public function getOrderTotal(): float
     {
-        $items = $this->getItems();
+        $total = 0.00;
+        foreach ($this->items as $item) {
+            $total += $item->price * $item->quantity;
+        }
+
+        return $total;
     }
 
     /**
@@ -259,11 +283,11 @@ class Order extends Model
     /**
      * Create items
      * 
-     * @param array $productsID Products id to assign
+     * @param array $products Products and quantities to assign
      *
      * @return bool
      */
-    public function createItems(array $productsID): bool {
+    public function createItems(array $products): bool {
         // Create a transaction manager
         $manager = new TxManager();
 
@@ -271,7 +295,7 @@ class Order extends Model
         $transaction = $manager->get();
 
         try {
-            foreach ($productsID as $prodID) {
+            foreach ($products as $prodID => $quantity) {
                 $item = new Item;
                 $item->setTransaction($transaction);
 
@@ -281,6 +305,8 @@ class Order extends Model
                     throw new \Exception('Product doesn\'t exists');
                 }
 
+                $item->quantity  = (int) $quantity;
+                $item->price     = (float) $product->price;
                 $item->productID = (int) $product->id;
                 $item->orderID   = (int) $this->id;
 
@@ -390,7 +416,8 @@ class Order extends Model
                     'productID'      => $productID,
                     'isSubscription' => 1
                 ]
-            )->orderBy("$p_model.id DESC")
+            )
+            ->orderBy("$p_model.id DESC")
             ->execute()
             ->count() === 1;
     }
@@ -502,6 +529,7 @@ class Order extends Model
                 $p_model.shippingMethodID,
                 I.id AS itemID,
                 I.productID,
+                (SUM(I.price) * SUM(I.quantity)) AS totalPrice,
                 (SELECT COUNT($i_model.id) FROM $i_model WHERE $i_model.orderID = $p_model.id) AS itemsCount
             ")
             ->innerJoin($i_model, null, 'I')

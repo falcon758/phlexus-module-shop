@@ -36,7 +36,7 @@ class ShopController extends AbstractController
         $this->tag->setTitle($title);
 
         $products = $this->cart->getProducts();
-        
+
         $this->view->setVar('checkoutRoute', '/checkout');
         $this->view->setVar('csrfToken', $this->security->getToken());
         $this->view->setVar('products', $products);
@@ -207,7 +207,7 @@ class ShopController extends AbstractController
                 $paymentTypeID = PaymentType::RENEWAL;
             }
 
-            $payment = Payment::createPayment($paymentTypeID, $paymentMethodID, (int) $order->id);
+            $payment = Payment::createPayment($order->getOrderTotal(), $paymentTypeID, $paymentMethodID, (int) $order->id);
         }
 
         if ($payment !== null) {
@@ -300,7 +300,7 @@ class ShopController extends AbstractController
 
             $products = $this->cart->getProducts();
 
-            if (!$order->createItems(array_column($products, 'id'))) {
+            if (!$order->createItems(array_column($products, 'quantity', 'id'))) {
                 $order->cancelOrder();
 
                 return null;

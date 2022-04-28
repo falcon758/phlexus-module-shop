@@ -8,7 +8,6 @@ use Phlexus\Modules\BaseUser\Models\User;
 use Phalcon\Mvc\Model;
 use Phalcon\Mvc\Model\Transaction\Manager as TxManager;
 use Phalcon\Mvc\Model\Transaction\Failed as TxFailed;
-use Phalcon\Mvc\Model\Resultset\Simple;
 use Phalcon\Di;
 
 /**
@@ -33,6 +32,11 @@ class Payment extends Model
      * @var string
      */
     public string $hashCode;
+
+    /**
+     * @var string
+     */
+    public string $totalPrice;
 
     /**
      * @var int|null
@@ -138,18 +142,20 @@ class Payment extends Model
     /**
      * Create payment
      * 
-     * @param int $paymentTypeID   Payment type id to assign
-     * @param int $paymentMethodID Payment method id to assign
-     * @param int $orderID         Order id to assign
+     * @param float $totalPrice      Total price assign
+     * @param int   $paymentTypeID   Payment type id to assign
+     * @param int   $paymentMethodID Payment method id to assign
+     * @param int   $orderID         Order id to assign
      *
      * @return Payment
      * 
      * @throws Exception
      */
-    public static function createPayment(int $paymentTypeID, int $paymentMethodID, int $orderID): Payment
+    public static function createPayment(float $totalPrice, int $paymentTypeID, int $paymentMethodID, int $orderID): Payment
     {
         $payment = new self;
         $payment->hashCode         = Di::getDefault()->getShared('security')->getRandom()->base64Safe(self::HASHLENGTH);
+        $payment->totalPrice       = $totalPrice;
         $payment->paymentTypeID    = $paymentTypeID;
         $payment->paymentMethodID  = $paymentMethodID;
         $payment->orderID          = $orderID;
@@ -256,11 +262,11 @@ class Payment extends Model
     /**
      * Get all in payment
      * 
-     * @return Simple
+     * @return array
      * 
      * @throws Exception
      */
-    public static function getInPayment(): Simple
+    public static function getInPayment(): array
     {
         $user = User::getUser();
 
@@ -271,8 +277,13 @@ class Payment extends Model
         $p_model = self::class;
 
         return self::query()
-            ->columns("$p_model.*")
+            ->columns("
+                $p_model.id as paymentID,
+                $p_model.orderID,
+            ")
             ->innerJoin(Order::class, null, 'O')
+            ->innerJoin(Item::class, 'O.id = I.orderID', 'I')
+            ->innerJoin(Product::class, 'I.productID = P.id', 'P')
             ->where("
                 $p_model.statusID = :paymentStatus: 
                 AND $p_model.active = :paymentActive:
@@ -287,6 +298,7 @@ class Payment extends Model
                 'userID'        => $user->id,
             ])
             ->orderBy("$p_model.id DESC")
-            ->execute();
+            ->execute()
+            ->toArray();
     }
 }

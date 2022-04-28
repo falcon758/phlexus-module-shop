@@ -23,6 +23,16 @@ class Item extends Model
     public $id;
 
     /**
+     * @var int
+     */
+    public int $quantity;
+
+    /**
+     * @var float
+     */
+    public float $price;
+
+    /**
      * @var int|null
      */
     public $active;
@@ -90,14 +100,16 @@ class Item extends Model
     /**
      * Create item
      * 
-     * @param int $productID Product id to assign
-     * @param int $orderID   Order id to assign
+     * @param int    $productID Product id to assign
+     * @param int    $orderID   Order id to assign
+     * @param int    $quantity  Product quantity to assign
+     * @param float  $price     Product price to assign
      *
      * @return Item
      * 
      * @throws Exception
      */
-    public static function createItem(int $productID, int $orderID): Item {
+    public static function createItem(int $productID, int $orderID, int $quantity, float $price): Item {
         $item = new self;
 
         $product = Product::findFirstByid($productID);
@@ -108,6 +120,8 @@ class Item extends Model
 
         $item->productID = $productID;
         $item->orderID   = $orderID;
+        $item->quantity  = $quantity;
+        $item->price     = $price;
 
         if (!$item->save()) {
             throw new \Exception('Unable to process item');

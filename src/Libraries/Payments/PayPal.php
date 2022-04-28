@@ -37,10 +37,10 @@ class Paypal extends PaymentAbstract
 
         foreach ($items as $item) {
             $arrProd[] = [
-                'reference_id'    => $item['id'],
-                'description'     => $item['name'],
-                'amount' => [
-                    'value'         => $item['price'],
+                'reference_id' => $item['productID'],
+                'description'  => $item['productName'],
+                'amount'       => [
+                    'value'         => $item['totalPrice'],
                     'currency_code' => 'EUR'
                 ]
             ];

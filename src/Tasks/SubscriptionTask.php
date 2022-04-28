@@ -19,7 +19,12 @@ class SubscriptionTask extends Task
         foreach ($allOrders as $order) {
             try {
                 if (((int) $order->itemsCount) === 1) {
-                    Payment::createPayment(PaymentType::RENEWAL, (int) $order->paymentMethodID, (int) $order->orderID);
+                    Payment::createPayment(
+                        (float) $order->totalPrice,
+                        PaymentType::RENEWAL,
+                        (int) $order->paymentMethodID,
+                        (int) $order->orderID
+                    );
                 } else {
                     if (!Item::disableOrderItem((int) $order->itemID, (int) $order->orderID)) {
                         error_log('Failed to disable item!', 0);
@@ -47,7 +52,12 @@ class SubscriptionTask extends Task
                         continue;
                     }
 
-                    Payment::createPayment(PaymentType::RENEWAL, (int) $newOrder->paymentMethodID, (int) $newOrder->id);
+                    Payment::createPayment(
+                        (float) $order->totalPrice,
+                        PaymentType::RENEWAL,
+                        (int) $newOrder->paymentMethodID,
+                        (int) $newOrder->id
+                    );
                 }
             } catch(\Exception $e) {
                 error_log('Failed to create renewal: ' . $e->getMessage(), 0);

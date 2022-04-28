@@ -240,7 +240,7 @@ class Payment extends Model
         $p_model = self::class;
 
         return self::query()
-            ->columns($p_model . '.*')
+            ->columns("$p_model.*")
             ->innerJoin(Order::class, null, 'O')
             ->innerJoin(Item::class, 'O.id = I.orderID', 'I')
             ->where(" $p_model.statusID = :status: AND O.userID = :userID: AND I.productID = :productID:", [
@@ -248,7 +248,7 @@ class Payment extends Model
                 'userID'    => $userID,
                 'productID' => $productID,
             ])
-            ->orderBy($p_model . '.id DESC')
+            ->orderBy("$p_model.id DESC")
             ->execute()
             ->getFirst();
     }
@@ -260,7 +260,7 @@ class Payment extends Model
      * 
      * @throws Exception
      */
-    public static function getInPayment()
+    public static function getInPayment(): Simple
     {
         $user = User::getUser();
 
@@ -271,22 +271,22 @@ class Payment extends Model
         $p_model = self::class;
 
         return self::query()
-            ->columns($p_model . '.*')
+            ->columns("$p_model.*")
             ->innerJoin(Order::class, null, 'O')
             ->where("
-                $p_model.active = :paymentActive:
-                $p_model.statusID = :paymentStatus:
-                AND O.active = :orderActive:  
-                AND O.statudID = :orderStatus: 
-                O.userID = :userID:
+                $p_model.statusID = :paymentStatus: 
+                AND $p_model.active = :paymentActive:
+                AND O.statusID = :orderStatus: 
+                AND O.active = :orderActive: 
+                AND O.userID = :userID:
             ", [
-                'paymentActive' => self::ENABLED,
                 'paymentStatus' => PaymentStatus::CREATED,
-                'orderActive'   => Order::ENABLED,
+                'paymentActive' => self::ENABLED,
                 'orderStatus'   => OrderStatus::RENEWAL,
+                'orderActive'   => Order::ENABLED,
                 'userID'        => $user->id,
             ])
-            ->orderBy($p_model . '.id DESC')
+            ->orderBy("$p_model.id DESC")
             ->execute();
     }
 }

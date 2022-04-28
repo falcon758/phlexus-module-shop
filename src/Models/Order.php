@@ -390,7 +390,7 @@ class Order extends Model
                     'productID'      => $productID,
                     'isSubscription' => 1
                 ]
-            )->orderBy($p_model . '.id DESC')
+            )->orderBy("$p_model.id DESC")
             ->execute()
             ->count() === 1;
     }
@@ -529,7 +529,7 @@ class Order extends Model
                     'status'         => OrderStatus::RENEWAL,
                     'isSubscription' => 1
                 ]
-            )->orderBy($p_model . '.id DESC')
+            )->orderBy("$p_model.id DESC")
             ->execute();
     }
 
@@ -571,7 +571,7 @@ class Order extends Model
                     'isSubscription' => 1,
                     'paymentStatus'  => PaymentStatus::PAID
                 ]
-            )->orderBy($p_model . '.id DESC')
+            )->orderBy("$p_model.id DESC")
             ->execute();
     }
 }

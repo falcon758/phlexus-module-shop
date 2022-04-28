@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Phlexus\Modules\Shop\Controllers;
 
-use Phalcon\Http\ResponseInterface;
 use Phlexus\Modules\Shop\Models\Payment;
 
 /**
@@ -15,7 +14,7 @@ class PaymentController extends AbstractController
     /**
      * @Get('/payment/index')
      */
-    public function indexAction(): ResponseInterface
+    public function indexAction()
     {
         $title = $this->translation->setTypePage()->_('title-shop-payments');
 
@@ -23,6 +22,7 @@ class PaymentController extends AbstractController
 
         $payments = Payment::getInPayment();
 
+        $this->view->setVar('csrfToken', $this->security->getToken());
         $this->view->setVar('payments', $payments);
     }
 }

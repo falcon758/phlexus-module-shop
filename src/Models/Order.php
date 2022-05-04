@@ -137,23 +137,24 @@ class Order extends Model
         $p_model = self::class;
 
         return self::query()
-            ->columns("
-                I.productID,
-                I.name AS productName,
-                I.quantity,
-                I.price,
+            ->columns('
+                I.productID AS productID,
+                PR.name AS productName,
+                I.quantity AS quantity,
+                I.price AS price,
                 (I.quantity * I.price) AS totalPrice
-            ")
+            ')
             ->innerJoin(Item::class, null, 'I')
             ->innerJoin(Product::class, 'I.productID = PR.id', 'PR')
             ->where("
-                $p_model.active = :active: 
+                $p_model.active = :orderActive: 
                 AND $p_model.id = :orderID:
-                AND I.active = :active:
+                AND I.active = :itemActive:
             ",
                 [
-                    'active'         => self::ENABLED,
-                    'orderID'        => $this->id
+                    'orderActive'  => self::ENABLED,
+                    'itemActive'  => Item::ENABLED,
+                    'orderID' => $this->id
                 ]
             )
             ->orderBy("$p_model.id DESC")

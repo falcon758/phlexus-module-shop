@@ -99,13 +99,13 @@ class Product extends Model
             return [];
         }
 
-        $inQuery = '?' . implode(', ?', range(1, count($names)));
+        $inQuery = '?' . implode(', ?', range(2, count($names)));
 
-        $values = array_merge([$this->id], $names);
+        $values = array_merge([1, $this->id], $names);
 
         $attributes = ProductAttribute::find(
             [
-                'productID = ?0 AND name IN (' . $inQuery . ')',
+                'active = ?0 AND productID = ?1 AND name IN (' . $inQuery . ')',
                 'bind' => $values
             ]
         );

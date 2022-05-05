@@ -531,7 +531,7 @@ class Order extends Model
                 $p_model.shippingMethodID,
                 I.id AS itemID,
                 I.productID,
-                (SUM(I.price) * SUM(I.quantity)) AS totalPrice,
+                (I.price * I.quantity) AS totalPrice,
                 (SELECT COUNT($i_model.id) FROM $i_model WHERE $i_model.orderID = $p_model.id) AS itemsCount
             ")
             ->innerJoin($i_model, null, 'I')
@@ -561,7 +561,6 @@ class Order extends Model
                     'isSubscription' => 1
                 ]
             )->orderBy("$p_model.id DESC")
-            ->groupBy('I.id')
             ->execute();
     }
 

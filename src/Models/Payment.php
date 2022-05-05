@@ -241,7 +241,7 @@ class Payment extends Model
      *
      * @return Payment|null
      */
-    public static function getLastPaidByUserProduct(int $userID, int $productID)
+    public static function getLastPaidByUserProduct(int $userID, int $productID): ?Payment
     {
         $p_model = self::class;
 

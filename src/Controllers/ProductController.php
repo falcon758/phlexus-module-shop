@@ -6,11 +6,12 @@ namespace Phlexus\Modules\Shop\Controllers;
 use Phlexus\Modules\Shop\Models\Product;
 use Phlexus\Modules\Shop\Models\ProductAttribute;
 use Phlexus\Modules\Generic\Forms\BaseForm;
+use Phlexus\Libraries\Media\Models\Media;
 use Phalcon\Forms\Element\Text;
 use Phalcon\Forms\Element\Check;
 use Phalcon\Forms\Element\File;
 use Phalcon\Forms\Element\Hidden;
-use Phlexus\Libraries\Media\Models\Media;
+use Phalcon\Http\ResponseInterface;
 
 /**
  * Class Product

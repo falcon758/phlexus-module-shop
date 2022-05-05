@@ -457,7 +457,7 @@ class Order extends Model
      * 
      * @return Payment|null
      */
-    public function getLastPayment()
+    public function getLastPayment(): ?Payment
     {
         return self::query()
             ->columns('P.*')
@@ -475,7 +475,7 @@ class Order extends Model
      * 
      * @return Payment|null
      */
-    public function getLastPaidPayment()
+    public function getLastPaidPayment(): ?Payment
     {
         return self::query()
             ->columns('P.*')
@@ -497,7 +497,7 @@ class Order extends Model
      *
      * @return Order|null
      */
-    public static function getLastOrderByUserProduct(int $userID, int $productID)
+    public static function getLastOrderByUserProduct(int $userID, int $productID): ?Order
     {
         return self::query()
             ->innerJoin(User::class, null, 'U')

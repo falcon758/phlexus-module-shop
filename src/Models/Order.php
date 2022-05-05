@@ -409,7 +409,8 @@ class Order extends Model
                 AND I.active = :active: 
                 AND PR.id = :productID:
                 AND PR.isSubscription = :isSubscription: 
-                AND DATEDIFF(CURRENT_DATE(), PST.createdAt) <= Period.value + MaxDelay.value",
+                AND DATEDIFF(CURRENT_DATE(), PST.createdAt) <= Period.value + MaxDelay.value
+                AND PSD.id IS NULL",
                 [
                     'active'         => self::ENABLED,
                     'orderID'        => $this->id,
@@ -552,13 +553,15 @@ class Order extends Model
                 AND $p_model.statusID = :status: 
                 AND I.active = :active: 
                 AND PR.isSubscription = :isSubscription: 
-                AND DATEDIFF(CURRENT_DATE(), PST.createdAt) >= Period.value - SOffset.value",
+                AND DATEDIFF(CURRENT_DATE(), PST.createdAt) >= Period.value - SOffset.value
+                AND PSD.id IS NULL",
                 [
                     'active'         => self::ENABLED,
                     'status'         => OrderStatus::RENEWAL,
                     'isSubscription' => 1
                 ]
             )->orderBy("$p_model.id DESC")
+            ->groupBy('I.id')
             ->execute();
     }
 
@@ -593,7 +596,8 @@ class Order extends Model
                 AND I.active = :active: 
                 AND PR.isSubscription = :isSubscription: 
                 AND PST.statusID != :paymentStatus:
-                AND DATEDIFF(CURRENT_DATE(), PST.createdAt) > (SOffset.value + MaxDelay.value)",
+                AND DATEDIFF(CURRENT_DATE(), PST.createdAt) > (SOffset.value + MaxDelay.value)
+                AND PSD.id IS NULL",
                 [
                     'active'         => self::ENABLED,
                     'status'         => OrderStatus::RENEWAL,

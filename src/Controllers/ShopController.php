@@ -20,7 +20,6 @@ use Phlexus\Modules\Shop\Form\CheckoutForm;
 use Phlexus\Modules\BaseUser\Models\User;
 use Phlexus\Modules\Shop\Libraries\Payments\PaymentFactory;
 
-
 /**
  * @RoutePrefix('/shop')
  */

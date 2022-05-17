@@ -22,6 +22,10 @@ class PaymentController extends AbstractController
 
         $this->tag->setTitle($title);
 
+        $mainView = $this->view->getMainView();
+
+        $this->view->setMainView(preg_replace('/\/public$/', '/default', $mainView));
+
         $payments = Payment::getInPayment();
 
         $this->view->setVar('csrfToken', $this->security->getToken());

@@ -234,6 +234,38 @@ class Payment extends Model
     }
 
     /**
+     * Get user payment
+     *
+     * @param int $paymentID Product to search for
+     *
+     * @return Payment|null
+     * 
+     * @throws Exception
+     */
+    public static function getUserPayment(int $paymentID): ?Payment {
+        
+        $p_model = self::class;
+
+        $user = User::getUser();
+
+        if (!$user) {
+            throw new \Exception('User not found!');
+        }
+
+        return self::query()
+            ->columns("$p_model.*")
+            ->innerJoin(Order::class, null, 'O')
+            ->where("$p_model.statusID = :status: AND $p_model.id = :id: AND O.userID = :userID:", [
+                'status' => PaymentStatus::CREATED,
+                'id'     => $paymentID,
+                'userID' => $user->id,
+            ])
+            ->orderBy("$p_model.id DESC")
+            ->execute()
+            ->getFirst();
+    }
+
+    /**
      * Get last paid by product
      * 
      * @param int $userID    User assigned to
@@ -296,11 +328,11 @@ class Payment extends Model
             ->innerJoin(ProductAttribute::class, 'P.id = SOffset.productID AND SOffset.name = "' . ProductAttribute::SUBSCRIPTION_PAYMENT_OFFSET . '"', 'SOffset')
             ->where("
                 $p_model.statusID = :paymentStatus: 
-                AND $p_model.active = :paymentActive:
+                AND $p_model.active = :paymentActive: 
                 AND O.statusID = :orderStatus: 
                 AND O.active = :orderActive: 
-                AND O.userID = :userID:
-                AND I.active = :itemActive: 
+                AND O.userID = :userID: 
+                AND I.active = :itemActive:
             ", [
                 'paymentStatus' => PaymentStatus::CREATED,
                 'paymentActive' => self::ENABLED,

@@ -89,7 +89,7 @@ $routes->addGet('/payments', [
     'action'     => 'index',
 ]);
 
-$routes->addGet('/payment/pay/{paymentID:[0-9]+}', [
+$routes->addGet('/payment/pay/{paymentHash:[a-zA-Z0-9]+}', [
     'controller' => 'payment',
     'action'     => 'pay',
 ]);

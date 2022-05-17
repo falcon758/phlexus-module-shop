@@ -236,13 +236,13 @@ class Payment extends Model
     /**
      * Get user payment
      *
-     * @param int $paymentID Product to search for
+     * @param string $paymentHash Payment to search for
      *
      * @return Payment|null
      * 
      * @throws Exception
      */
-    public static function getUserPayment(int $paymentID): ?Payment {
+    public static function getUserPayment(string $paymentHash): ?Payment {
         
         $p_model = self::class;
 
@@ -255,10 +255,10 @@ class Payment extends Model
         return self::query()
             ->columns("$p_model.*")
             ->innerJoin(Order::class, null, 'O')
-            ->where("$p_model.statusID = :status: AND $p_model.id = :id: AND O.userID = :userID:", [
-                'status' => PaymentStatus::CREATED,
-                'id'     => $paymentID,
-                'userID' => $user->id,
+            ->where("$p_model.statusID = :status: AND $p_model.hashCode = :hashCode: AND O.userID = :userID:", [
+                'status'   => PaymentStatus::CREATED,
+                'hashCode' => $paymentHash,
+                'userID'   => $user->id,
             ])
             ->orderBy("$p_model.id DESC")
             ->execute()
@@ -312,6 +312,7 @@ class Payment extends Model
             ->columns("
                 $p_model.id as paymentID,
                 $p_model.orderID AS orderID,
+                $p_model.hashCode as hashCode,
                 I.productID AS productID,
                 I.quantity AS quantity,
                 I.price AS price,

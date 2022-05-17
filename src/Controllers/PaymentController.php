@@ -36,11 +36,11 @@ class PaymentController extends AbstractController
     /**
      * @Get('/payment/pay')
      */
-    public function payAction(int $paymentID)
+    public function payAction(string $paymentHash)
     {
         $this->view->disable();
         
-        $payment = Payment::getUserPayment($paymentID);
+        $payment = Payment::getUserPayment($paymentHash);
 
         if (!$payment) {
             return $this->response->redirect('/payments');

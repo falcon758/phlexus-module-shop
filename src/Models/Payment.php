@@ -8,6 +8,8 @@ use Phlexus\Modules\BaseUser\Models\User;
 use Phlexus\Models\Model;
 use Phalcon\Mvc\Model\Transaction\Manager as TxManager;
 use Phalcon\Mvc\Model\Transaction\Failed as TxFailed;
+use Phalcon\Paginator\Adapter\QueryBuilder;
+use Phalcon\Paginator\Repository;
 use Phalcon\Di;
 
 /**
@@ -292,13 +294,13 @@ class Payment extends Model
     }
 
     /**
-     * Get all in payment
+     * Get history
      * 
-     * @return array
+     * @return Repository
      * 
      * @throws Exception
      */
-    public static function getInPayment(): array
+    public static function getHistory(): Repository
     {
         $user = User::getUser();
 
@@ -309,6 +311,51 @@ class Payment extends Model
         $p_model = self::class;
 
         return self::query()
+            ->columns("
+                $p_model.id as paymentID,
+                $p_model.orderID AS orderID,
+                $p_model.hashCode as hashCode
+            ")
+            ->innerJoin(Order::class, null, 'O')
+            ->where("
+                $p_model.statusID = :paymentStatus: 
+                AND $p_model.active = :paymentActive: 
+                AND O.statusID = :orderStatus: 
+                AND O.active = :orderActive: 
+                AND O.userID = :userID:
+            ", [
+                'paymentStatus' => PaymentStatus::CREATED,
+                'paymentActive' => self::ENABLED,
+                'orderStatus'   => OrderStatus::RENEWAL,
+                'orderActive'   => Order::ENABLED,
+                'userID'        => $user->id
+            ])
+            ->orderBy("$p_model.id DESC")
+            ->execute()
+            ->toArray();
+    }
+
+    /**
+     * Get all in payment
+     * 
+     * @param int $page Current page
+     * 
+     * @return Repository
+     * 
+     * @throws Exception
+     */
+    public static function getInPayment(int $page = 1): Repository
+    {
+        $user = User::getUser();
+
+        if (!$user) {
+            throw new \Exception('User not found!');
+        }
+
+        $p_model = self::class;
+
+        $query = self::query()
+            ->createBuilder()
             ->columns("
                 $p_model.id as paymentID,
                 $p_model.orderID AS orderID,
@@ -342,8 +389,17 @@ class Payment extends Model
                 'userID'        => $user->id,
                 'itemActive'    => Item::ENABLED,
             ])
-            ->orderBy("$p_model.id DESC")
-            ->execute()
-            ->toArray();
+            ->orderBy("$p_model.id DESC");
+
+
+            return (
+                new QueryBuilder(
+                [
+                    'builder' => $query,
+                    'limit'   => self::PAGE_LIMIT,
+                    'page'    => $page,
+                ]
+                )
+            )->paginate();
     }
 }

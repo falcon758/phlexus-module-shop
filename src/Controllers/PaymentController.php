@@ -32,6 +32,25 @@ class PaymentController extends AbstractController
         $this->view->setVar('payRoute', '/payment/pay/');
         $this->view->setVar('payments', $payments);
     }
+
+    /**
+     * @Get('/payment/history')
+     */
+    public function historyAction()
+    {
+        $title = $this->translation->setTypePage()->_('title-shop-payments-history');
+
+        $this->tag->setTitle($title);
+
+        $mainView = $this->view->getMainView();
+
+        $this->view->setMainView(preg_replace('/\/public$/', '/default', $mainView));
+
+        $payments = Payment::getHistory();
+
+        $this->view->setVar('csrfToken', $this->security->getToken());
+        $this->view->setVar('payments', $payments);
+    }
     
     /**
      * @Get('/payment/pay')

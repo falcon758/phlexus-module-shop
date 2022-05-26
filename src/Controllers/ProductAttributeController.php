@@ -10,6 +10,7 @@ use Phalcon\Forms\Element\Check;
 use Phalcon\Forms\Element\File;
 use Phalcon\Forms\Element\Hidden;
 use Phalcon\Http\ResponseInterface;
+use Phalcon\Paginator\Adapter\Model as PaginatorModel;
 
 /**
  * Class ProductAttribute
@@ -18,6 +19,9 @@ use Phalcon\Http\ResponseInterface;
  */
 final class ProductAttributeController extends AbstractController
 {
+
+    const PAGE_LIMIT = 25;
+
     use \Phlexus\Modules\Generic\Actions\CreateAction;
     use \Phlexus\Modules\Generic\Actions\EditAction;
     use \Phlexus\Modules\Generic\Actions\DeleteAction;
@@ -43,7 +47,12 @@ final class ProductAttributeController extends AbstractController
 
         $this->setModel(new ProductAttribute);
 
-        $this->setRecords(ProductAttribute::findByproductID($this->request->get('related', null, 0)));
+        $productAttParams = [
+            'active'    => ProductAttribute::ENABLED,
+            'productID' => (int) $this->request->get('related', null, 0),
+        ];
+
+        $this->setRecords(ProductAttribute::getModelPaginator($productAttParams, (int) $this->request->get('p', null, 1)));
 
         $form = new BaseForm(!$this->isSave());
 

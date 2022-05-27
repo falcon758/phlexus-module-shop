@@ -310,7 +310,8 @@ class Payment extends Model
 
         $p_model = self::class;
 
-        return self::query()
+        $query = self::query()
+            ->createBuilder()
             ->columns("
                 $p_model.id as paymentID,
                 $p_model.orderID AS orderID,
@@ -330,9 +331,17 @@ class Payment extends Model
                 'orderActive'   => Order::ENABLED,
                 'userID'        => $user->id
             ])
-            ->orderBy("$p_model.id DESC")
-            ->execute()
-            ->toArray();
+            ->orderBy("$p_model.id DESC");
+
+        return (
+            new QueryBuilder(
+            [
+                'builder' => $query,
+                'limit'   => self::PAGE_LIMIT,
+                'page'    => $page,
+            ]
+            )
+        )->paginate();
     }
 
     /**

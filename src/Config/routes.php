@@ -84,9 +84,14 @@ $routes->addGet('/payment/callback/paypal/{paymentHash:[a-zA-Z0-9]+}', [
     'action'     => 'paypal',
 ]);
 
-$routes->addGet('/payment/inPayment', [
+$routes->addGet('/payment/index', [
     'controller' => 'payment',
     'action'     => 'index',
+]);
+
+$routes->addGet('/payment/history', [
+    'controller' => 'payment',
+    'action'     => 'history',
 ]);
 
 $routes->addGet('/payment/pay/{paymentHash:[a-zA-Z0-9]+}', [

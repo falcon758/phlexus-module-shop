@@ -49,6 +49,7 @@ class PaymentController extends AbstractController
         $payments = Payment::getHistory();
 
         $this->view->setVar('csrfToken', $this->security->getToken());
+        $this->view->setVar('viewRoute', '/payment/');
         $this->view->setVar('payments', $payments);
     }
     

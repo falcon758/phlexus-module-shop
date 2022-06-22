@@ -7,6 +7,8 @@ use Phlexus\Modules\BaseUser\Models\User;
 use Phlexus\Models\Model;
 use Phalcon\Mvc\Model\Transaction\Manager as TxManager;
 use Phalcon\Mvc\Model\Transaction\Failed as TxFailed;
+use Phalcon\Paginator\Adapter\QueryBuilder;
+use Phalcon\Paginator\Repository;
 use Phalcon\Mvc\Model\Resultset\Simple;
 use Phalcon\Di;
 
@@ -509,6 +511,48 @@ class Order extends Model
             ->orderBy(self::class . '.id DESC')
             ->execute()
             ->getFirst();
+    }
+
+
+    /**
+     * Get history
+     * 
+     * @return Repository
+     * 
+     * @throws Exception
+     */
+    public static function getHistory(): Repository
+    {
+        $user = User::getUser();
+
+        if (!$user) {
+            throw new \Exception('User not found!');
+        }
+
+        $p_model = self::class;
+
+        $query = self::query()
+            ->createBuilder()
+            ->columns("
+                $p_model.id,
+                $p_model.hashCode as hashCode,
+                I.productID AS productID,
+                I.quantity AS quantity,
+                I.price AS price
+            ")
+            ->innerJoin(Item::class, null, 'I')
+
+            ->orderBy("$p_model.id DESC");
+
+        return (
+            new QueryBuilder(
+            [
+                'builder' => $query,
+                'limit'   => self::PAGE_LIMIT,
+                'page'    => $page,
+            ]
+            )
+        )->paginate();
     }
 
     /**

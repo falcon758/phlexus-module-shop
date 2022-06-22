@@ -315,22 +315,14 @@ class Payment extends Model
             ->columns("
                 $p_model.id as paymentID,
                 $p_model.orderID AS orderID,
-                $p_model.hashCode as hashCode
+                $p_model.hashCode as hashCode,
+                I.productID AS productID,
+                I.quantity AS quantity,
+                I.price AS price
             ")
             ->innerJoin(Order::class, null, 'O')
-            ->where("
-                $p_model.statusID = :paymentStatus: 
-                AND $p_model.active = :paymentActive: 
-                AND O.statusID = :orderStatus: 
-                AND O.active = :orderActive: 
-                AND O.userID = :userID:
-            ", [
-                'paymentStatus' => PaymentStatus::CREATED,
-                'paymentActive' => self::ENABLED,
-                'orderStatus'   => OrderStatus::RENEWAL,
-                'orderActive'   => Order::ENABLED,
-                'userID'        => $user->id
-            ])
+            ->innerJoin(Item::class, 'O.id = I.orderID', 'I')
+
             ->orderBy("$p_model.id DESC");
 
         return (

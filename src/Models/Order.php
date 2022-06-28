@@ -539,10 +539,14 @@ class Order extends Model
                 $p_model.createdAt as createdAt,
                 I.productID AS productID,
                 I.quantity AS quantity,
-                I.price AS price
+                I.price AS price,
+                SUM(L.quantity) AS totalQuantities,
+                SUM(L.price) AS totalPrice
             ")
             ->innerJoin(Item::class, null, 'I')
-            ->orderBy("$p_model.id DESC");
+            ->innerJoin(Item::class, 'I.orderID = L.orderID', 'L')
+            ->orderBy("$p_model.id DESC")
+            ->groupBy('I.id, L.orderID');
 
         return (
             new QueryBuilder(

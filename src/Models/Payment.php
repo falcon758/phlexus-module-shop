@@ -300,7 +300,7 @@ class Payment extends Model
      * 
      * @throws Exception
      */
-    public static function getHistory(): Repository
+    public static function getHistory(int $page = 1): Repository
     {
         $user = User::getUser();
 

@@ -521,7 +521,7 @@ class Order extends Model
      * 
      * @throws Exception
      */
-    public static function getHistory(): Repository
+    public static function getHistory(int $page = 1): Repository
     {
         $user = User::getUser();
 
@@ -534,14 +534,14 @@ class Order extends Model
         $query = self::query()
             ->createBuilder()
             ->columns("
-                $p_model.id,
+                $p_model.id AS orderID,
                 $p_model.hashCode as hashCode,
+                $p_model.createdAt as createdAt,
                 I.productID AS productID,
                 I.quantity AS quantity,
                 I.price AS price
             ")
             ->innerJoin(Item::class, null, 'I')
-
             ->orderBy("$p_model.id DESC");
 
         return (

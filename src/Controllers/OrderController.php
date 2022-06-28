@@ -25,7 +25,7 @@ class OrderController extends AbstractController
 
         $this->view->setMainView(preg_replace('/\/public$/', '/default', $mainView));
 
-        $orders = Order::getHistory();
+        $orders = Order::getHistory((int) $this->request->get('p', null, 1));
 
         $groupedKey = Arrays::groupArrayByKey($orders->getItems()->toArray(), 'orderID');
 

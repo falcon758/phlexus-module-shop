@@ -314,16 +314,20 @@ class Payment extends Model
             ->createBuilder()
             ->columns("
                 $p_model.id as paymentID,
-                $p_model.orderID AS orderID,
-                $p_model.hashCode as hashCode,
+                $p_model.createdAt as createdAt,
+                O.id AS orderID,
+                O.hashCode as hashCode,
                 I.productID AS productID,
                 I.quantity AS quantity,
-                I.price AS price
+                I.price AS price,
+                SUM(L.quantity) AS totalQuantities,
+                SUM(L.price) AS totalPrice
             ")
             ->innerJoin(Order::class, null, 'O')
             ->innerJoin(Item::class, 'O.id = I.orderID', 'I')
-
-            ->orderBy("$p_model.id DESC");
+            ->innerJoin(Item::class, 'I.orderID = L.orderID', 'L')
+            ->orderBy("$p_model.id DESC")
+            ->groupBy("$p_model.id, I.id, L.orderID");
 
         return (
             new QueryBuilder(

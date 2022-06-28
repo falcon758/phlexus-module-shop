@@ -7,6 +7,7 @@ namespace Phlexus\Modules\Shop\Controllers;
 use Phlexus\Modules\Shop\Models\Payment;
 use Phlexus\Modules\Shop\Models\PaymentType;
 use Phlexus\Modules\Shop\Libraries\Payments\PaymentFactory;
+use Phlexus\Libraries\Arrays;
 
 /**
  * @RoutePrefix('/payment')
@@ -26,7 +27,7 @@ class PaymentController extends AbstractController
 
         $this->view->setMainView(preg_replace('/\/public$/', '/default', $mainView));
 
-        $payments = Payment::getInPayment();
+        $payments = Payment::getInPayment((int) $this->request->get('p', null, 1));
 
         $this->view->setVar('csrfToken', $this->security->getToken());
         $this->view->setVar('payRoute', '/payment/pay/');
@@ -46,11 +47,16 @@ class PaymentController extends AbstractController
 
         $this->view->setMainView(preg_replace('/\/public$/', '/default', $mainView));
 
-        $payments = Payment::getHistory();
+        $payments = Payment::getHistory((int) $this->request->get('p', null, 1));
+
+        $groupedKey = Arrays::groupArrayByKey($payments->getItems()->toArray(), 'orderID');
+
+        $groupedItems = Arrays::groupArray($groupedKey, ['productID', 'quantity', 'price'], 'items');
 
         $this->view->setVar('csrfToken', $this->security->getToken());
         $this->view->setVar('viewRoute', '/payment/');
         $this->view->setVar('payments', $payments);
+        $this->view->setVar('groupedOrder', $groupedItems);
     }
     
     /**

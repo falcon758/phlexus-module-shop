@@ -535,12 +535,44 @@ class Order extends Model
                 $p_model.id AS orderID,
                 $p_model.hashCode as hashCode,
                 $p_model.createdAt as createdAt,
+                U.email as userEmail,
+
+                BA.address AS billingAddress,
+                BP.postCode as billingPostCode,
+                BC.country as billingCountry,
+
+                SA.address AS shipmentAddress,
+                SP.postCode as shipmentPostCode,
+                SC.country as shipmentCountry,
+
+                PM.name as paymentMethod,
+                SM.name as shippingMethod,
+
                 I.productID AS productID,
                 I.quantity AS quantity,
-                I.price AS price
+                I.price AS price,
+                SUM(L.quantity) AS totalQuantities,
+                SUM(L.price) AS totalPrice
             ")
             ->innerJoin(User::class, null, 'U')
+
+            ->innerJoin(UserAddress::class, "$p_model.billingID = B.id", 'B')
+            ->innerJoin(Address::class, 'B.addressID = BA.id', 'BA')
+            ->innerJoin(PostCode::class, 'BA.postCodeID = BP    .id', 'BP')
+            ->innerJoin(Locale::class, 'BP.localeID = BL.id', 'BL')
+            ->innerJoin(Country::class, 'BL.countryID = BC.id', 'BC')
+
+            ->innerJoin(UserAddress::class, "$p_model.shipmentID = S.id", 'S')
+            ->innerJoin(Address::class, 'S.addressID = SA.id', 'SA')
+            ->innerJoin(PostCode::class, 'SA.postCodeID = SP.id', 'SP')
+            ->innerJoin(Locale::class, 'SP.localeID = SL.id', 'SL')
+            ->innerJoin(Country::class, 'SL.countryID = SC.id', 'SC')
+
+            ->innerJoin(PaymentMethod::class, null, 'PM')
+            ->innerJoin(ShippingMethod::class, null, 'SM')
+
             ->innerJoin(Item::class, null, 'I')
+            ->innerJoin(Item::class, 'I.orderID = L.orderID', 'L')
             ->where(
                 "$p_model.active = :active: 
                 AND $p_model.userID = :userID: 
@@ -552,6 +584,7 @@ class Order extends Model
                 ]
             )
             ->orderBy("$p_model.id DESC")
+            ->groupBy('I.id, L.orderID')
             ->execute();
     }
 

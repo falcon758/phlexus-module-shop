@@ -52,6 +52,10 @@ class OrderController extends AbstractController
 
         $order = Order::getOrderByHash($orderHash);
 
+        if (count($order) === 0) {
+            return $this->response->redirect('/orders');
+        }
+
         $groupedItems = Arrays::groupArray($order->toArray(), ['productID', 'quantity', 'price'], 'items');
 
         $this->view->setVar('csrfToken', $this->security->getToken());

@@ -326,6 +326,14 @@ class Payment extends Model
             ->innerJoin(Order::class, null, 'O')
             ->innerJoin(Item::class, 'O.id = I.orderID', 'I')
             ->innerJoin(Item::class, 'I.orderID = L.orderID', 'L')
+            ->where(
+                'O.active = :active: 
+                AND O.userID = :userID:',
+                [
+                    'active' => self::ENABLED,
+                    'userID' => $user->id,
+                ]
+            )
             ->orderBy("$p_model.id DESC")
             ->groupBy("$p_model.id, I.id, L.orderID");
 

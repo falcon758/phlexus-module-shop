@@ -36,4 +36,27 @@ class OrderController extends AbstractController
         $this->view->setVar('orders', $orders);
         $this->view->setVar('groupedOrder', $groupedItems);
     }
+
+    /**
+     * @Get('/order/view')
+     */
+    public function viewAction(string $orderHash)
+    {
+        $title = $this->translation->setTypePage()->_('title-shop-order-view');
+
+        $this->tag->setTitle($title);
+
+        $mainView = $this->view->getMainView();
+
+        $this->view->setMainView(preg_replace('/\/public$/', '/default', $mainView));
+
+        $order = Order::getOrderByHash($orderHash);
+
+        $groupedItems = Arrays::groupArray($order->toArray(), ['productID', 'quantity', 'price'], 'items');
+
+        $this->view->setVar('csrfToken', $this->security->getToken());
+        $this->view->setVar('orderRoute', '/order/');
+        $this->view->setVar('orders', $order);
+        $this->view->setVar('groupedOrder', $groupedItems);
+    }
 }

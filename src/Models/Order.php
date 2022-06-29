@@ -513,6 +513,47 @@ class Order extends Model
             ->getFirst();
     }
 
+    /**
+     * Get order by Hash
+     * 
+     * @param string $hashCode
+     *
+     * @return Order|null
+     */
+    public static function getOrderByHash(string $hashCode): ?Simple
+    {
+        $user = User::getUser();
+
+        if (!$user) {
+            throw new \Exception('User not found!');
+        }
+
+        $p_model = self::class;
+
+        return self::query()
+            ->columns("
+                $p_model.id AS orderID,
+                $p_model.hashCode as hashCode,
+                $p_model.createdAt as createdAt,
+                I.productID AS productID,
+                I.quantity AS quantity,
+                I.price AS price
+            ")
+            ->innerJoin(User::class, null, 'U')
+            ->innerJoin(Item::class, null, 'I')
+            ->where(
+                "$p_model.active = :active: 
+                AND $p_model.userID = :userID: 
+                AND $p_model.hashCode = :hashCode:",
+                [
+                    'active'   => self::ENABLED,
+                    'userID'   => $user->id,
+                    'hashCode' => $hashCode
+                ]
+            )
+            ->orderBy("$p_model.id DESC")
+            ->execute();
+    }
 
     /**
      * Get history
@@ -545,6 +586,14 @@ class Order extends Model
             ")
             ->innerJoin(Item::class, null, 'I')
             ->innerJoin(Item::class, 'I.orderID = L.orderID', 'L')
+            ->where(
+                "$p_model.active = :active: 
+                AND $p_model.userID = :userID:",
+                [
+                    'active' => self::ENABLED,
+                    'userID' => $user->id,
+                ]
+            )
             ->orderBy("$p_model.id DESC")
             ->groupBy('I.id, L.orderID');
 

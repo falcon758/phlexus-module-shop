@@ -89,14 +89,14 @@ $routes->addGet('/orders', [
     'action'     => 'index',
 ]);
 
+$routes->addGet('/order/{orderHash:[a-zA-Z0-9]+}', [
+    'controller' => 'order',
+    'action'     => 'view',
+]);
+
 $routes->addGet('/payments', [
     'controller' => 'payment',
     'action'     => 'index',
-]);
-
-$routes->addGet('/payment/history', [
-    'controller' => 'payment',
-    'action'     => 'history',
 ]);
 
 $routes->addGet('/payment/pay/{paymentHash:[a-zA-Z0-9]+}', [

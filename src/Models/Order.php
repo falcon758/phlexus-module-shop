@@ -533,20 +533,22 @@ class Order extends Model
         return self::query()
             ->columns("
                 $p_model.id AS orderID,
-                $p_model.hashCode as hashCode,
-                $p_model.createdAt as createdAt,
-                U.email as userEmail,
+                $p_model.hashCode AS hashCode,
+                $p_model.createdAt AS createdAt,
+                U.email AS userEmail,
 
                 BA.address AS billingAddress,
-                BP.postCode as billingPostCode,
-                BC.country as billingCountry,
+                BP.postCode AS billingPostCode,
+                BC.country AS billingCountry,
 
                 SA.address AS shipmentAddress,
-                SP.postCode as shipmentPostCode,
-                SC.country as shipmentCountry,
+                SP.postCode AS shipmentPostCode,
+                SC.country AS shipmentCountry,
 
-                PM.name as paymentMethod,
-                SM.name as shippingMethod,
+                P.invoiceNumber AS invoiceNumber,
+
+                PM.name AS paymentMethod,
+                SM.name AS shippingMethod,
 
                 I.productID AS productID,
                 I.quantity AS quantity,
@@ -568,6 +570,8 @@ class Order extends Model
             ->innerJoin(Locale::class, 'SP.localeID = SL.id', 'SL')
             ->innerJoin(Country::class, 'SL.countryID = SC.id', 'SC')
 
+            ->innerJoin(Payment::class, null, 'P')
+
             ->innerJoin(PaymentMethod::class, null, 'PM')
             ->innerJoin(ShippingMethod::class, null, 'SM')
 
@@ -584,7 +588,7 @@ class Order extends Model
                 ]
             )
             ->orderBy("$p_model.id DESC")
-            ->groupBy('I.id, L.orderID')
+            ->groupBy('P.id, I.id, L.orderID')
             ->execute();
     }
 

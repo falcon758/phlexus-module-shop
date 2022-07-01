@@ -25,6 +25,8 @@ class Payment extends Model
 
     private const HASHLENGTH = 40;
 
+    private const INVOICEPAD = 7;
+
     /**
      * @var int
      */
@@ -36,9 +38,14 @@ class Payment extends Model
     public string $hashCode;
 
     /**
-     * @var string
+     * @var float
      */
     public float $totalPrice;
+
+    /**
+     * @var string
+     */
+    public string $invoiceNumber;
 
     /**
      * @var int|null
@@ -105,6 +112,18 @@ class Payment extends Model
         ]);
 
         $this->hasMany('id', PaymentAttribute::class, 'paymentID', ['alias' => 'paymentAttribute']);
+    }
+
+    /**
+     * After create
+     * 
+     * @return bool
+     */
+    public function afterCreate()
+    {
+        $this->invoiceNumber = self::generateInvoiceNumber($this->id);
+
+        $this->save();
     }
 
     /**
@@ -414,5 +433,18 @@ class Payment extends Model
                 ]
                 )
             )->paginate();
+    }
+
+    /**
+     * Generate invoice number
+     * 
+     * @param int $orderID Order 
+     * @param int $padLen  Padding length
+     * 
+     * @return string
+     */
+    private static function generateInvoiceNumber(int $orderID, $padLen = self::INVOICEPAD): string
+    {
+        return str_pad($orderID, $padLen, '0', STR_PAD_LEFT);
     }
 }

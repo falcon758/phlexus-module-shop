@@ -45,7 +45,7 @@ class Payment extends Model
     /**
      * @var string
      */
-    public string $invoiceNumber;
+    public $invoiceNumber;
 
     /**
      * @var int|null
@@ -117,13 +117,11 @@ class Payment extends Model
     /**
      * After create
      * 
-     * @return bool
+     * @todo Save record
      */
     public function afterCreate()
     {
-        $this->invoiceNumber = self::generateInvoiceNumber($this->id);
-
-        $this->save();
+        $this->invoiceNumber = self::generateInvoiceNumber((int) $this->id);
     }
 
     /**
@@ -443,8 +441,8 @@ class Payment extends Model
      * 
      * @return string
      */
-    private static function generateInvoiceNumber(int $orderID, $padLen = self::INVOICEPAD): string
+    private static function generateInvoiceNumber(int $orderID, int $padLen = 7): string
     {
-        return str_pad($orderID, $padLen, '0', STR_PAD_LEFT);
+        return str_pad((string) $orderID, $padLen, '0', STR_PAD_LEFT);
     }
 }

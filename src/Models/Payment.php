@@ -441,7 +441,7 @@ class Payment extends Model
      * 
      * @return string
      */
-    private static function generateInvoiceNumber(int $orderID, int $padLen = 7): string
+    private static function generateInvoiceNumber(int $orderID, int $padLen = self::INVOICEPAD): string
     {
         return str_pad((string) $orderID, $padLen, '0', STR_PAD_LEFT);
     }

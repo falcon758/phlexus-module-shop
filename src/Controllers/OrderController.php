@@ -34,7 +34,7 @@ class OrderController extends AbstractController
         $this->view->setVar('csrfToken', $this->security->getToken());
         $this->view->setVar('orderRoute', '/order/');
         $this->view->setVar('orders', $orders);
-        $this->view->setVar('groupedOrder', $groupedItems);
+        $this->view->setVar('groupedOrders', $groupedItems);
     }
 
     /**
@@ -58,9 +58,7 @@ class OrderController extends AbstractController
 
         $groupedItems = Arrays::groupArray($order->toArray(), ['productID', 'quantity', 'price'], 'items');
 
-        $this->view->setVar('csrfToken', $this->security->getToken());
-        $this->view->setVar('orderRoute', '/order/');
-        $this->view->setVar('orders', $order);
+        $this->view->setVar('order', $order);
         $this->view->setVar('groupedOrder', $groupedItems);
     }
 }

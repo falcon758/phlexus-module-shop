@@ -99,6 +99,16 @@ $routes->addGet('/payments', [
     'action'     => 'index',
 ]);
 
+$routes->addGet('/payment/history', [
+    'controller' => 'payment',
+    'action'     => 'history',
+]);
+
+$routes->addGet('/payment/{paymentHash:[a-zA-Z0-9]+}', [
+    'controller' => 'payment',
+    'action'     => 'view',
+]);
+
 $routes->addGet('/payment/pay/{paymentHash:[a-zA-Z0-9]+}', [
     'controller' => 'payment',
     'action'     => 'pay',

@@ -56,6 +56,31 @@ class PaymentController extends AbstractController
         $this->view->setVar('csrfToken', $this->security->getToken());
         $this->view->setVar('viewRoute', '/payment/');
         $this->view->setVar('payments', $payments);
+        $this->view->setVar('groupedPayments', $groupedItems);
+    }
+
+    /**
+     * @Get('/payment/view')
+     */
+    public function viewAction(string $paymentHash)
+    {
+        $title = $this->translation->setTypePage()->_('title-shop-payment-view');
+
+        $this->tag->setTitle($title);
+
+        $mainView = $this->view->getMainView();
+
+        $this->view->setMainView(preg_replace('/\/public$/', '/default', $mainView));
+
+        $payment = Payment::getPaymentByHash($paymentHash);
+
+        if (count($payment) === 0) {
+            return $this->response->redirect('/payment/history');
+        }
+
+        $groupedItems = Arrays::groupArray($payment->toArray(), ['productID', 'quantity', 'price'], 'items');
+
+        $this->view->setVar('payment', $order);
         $this->view->setVar('groupedOrder', $groupedItems);
     }
 

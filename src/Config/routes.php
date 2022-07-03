@@ -79,11 +79,6 @@ $routes->addGet('/order/cancel', [
     'action'     => 'cancel',
 ]);
 
-$routes->addGet('/payment/callback/paypal/{paymentHash:[a-zA-Z0-9]+}', [
-    'controller' => 'callback',
-    'action'     => 'paypal',
-]);
-
 $routes->addGet('/orders', [
     'controller' => 'order',
     'action'     => 'index',
@@ -112,6 +107,11 @@ $routes->addGet('/payment/{paymentHash:[a-zA-Z0-9]+}', [
 $routes->addGet('/payment/pay/{paymentHash:[a-zA-Z0-9]+}', [
     'controller' => 'payment',
     'action'     => 'pay',
+]);
+
+$routes->addGet('/payment/callback/paypal/{paymentHash:[a-zA-Z0-9]+}', [
+    'controller' => 'callback',
+    'action'     => 'paypal',
 ]);
 
 return $routes;

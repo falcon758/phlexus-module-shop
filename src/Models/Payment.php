@@ -122,6 +122,17 @@ class Payment extends Model
     public function afterCreate()
     {
         $this->invoiceNumber = self::generateInvoiceNumber((int) $this->id);
+        //$this->save();
+
+        // Save workaround
+        $saveInvoiceNumber = Di::getDefault()->getShared('db')->prepare('
+            UPDATE payments SET invoiceNumber = :invoiceNumber WHERE id = :id
+        ');
+
+        $saveInvoiceNumber->bindParam(':invoiceNumber', $this->invoiceNumber);
+        $saveInvoiceNumber->bindParam(':id', $this->id);
+
+        $saveInvoiceNumber->execute();
     }
 
     /**

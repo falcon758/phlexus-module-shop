@@ -94,7 +94,7 @@ $routes->addGet('/payments', [
     'action'     => 'index',
 ]);
 
-$routes->addGet('/payment/history', [
+$routes->addGet('/payments/history', [
     'controller' => 'payment',
     'action'     => 'history',
 ]);

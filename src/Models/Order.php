@@ -518,7 +518,7 @@ class Order extends Model
      * 
      * @param string $hashCode
      *
-     * @return Order|null
+     * @return Simple|null
      */
     public static function getOrderByHash(string $hashCode): ?Simple
     {
@@ -531,10 +531,7 @@ class Order extends Model
         $p_model = self::class;
 
         return self::query()
-            ->columns("
-                $p_model.id AS orderID,
-                $p_model.hashCode AS hashCode,
-                $p_model.createdAt AS createdAt,
+            ->columns('
                 U.email AS userEmail,
 
                 BA.address AS billingAddress,
@@ -555,12 +552,12 @@ class Order extends Model
                 I.price AS price,
                 SUM(L.quantity) AS totalQuantities,
                 SUM(L.price) AS totalPrice
-            ")
+            ')
             ->innerJoin(User::class, null, 'U')
 
             ->innerJoin(UserAddress::class, "$p_model.billingID = B.id", 'B')
             ->innerJoin(Address::class, 'B.addressID = BA.id', 'BA')
-            ->innerJoin(PostCode::class, 'BA.postCodeID = BP    .id', 'BP')
+            ->innerJoin(PostCode::class, 'BA.postCodeID = BP.id', 'BP')
             ->innerJoin(Locale::class, 'BP.localeID = BL.id', 'BL')
             ->innerJoin(Country::class, 'BL.countryID = BC.id', 'BC')
 

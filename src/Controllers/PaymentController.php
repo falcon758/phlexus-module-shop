@@ -49,7 +49,7 @@ class PaymentController extends AbstractController
 
         $payments = Payment::getHistory((int) $this->request->get('p', null, 1));
 
-        $groupedKey = Arrays::groupArrayByKey($payments->getItems()->toArray(), 'orderID');
+        $groupedKey = Arrays::groupArrayByKey($payments->getItems()->toArray(), 'paymentID');
 
         $groupedItems = Arrays::groupArray($groupedKey, ['productID', 'quantity', 'price'], 'items');
 

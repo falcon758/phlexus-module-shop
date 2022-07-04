@@ -322,6 +322,86 @@ class Payment extends Model
     }
 
     /**
+     * Get payment by Hash
+     * 
+     * @param string $hashCode
+     *
+     * @return Simple|null
+     */
+    public static function getPaymentByHash(string $hashCode): ?Simple
+    {
+        $user = User::getUser();
+
+        if (!$user) {
+            throw new \Exception('User not found!');
+        }
+
+        $p_model = self::class;
+
+        return self::query()
+            ->columns("
+                $p_model.invoiceNumber AS invoiceNumber,
+
+                U.email AS userEmail,
+
+                BA.address AS billingAddress,
+                BP.postCode AS billingPostCode,
+                BC.country AS billingCountry,
+
+                SA.address AS shipmentAddress,
+                SP.postCode AS shipmentPostCode,
+                SC.country AS shipmentCountry,
+
+                PM.name AS paymentMethod,
+                SM.name AS shippingMethod,
+
+                I.productID AS productID,
+                I.quantity AS quantity,
+                I.price AS price,
+                SUM(L.quantity) AS totalQuantities,
+                SUM(L.price) AS totalPrice
+            ")
+            ->innerJoin(Order::class, null, 'O')
+
+            ->innerJoin(User::class, 'O.userID = U.id', 'U')
+
+            ->innerJoin(UserAddress::class, 'O.billingID = B.id', 'B')
+            ->innerJoin(Address::class, 'B.addressID = BA.id', 'BA')
+            ->innerJoin(PostCode::class, 'BA.postCodeID = BP.id', 'BP')
+            ->innerJoin(Locale::class, 'BP.localeID = BL.id', 'BL')
+            ->innerJoin(Country::class, 'BL.countryID = BC.id', 'BC')
+
+            ->innerJoin(UserAddress::class, 'O.shipmentID = S.id', 'S')
+            ->innerJoin(Address::class, 'S.addressID = SA.id', 'SA')
+            ->innerJoin(PostCode::class, 'SA.postCodeID = SP.id', 'SP')
+            ->innerJoin(Locale::class, 'SP.localeID = SL.id', 'SL')
+            ->innerJoin(Country::class, 'SL.countryID = SC.id', 'SC')
+
+            ->innerJoin(Payment::class, null, 'P')
+
+            ->innerJoin(PaymentMethod::class, 'O.paymentMethodID = PM.id', 'PM')
+            ->innerJoin(ShippingMethod::class, 'O.shippingMethodID = SM.id', 'SM')
+
+            ->innerJoin(Item::class, 'O.id = I.orderID', 'I')
+            ->innerJoin(Item::class, 'I.orderID = L.orderID', 'L')
+            ->where(
+                "$p_model.hashCode = :hashCode:
+                AND $p_model.active = :paymentActive: 
+                AND O.active = :orderActive: 
+                AND O.userID = :userID:",
+                [
+                    'paymentActive' => self::ENABLED,
+                    'orderActive' => Order::ENABLED,
+                    'userID'   => $user->id,
+                    'hashCode' => $hashCode
+                ]
+            )
+            ->orderBy("$p_model.id DESC")
+            ->groupBy("$p_model.id, I.id, L.orderID")
+            ->execute();
+    }
+
+    /**
      * Get history
      * 
      * @return Repository
@@ -343,8 +423,7 @@ class Payment extends Model
             ->columns("
                 $p_model.id as paymentID,
                 $p_model.createdAt as createdAt,
-                O.id AS orderID,
-                O.hashCode as hashCode,
+                $p_model.hashCode as hashCode,
                 I.productID AS productID,
                 I.quantity AS quantity,
                 I.price AS price,

@@ -10,6 +10,7 @@ use Phalcon\Mvc\Model\Transaction\Manager as TxManager;
 use Phalcon\Mvc\Model\Transaction\Failed as TxFailed;
 use Phalcon\Paginator\Adapter\QueryBuilder;
 use Phalcon\Paginator\Repository;
+use Phalcon\Mvc\Model\Resultset\Simple;
 use Phalcon\Di;
 
 /**
@@ -125,9 +126,14 @@ class Payment extends Model
         //$this->save();
 
         // Save workaround
-        $saveInvoiceNumber = Di::getDefault()->getShared('db')->prepare('
-            UPDATE payments SET invoiceNumber = :invoiceNumber WHERE id = :id
-        ');
+        $saveInvoiceNumber = Di::getDefault()->getShared('db')->prepare(
+            'UPDATE
+                payments 
+            SET
+                invoiceNumber = :invoiceNumber 
+            WHERE
+                id = :id'
+        );
 
         $saveInvoiceNumber->bindParam(':invoiceNumber', $this->invoiceNumber);
         $saveInvoiceNumber->bindParam(':id', $this->id);
@@ -217,7 +223,9 @@ class Payment extends Model
 
         $attributes = PaymentAttribute::find(
             [
-                'active = ?0 AND paymentID = ?1 AND name IN (' . $inQuery . ')',
+                'active = ?0 
+                AND paymentID = ?1 
+                AND name IN (' . $inQuery . ')',
                 'bind' => $values
             ]
         );
@@ -285,8 +293,15 @@ class Payment extends Model
         return self::query()
             ->columns("$p_model.*")
             ->innerJoin(Order::class, null, 'O')
-            ->where("$p_model.statusID = :status: AND $p_model.hashCode = :hashCode: AND O.userID = :userID:", [
-                'status'   => PaymentStatus::CREATED,
+            ->where("$p_model.statusID = :paymentStatus: 
+                AND $p_model.hashCode = :hashCode: 
+                AND $p_model.active = :paymentActive: 
+                AND O.active = :orderActive: 
+                AND O.userID = :userID:",
+            [
+                'paymentStatus'   => PaymentStatus::CREATED,
+                'paymentActive' => self::ENABLED,
+                'orderActive' => Order::ENABLED,
                 'hashCode' => $paymentHash,
                 'userID'   => $user->id,
             ])
@@ -377,8 +392,6 @@ class Payment extends Model
             ->innerJoin(Locale::class, 'SP.localeID = SL.id', 'SL')
             ->innerJoin(Country::class, 'SL.countryID = SC.id', 'SC')
 
-            ->innerJoin(Payment::class, null, 'P')
-
             ->innerJoin(PaymentMethod::class, 'O.paymentMethodID = PM.id', 'PM')
             ->innerJoin(ShippingMethod::class, 'O.shippingMethodID = SM.id', 'SM')
 
@@ -434,11 +447,13 @@ class Payment extends Model
             ->innerJoin(Item::class, 'O.id = I.orderID', 'I')
             ->innerJoin(Item::class, 'I.orderID = L.orderID', 'L')
             ->where(
-                'O.active = :active: 
-                AND O.userID = :userID:',
+               "$p_model.active = :paymentActive: 
+                AND O.active = :orderActive: 
+                AND O.userID = :userID:",
                 [
-                    'active' => self::ENABLED,
-                    'userID' => $user->id,
+                    'paymentActive' => self::ENABLED,
+                    'orderActive' => Order::ENABLED,
+                    'userID'   => $user->id
                 ]
             )
             ->orderBy("$p_model.id DESC")

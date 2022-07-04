@@ -80,8 +80,8 @@ class PaymentController extends AbstractController
 
         $groupedItems = Arrays::groupArray($payment->toArray(), ['productID', 'quantity', 'price'], 'items');
 
-        $this->view->setVar('payment', $order);
-        $this->view->setVar('groupedOrder', $groupedItems);
+        $this->view->setVar('payment', $payment);
+        $this->view->setVar('groupedPayment', $groupedItems);
     }
 
     /**

@@ -160,6 +160,8 @@ class Payment extends Model
     public function paid(): bool
     {
         $this->statusID = PaymentStatus::PAID;
+        $this->modifiedAt = date('Y-m-d H:i:s', time());
+
         $this->order->paidOrder();
 
         return $this->save();
@@ -436,6 +438,7 @@ class Payment extends Model
             ->columns("
                 $p_model.id as paymentID,
                 $p_model.createdAt as createdAt,
+                $p_model.modifiedAt as modifiedAt,
                 $p_model.hashCode as hashCode,
                 I.productID AS productID,
                 I.quantity AS quantity,
@@ -456,7 +459,7 @@ class Payment extends Model
                     'userID'   => $user->id
                 ]
             )
-            ->orderBy("$p_model.id DESC")
+            ->orderBy("$p_model.id DESC, $p_model.modifiedAt DESC")
             ->groupBy("$p_model.id, I.id, L.orderID");
 
         return (

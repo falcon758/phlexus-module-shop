@@ -401,14 +401,16 @@ class Payment extends Model
             ->innerJoin(Item::class, 'I.orderID = L.orderID', 'L')
             ->where(
                 "$p_model.hashCode = :hashCode:
+                AND $p_model.statusID = :paymentStatus: 
                 AND $p_model.active = :paymentActive: 
                 AND O.active = :orderActive: 
                 AND O.userID = :userID:",
                 [
+                    'hashCode'      => $hashCode,
+                    'paymentStatus' => PaymentStatus::PAID,
                     'paymentActive' => self::ENABLED,
-                    'orderActive' => Order::ENABLED,
-                    'userID'   => $user->id,
-                    'hashCode' => $hashCode
+                    'orderActive'   => Order::ENABLED,
+                    'userID'        => $user->id,
                 ]
             )
             ->orderBy("$p_model.id DESC")
@@ -450,16 +452,18 @@ class Payment extends Model
             ->innerJoin(Item::class, 'O.id = I.orderID', 'I')
             ->innerJoin(Item::class, 'I.orderID = L.orderID', 'L')
             ->where(
-               "$p_model.active = :paymentActive: 
+               "$p_model.statusID = :paymentStatus: 
+                AND $p_model.active = :paymentActive: 
                 AND O.active = :orderActive: 
                 AND O.userID = :userID:",
                 [
+                    'paymentStatus' => PaymentStatus::PAID,
                     'paymentActive' => self::ENABLED,
-                    'orderActive' => Order::ENABLED,
-                    'userID'   => $user->id
+                    'orderActive'   => Order::ENABLED,
+                    'userID'        => $user->id,
                 ]
             )
-            ->orderBy("$p_model.id DESC, $p_model.modifiedAt DESC")
+            ->orderBy("$p_model.modifiedAt DESC, $p_model.id DESC")
             ->groupBy("$p_model.id, I.id, L.orderID");
 
         return (

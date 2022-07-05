@@ -75,7 +75,7 @@ class PaymentController extends AbstractController
         $payment = Payment::getPaymentByHash($paymentHash);
 
         if (count($payment) === 0) {
-            return $this->response->redirect('/payment/history');
+            return $this->response->redirect('/payments/history');
         }
 
         $groupedItems = Arrays::groupArray($payment->toArray(), ['productID', 'quantity', 'price'], 'items');

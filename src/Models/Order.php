@@ -538,6 +538,8 @@ class Order extends Model
                 BP.postCode AS billingPostCode,
                 BC.country AS billingCountry,
 
+                VT.tax AS vatTax,
+
                 SA.address AS shipmentAddress,
                 SP.postCode AS shipmentPostCode,
                 SC.country AS shipmentCountry,
@@ -560,6 +562,8 @@ class Order extends Model
             ->innerJoin(PostCode::class, 'BA.postCodeID = BP.id', 'BP')
             ->innerJoin(Locale::class, 'BP.localeID = BL.id', 'BL')
             ->innerJoin(Country::class, 'BL.countryID = BC.id', 'BC')
+
+            ->innerJoin(VATTax::class, 'BC.id = VT.countryID', 'VT')
 
             ->innerJoin(UserAddress::class, "$p_model.shipmentID = S.id", 'S')
             ->innerJoin(Address::class, 'S.addressID = SA.id', 'SA')
@@ -585,7 +589,7 @@ class Order extends Model
                 ]
             )
             ->orderBy("$p_model.id DESC")
-            ->groupBy('P.id, I.id, L.orderID')
+            ->groupBy('P.id, I.id, L.orderID, VT.id')
             ->execute();
     }
 

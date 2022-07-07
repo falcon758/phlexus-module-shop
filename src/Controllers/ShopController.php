@@ -138,6 +138,9 @@ class ShopController extends AbstractController
             return $this->response->redirect('/user');
         }
 
+        // @Todo: Implement address fullfill
+        //$address = UserAddress::getUserAddress((int) $user->id, [AddressType::BILLING, AddressType::SHIPPING]);
+
         $this->view->setVar('products', $products);
         $this->view->setVar('orderRoute', '/checkout/order');
         $this->view->setVar('csrfToken', $this->security->getToken());

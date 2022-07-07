@@ -5,6 +5,7 @@ namespace Phlexus\Modules\Shop\Models;
 
 use Phlexus\Models\Model;
 use Phlexus\Modules\BaseUser\Models\User;
+use Phalcon\Mvc\Model\Resultset\Simple;
 
 /**
  * Class UserAddress
@@ -113,5 +114,44 @@ class UserAddress extends Model
         }
 
         return $newUserAddress;
+    }
+
+    /**
+     * Get user address
+     * 
+     * @param int   $userID
+     * @param array $addressTypeID
+     *
+     * @return Simple
+     */
+    public static function getUserAddress(int $userID, array $addressTypeID = [AddressType::SHIPPING]): ?Simple
+    {
+        $p_model = self::class;
+
+        return self::query()
+            ->columns("
+                $p_model.addressTypeID AS addressTypeID,
+                AD.address AS address,
+                PC.postCode AS postCode,
+                CT.country AS country
+            ")
+            ->innerJoin(Address::class, null, 'AD')
+            ->innerJoin(PostCode::class, 'AD.postCodeID = PC.id', 'PC')
+            ->innerJoin(Locale::class, 'PC.localeID = LC.id', 'LC')
+            ->innerJoin(Country::class, 'LC.countryID = CT.id', 'CT')
+            ->where(
+                "$p_model.userID = :userID:
+                AND $p_model.addressTypeID IN (:addressTypeFST:, :addressTypeSCD:)
+                AND $p_model.active = :userAddressActive: 
+                AND AD.active = :addressActive:",
+                [
+                    'userID'            => $userID,
+                    'addressTypeFST'    => $addressTypeID[0] ?? null,
+                    'addressTypeSCD'    => $addressTypeID[1] ?? null,
+                    'userAddressActive' => self::ENABLED,
+                    'addressActive'     => Address::ENABLED,
+                ]
+            )
+            ->execute();
     }
 }

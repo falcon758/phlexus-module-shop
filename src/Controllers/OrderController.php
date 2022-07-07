@@ -6,6 +6,7 @@ namespace Phlexus\Modules\Shop\Controllers;
 
 use Phlexus\Modules\Shop\Models\Order;
 use Phlexus\Libraries\Arrays;
+use Phlexus\Helpers as PhlexusHelpers;
 
 /**
  * @RoutePrefix('/order')
@@ -58,6 +59,9 @@ class OrderController extends AbstractController
 
         $groupedItems = Arrays::groupArray($order->toArray(), ['productID', 'quantity', 'price'], 'items');
 
+        $company = PhlexusHelpers::phlexusConfig('company')->toArray();
+
+        $this->view->setVar('company', $company);
         $this->view->setVar('order', $order);
         $this->view->setVar('groupedOrder', $groupedItems);
     }

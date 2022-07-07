@@ -8,6 +8,7 @@ use Phlexus\Modules\Shop\Models\Payment;
 use Phlexus\Modules\Shop\Models\PaymentType;
 use Phlexus\Modules\Shop\Libraries\Payments\PaymentFactory;
 use Phlexus\Libraries\Arrays;
+use Phlexus\Helpers as PhlexusHelpers;
 
 /**
  * @RoutePrefix('/payment')
@@ -80,6 +81,9 @@ class PaymentController extends AbstractController
 
         $groupedItems = Arrays::groupArray($payment->toArray(), ['productID', 'quantity', 'price'], 'items');
 
+        $company = PhlexusHelpers::phlexusConfig('company')->toArray();
+
+        $this->view->setVar('company', $company);
         $this->view->setVar('payment', $payment);
         $this->view->setVar('groupedPayment', $groupedItems);
     }

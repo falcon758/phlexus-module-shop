@@ -141,6 +141,7 @@ class ShopController extends AbstractController
         // @Todo: Implement address fullfill
         //$address = UserAddress::getUserAddress((int) $user->id, [AddressType::BILLING, AddressType::SHIPPING]);
 
+        $this->view->setVar('addressType', [AddressType::BILLING, AddressType::SHIPPING]);
         $this->view->setVar('products', $products);
         $this->view->setVar('orderRoute', '/checkout/order');
         $this->view->setVar('csrfToken', $this->security->getToken());
@@ -171,35 +172,25 @@ class ShopController extends AbstractController
             return $this->response->redirect('checkout');
         }
 
-        $address = $post['address'];
-
-        $postCode = $post['post_code'];
-
-        $countryID = (int) $post['country'];        
-
-        $locale = 'Unknown' /*$post['local']*/;
-
         $paymentMethodID = (int) $post['payment_method'];
 
         $shippingMethodID = (int )$post['shipping_method'];
 
-        $billing = [
-            'address'   => $address,
-            'postCode'  => $postCode,
-            'locale'    => $locale,
-            'country'   => $countryID
-        ];
-
-        $shipment = [
-            'address'   => $address,
-            'postCode'  => $postCode,
-            'locale'    => $locale,
-            'country'   => $countryID
-        ];
+        $addresses  = [];
+        $billingID  = AddressType::BILLING;
+        $shippingID = AddressType::SHIPPING;
+        foreach ([$billingID, $shippingID] as $type) {
+            $addresses[$type] = [
+                'address'   => $post["address_$type"],
+                'postCode'  => $post["post_code_$type"],
+                'locale'    => 'Unknown' /*$post['local']*/,
+                'country'   => (int) $post["country_$type"]
+            ];
+        }
 
         $order = $this->createOrder(
-            $billing, $shipment, $paymentMethodID,
-            $shippingMethodID, $countryID
+            $addresses[$billingID], $addresses[$shippingID],
+            $paymentMethodID, $shippingMethodID
         );
 
         $payment = null;
@@ -249,27 +240,26 @@ class ShopController extends AbstractController
      * @param array $shipment         Shipment address
      * @param array $paymentMethodID  Payment method
      * @param array $shippingMethodID Shipping address
-     * @param array $countryID        Address country
      * 
      * @return mixed Order or null
      */
     private function createOrder(
         array $billing, array $shipment, int $paymentMethodID,
-        int $shippingMethodID, int $countryID
+        int $shippingMethodID
     ) {
         try {
             $billingID = Address::createAddress(
                 $billing['address'],
                 $billing['postCode'],
                 $billing['locale'],
-                $countryID
+                $billing['country']
             );
 
             $shipmentID = Address::createAddress(
                 $shipment['address'],
                 $shipment['postCode'],
                 $shipment['locale'],
-                $countryID
+                $shipment['country']
             );
 
             // Get current logged user

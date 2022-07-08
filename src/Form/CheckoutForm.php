@@ -15,6 +15,7 @@ namespace Phlexus\Modules\Shop\Form;
 
 use Phlexus\Forms\CaptchaForm;
 use Phlexus\Modules\Shop\Models\Country;
+use Phlexus\Modules\Shop\Models\AddressType;
 use Phlexus\Modules\Shop\Models\PaymentMethod;
 use Phlexus\Modules\Shop\Models\ShippingMethod;
 use Phalcon\Forms\Element\Text;
@@ -33,30 +34,6 @@ class checkoutForm extends CaptchaForm
         $translationForm = $this->translation->setPage()->setTypeForm();   
 
         // Fields
-        $address = new Text('address', [
-            'required'    => true,
-            'class'       => 'form-control',
-            'placeholder' => $translationForm->_('field-address')
-        ]);
-
-        $postCode = new Text('post_code', [
-            'required'    => true,
-            'class'       => 'form-control',
-            'placeholder' => $translationForm->_('field-post-code')
-        ]);
-
-        $countryData = Country::find();
-        $country = new Select(
-            'country',
-            $countryData,
-            [
-                'using'       => ['id', 'country'],
-                'required'    => true,
-                'class'       => 'form-control',
-                'placeholder' => $translationForm->_('field-country')
-            ]
-        );
-
         $paymentMethodData = PaymentMethod::find();
         $paymentMethod = new Select(
             'payment_method',
@@ -78,6 +55,71 @@ class checkoutForm extends CaptchaForm
                 'required'    => true,
                 'class'       => 'form-control',
                 'placeholder' => $translationForm->_('field-shipping-method')
+            ]
+        );
+
+        $translationMessage = $this->translation->setTypeMessage();
+
+        // Validators
+        $paymentMethodRequired = $translationMessage->_('field-payment-method-required');
+        $paymentMethod->addValidators([
+            new PresenceOf(['message' => $paymentMethodRequired]),
+            new InclusionIn(
+                [
+                    'message' => $paymentMethodRequired,
+                    'domain'  => array_column($paymentMethodData->toArray(), 'id')
+                ]
+            )
+        ]);
+
+        $shippingMethodRequired = $translationMessage->_('field-shipping-method-required');
+        $shippingMethod->addValidators([
+            new PresenceOf(['message' => $shippingMethodRequired]),
+            new InclusionIn(
+                [
+                    'message' => $shippingMethodRequired,
+                    'domain' => array_column($shippingMethodData->toArray(), 'id')
+                ]
+            )
+        ]);
+
+        $this->add($paymentMethod);
+        $this->add($shippingMethod);
+
+        $this->buildAddress(AddressType::BILLING);
+        $this->buildAddress(AddressType::SHIPPING);
+    }
+
+
+    /**
+     * Build address fields
+     */
+    public function buildAddress($type)
+    {
+        $translationForm = $this->translation->setPage()->setTypeForm();   
+
+        // Fields
+        $address = new Text("address_$type", [
+            'required'    => true,
+            'class'       => 'form-control',
+            'placeholder' => $translationForm->_('field-address')
+        ]);
+
+        $postCode = new Text("post_code_$type", [
+            'required'    => true,
+            'class'       => 'form-control',
+            'placeholder' => $translationForm->_('field-post-code')
+        ]);
+
+        $countryData = Country::find();
+        $country = new Select(
+            "country_$type",
+            $countryData,
+            [
+                'using'       => ['id', 'country'],
+                'required'    => true,
+                'class'       => 'form-control',
+                'placeholder' => $translationForm->_('field-country')
             ]
         );
 
@@ -115,32 +157,8 @@ class checkoutForm extends CaptchaForm
             )
         ]);
 
-        $paymentMethodRequired = $translationMessage->_('field-payment-method-required');
-        $paymentMethod->addValidators([
-            new PresenceOf(['message' => $paymentMethodRequired]),
-            new InclusionIn(
-                [
-                    'message' => $paymentMethodRequired,
-                    'domain'  => array_column($paymentMethodData->toArray(), 'id')
-                ]
-            )
-        ]);
-
-        $shippingMethodRequired = $translationMessage->_('field-shipping-method-required');
-        $shippingMethod->addValidators([
-            new PresenceOf(['message' => $shippingMethodRequired]),
-            new InclusionIn(
-                [
-                    'message' => $shippingMethodRequired,
-                    'domain' => array_column($shippingMethodData->toArray(), 'id')
-                ]
-            )
-        ]);
-
         $this->add($address);
         $this->add($postCode);
         $this->add($country);
-        $this->add($paymentMethod);
-        $this->add($shippingMethod);
     }
 }

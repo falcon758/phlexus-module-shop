@@ -665,6 +665,7 @@ class Order extends Model
                 $p_model.paymentMethodID,
                 $p_model.shippingMethodID,
                 I.id AS itemID,
+                I.quantity,
                 I.productID,
                 (I.price * I.quantity) AS totalPrice,
                 (SELECT COUNT($i_model.id) FROM $i_model WHERE $i_model.orderID = $p_model.id) AS itemsCount

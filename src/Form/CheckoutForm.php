@@ -20,6 +20,7 @@ use Phlexus\Modules\Shop\Models\PaymentMethod;
 use Phlexus\Modules\Shop\Models\ShippingMethod;
 use Phalcon\Forms\Element\Text;
 use Phalcon\Forms\Element\Select;
+use Phalcon\Forms\Element\Check;
 use Phalcon\Validation\Validator\PresenceOf;
 use Phalcon\Validation\Validator\InclusionIn;
 use Phalcon\Validation\Validator\Regex;
@@ -58,6 +59,11 @@ class checkoutForm extends CaptchaForm
             ]
         );
 
+        $sameAddress = new Check('same_address', [
+            'class' => 'form-control',
+            'label' => $translationForm->_('field-same-address')
+        ]);
+
         $translationMessage = $this->translation->setTypeMessage();
 
         // Validators
@@ -88,6 +94,9 @@ class checkoutForm extends CaptchaForm
 
         $this->buildAddress(AddressType::BILLING);
         $this->buildAddress(AddressType::SHIPPING);
+
+
+        $this->add($sameAddress->setLabel($translationForm->_('field-same-address')));
     }
 
 

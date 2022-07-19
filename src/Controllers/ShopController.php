@@ -79,8 +79,9 @@ class ShopController extends AbstractController
         }
 
         return $this->response->setJsonContent([
-            'success' => true,
-            'message' => $translationMessage->_('product-added-successfully'),
+            'success'  => true,
+            'message'  => $translationMessage->_('product-added-successfully'),
+            'newToken' => $this->security->getToken(),
         ]);
     }
 
@@ -106,8 +107,9 @@ class ShopController extends AbstractController
         $this->cart->removeProduct($productID);
 
         return $this->response->setJsonContent([
-            'success' => true,
-            'message' => $translationMessage->_('product-successfully-removed'),
+            'success'  => true,
+            'message'  => $translationMessage->_('product-successfully-removed'),
+            'newToken' => $this->security->getToken(),
         ]);
     }
 

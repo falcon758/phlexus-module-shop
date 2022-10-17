@@ -10,7 +10,7 @@ use Phalcon\Mvc\Model\Transaction\Failed as TxFailed;
 use Phalcon\Paginator\Adapter\QueryBuilder;
 use Phalcon\Paginator\Repository;
 use Phalcon\Mvc\Model\Resultset\Simple;
-use Phalcon\Di;
+use Phalcon\Di\Di;
 
 /**
  * Class Order

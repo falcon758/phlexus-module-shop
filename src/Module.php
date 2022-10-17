@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Phlexus\Modules\Shop;
 
 use Phalcon\Di\DiInterface;
-use Phalcon\Loader;
+use Phalcon\Autoload\Loader;
 use Phalcon\Mvc\View\Engine\Volt;
 use Phlexus\Module as PhlexusModule;
 use Phlexus\Helpers;
@@ -58,7 +58,7 @@ class Module extends PhlexusModule
     public function registerAutoloaders(DiInterface $di = null): void
     {
         (new Loader())
-            ->registerNamespaces([
+            ->setNamespaces([
                 self::getHandlersNamespace() . '\\Models' => __DIR__ . '/Models/',
                 self::getHandlersNamespace() . '\\Controllers' => __DIR__ . '/Controllers/',
                 self::getHandlersNamespace() . '\\Providers' => __DIR__ . '/Providers/',

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Phlexus\Modules\Shop\Libraries\Payments;
 
-use Phalcon\Di;
+use Phalcon\Di\Di;
 use Phalcon\Http\ResponseInterface;
 use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
 use PayPalCheckoutSdk\Orders\OrdersGetRequest;

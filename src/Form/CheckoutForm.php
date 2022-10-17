@@ -21,9 +21,9 @@ use Phlexus\Modules\Shop\Models\ShippingMethod;
 use Phalcon\Forms\Element\Text;
 use Phalcon\Forms\Element\Select;
 use Phalcon\Forms\Element\Check;
-use Phalcon\Validation\Validator\PresenceOf;
-use Phalcon\Validation\Validator\InclusionIn;
-use Phalcon\Validation\Validator\Regex;
+use Phalcon\Filter\Validation\Validator\PresenceOf;
+use Phalcon\Filter\Validation\Validator\InclusionIn;
+use Phalcon\Filter\Validation\Validator\Regex;
 
 class checkoutForm extends CaptchaForm
 {

@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Phlexus\Modules\Shop\Libraries\Payments;
 
 use Phlexus\Modules\Shop\Models\Payment;
-use Phalcon\Di;
-use Phalcon\Url;
+use Phalcon\Di\Di;
+use Phalcon\Mvc\Url;
 use Phalcon\Http\Response;
 use Phalcon\Flash\Session as FlashSession;
 

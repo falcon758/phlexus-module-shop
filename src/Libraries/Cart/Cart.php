@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Phlexus\Modules\Shop\Libraries\Cart;
 
-use Phalcon\Di;
+use Phalcon\Di\Di;
 use Phlexus\Modules\Shop\Models\Product;
 use Phalcon\Session\Manager;
 

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Phlexus\Modules\Shop\Models;
 
-use Phalcon\Di;
+use Phalcon\Di\Di;
 use Phlexus\Models\Model;
 
 /**

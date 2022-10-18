@@ -6,6 +6,7 @@ namespace Phlexus\Modules\Shop\Controllers;
 
 use Phalcon\Http\ResponseInterface;
 use Phalcon\Mvc\Controller;
+use Phalcon\Tag;
 use Phlexus\Modules\Shop\Libraries\Cart\Cart;
 use Phlexus\Modules\Shop\Models\Product;
 use Phlexus\Modules\Shop\Models\Address;
@@ -32,7 +33,7 @@ class ShopController extends AbstractController
     {
         $title = $this->translation->setTypePage()->_('title-shop-cart');
 
-        $this->tag->setTitle($title);
+        Tag::setTitle($title);
 
         $products = $this->cart->getProducts();
 
@@ -49,7 +50,7 @@ class ShopController extends AbstractController
     {
         $title = $this->translation->setTypePage()->_('title-shop-products');
 
-        $this->tag->setTitle($title);
+        Tag::setTitle($title);
 
         $this->view->setVar('addRoute', '/cart/add/');
         $this->view->setVar('csrfToken', $this->security->getToken());
@@ -120,7 +121,7 @@ class ShopController extends AbstractController
     {
         $title = $this->translation->setTypePage()->_('title-shop-checkout');
 
-        $this->tag->setTitle($title);
+        Tag::setTitle($title);
 
         $products = $this->cart->getProducts();
 
@@ -220,7 +221,7 @@ class ShopController extends AbstractController
     {
         $title = $this->translation->setTypePage()->_('title-order-success');
 
-        $this->tag->setTitle($title);
+        Tag::setTitle($title);
 
         $this->cart->clear();
     }

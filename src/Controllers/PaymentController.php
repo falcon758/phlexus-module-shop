@@ -9,6 +9,7 @@ use Phlexus\Modules\Shop\Models\PaymentType;
 use Phlexus\Modules\Shop\Libraries\Payments\PaymentFactory;
 use Phlexus\Libraries\Arrays;
 use Phlexus\Helpers as PhlexusHelpers;
+use Phalcon\Tag;
 
 /**
  * @RoutePrefix('/payment')
@@ -22,7 +23,7 @@ class PaymentController extends AbstractController
     {
         $title = $this->translation->setTypePage()->_('title-shop-payments');
 
-        $this->tag->setTitle($title);
+        Tag::setTitle($title);
 
         $mainView = $this->view->getMainView();
 
@@ -42,7 +43,7 @@ class PaymentController extends AbstractController
     {
         $title = $this->translation->setTypePage()->_('title-shop-payments-history');
 
-        $this->tag->setTitle($title);
+        Tag::setTitle($title);
 
         $mainView = $this->view->getMainView();
 
@@ -67,7 +68,7 @@ class PaymentController extends AbstractController
     {
         $title = $this->translation->setTypePage()->_('title-shop-payment-view');
 
-        $this->tag->setTitle($title);
+        Tag::setTitle($title);
 
         $mainView = $this->view->getMainView();
 

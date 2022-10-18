@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Phlexus\Modules\Shop\Controllers;
 
+use Phalcon\Tag;
 use Phalcon\Http\ResponseInterface;
 use Phlexus\Modules\Shop\Models\Payment;
 use Phlexus\Modules\Shop\Libraries\Payments\PayPal;
@@ -20,7 +21,7 @@ class CallbackController extends AbstractController
     {
         $title = $this->translation->setTypePage()->_('title-shop-callback-paypal');
 
-        $this->tag->setTitle($title);
+        Tag::setTitle($title);
 
         $payment = Payment::findFirstByhashCode($paymentHash);
 

@@ -41,7 +41,6 @@ class checkoutForm extends CaptchaForm
             $paymentMethodData,
             [
                 'using'       => ['id', 'name'],
-                'required'    => true,
                 'class'       => 'form-control',
                 'placeholder' => $translationForm->_('field-payment-method')
             ]
@@ -53,7 +52,6 @@ class checkoutForm extends CaptchaForm
             $shippingMethodData,
             [
                 'using'       => ['id', 'name'],
-                'required'    => true,
                 'class'       => 'form-control',
                 'placeholder' => $translationForm->_('field-shipping-method')
             ]
@@ -109,13 +107,11 @@ class checkoutForm extends CaptchaForm
 
         // Fields
         $address = new Text("address_$type", [
-            'required'    => true,
             'class'       => 'form-control',
             'placeholder' => $translationForm->_('field-address')
         ]);
 
         $postCode = new Text("post_code_$type", [
-            'required'    => true,
             'class'       => 'form-control',
             'placeholder' => $translationForm->_('field-post-code')
         ]);
@@ -126,7 +122,6 @@ class checkoutForm extends CaptchaForm
             $countryData,
             [
                 'using'       => ['id', 'country'],
-                'required'    => true,
                 'class'       => 'form-control',
                 'placeholder' => $translationForm->_('field-country')
             ]

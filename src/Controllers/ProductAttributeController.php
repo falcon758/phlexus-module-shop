@@ -11,6 +11,7 @@ use Phalcon\Forms\Element\File;
 use Phalcon\Forms\Element\Hidden;
 use Phalcon\Http\ResponseInterface;
 use Phalcon\Paginator\Adapter\Model as PaginatorModel;
+use Phalcon\Tag;
 
 /**
  * Class ProductAttribute
@@ -39,7 +40,7 @@ final class ProductAttributeController extends AbstractController
     {
         $title = $this->translation->setTypePage()->_('title-product-attributes-manager');
 
-        $this->tag->setTitle($title);
+        Tag::setTitle($title);
 
         $mainView = $this->view->getMainView();
 

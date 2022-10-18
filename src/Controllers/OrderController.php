@@ -7,6 +7,7 @@ namespace Phlexus\Modules\Shop\Controllers;
 use Phlexus\Modules\Shop\Models\Order;
 use Phlexus\Libraries\Arrays;
 use Phlexus\Helpers as PhlexusHelpers;
+use Phalcon\Tag;
 
 /**
  * @RoutePrefix('/order')
@@ -20,7 +21,7 @@ class OrderController extends AbstractController
     {
         $title = $this->translation->setTypePage()->_('title-shop-orders');
 
-        $this->tag->setTitle($title);
+        Tag::setTitle($title);
 
         $mainView = $this->view->getMainView();
 
@@ -45,7 +46,7 @@ class OrderController extends AbstractController
     {
         $title = $this->translation->setTypePage()->_('title-shop-order-view');
 
-        $this->tag->setTitle($title);
+        Tag::setTitle($title);
 
         $mainView = $this->view->getMainView();
 

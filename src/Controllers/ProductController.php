@@ -12,6 +12,7 @@ use Phalcon\Forms\Element\Check;
 use Phalcon\Forms\Element\File;
 use Phalcon\Forms\Element\Hidden;
 use Phalcon\Http\ResponseInterface;
+use Phalcon\Tag;
 
 /**
  * Class Product
@@ -37,7 +38,7 @@ final class ProductController extends AbstractController
     {
         $title = $this->translation->setTypePage()->_('title-products-manager');
 
-        $this->tag->setTitle($title);
+        Tag::setTitle($title);
 
         $mainView = $this->view->getMainView();
 

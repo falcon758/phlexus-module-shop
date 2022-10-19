@@ -3,8 +3,8 @@
     "license": "BSD-3-Clause",
     "description": "Phlexus Shop Module",
     "require": {
-        "falcon758/phlexus-module-users": "^1.10.5",
-        "falcon758/phlexus-library-media": "^1.2.1",
+        "falcon758/phlexus-module-users": "^2.0.0",
+        "falcon758/phlexus-library-media": "^2.0.0",
         "paypal/paypal-checkout-sdk": "^1.0"
     },
     "require-dev": {

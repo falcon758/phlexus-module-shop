@@ -405,23 +405,23 @@ class Order extends Model
                     )
                 )", 'PSD')
             ->where(
-                "$p_model.active = :active: 
+                "$p_model.active = :orderActive: 
                 AND $p_model.id = :orderID:
-                AND $p_model.statusID = :status: 
-                AND I.active = :active: 
+                AND $p_model.statusID = :orderStatus: 
+                AND I.active = :itemActive: 
                 AND PR.id = :productID:
                 AND PR.isSubscription = :isSubscription: 
                 AND DATEDIFF(CURRENT_DATE(), PST.createdAt) <= Period.value + MaxDelay.value
                 AND PSD.id IS NULL",
                 [
-                    'active'         => self::ENABLED,
+                    'orderActive'    => self::ENABLED,
                     'orderID'        => $this->id,
-                    'status'         => OrderStatus::RENEWAL,
+                    'orderStatus'    => OrderStatus::RENEWAL,
+                    'itemActive'     => Item::ENABLED,
                     'productID'      => $productID,
                     'isSubscription' => 1
                 ]
             )
-            ->orderBy("$p_model.id DESC")
             ->execute()
             ->count() === 1;
     }

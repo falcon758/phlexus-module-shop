@@ -193,4 +193,53 @@ class Product extends Model
 
         return true;
     }
+
+    /**
+     * Has subscription active
+     * 
+     * @param int $productID Product to search for
+     * @param int $userID    User to check against
+     * 
+     * @return bool
+     * 
+     * @throws Exception
+     */
+    public static function hasSubscriptionActive(int $productID, int $userID): bool
+    {
+        $p_model = self::class;
+
+        return self::query()
+            ->innerJoin(ProductAttribute::class, "$p_model.id = Period.productID AND Period.name = '" . ProductAttribute::SUBSCRIPTION_PERIOD . "'", 'Period')
+            ->innerJoin(ProductAttribute::class, "$p_model.id = MaxDelay.productID AND MaxDelay.name = '" . ProductAttribute::SUBSCRIPTION_MAX_DELAY . "'", 'MaxDelay')
+            ->innerJoin(Item::class, "$p_model.id = I.productID", 'I')
+            ->innerJoin(Order::class, "I.orderID = O.id", 'O')
+            ->innerJoin(Payment::class, "O.id = PST.orderID", 'PST')
+            ->leftJoin(Payment::class, "
+                O.id = PSD.orderID
+            AND 
+                (
+                        PST.createdAt < PSD.createdAt 
+                    OR (
+                        PST.createdAt = PSD.createdAt AND PST.id < PSD.id
+                    )
+                )", 'PSD')
+            ->where(
+                "O.active = :orderActive: 
+                AND O.statusID = :orderStatus: 
+                AND I.active = :itemActive: 
+                AND $p_model.id = :productID:
+                AND $p_model.isSubscription = :isSubscription: 
+                AND DATEDIFF(CURRENT_DATE(), PST.createdAt) <= Period.value + MaxDelay.value
+                AND PSD.id IS NULL",
+                [
+                    'orderActive'    => Order::ENABLED,
+                    'orderStatus'    => OrderStatus::RENEWAL,
+                    'itemActive'     => Item::ENABLED,
+                    'productID'      => $productID,
+                    'isSubscription' => 1
+                ]
+            )
+            ->execute()
+            ->count() === 1;
+    }
 }

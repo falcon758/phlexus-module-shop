@@ -215,11 +215,13 @@ class Payment extends Model
      */
     public function getAttributes(array $names): array
     {
-        if (count($names) === 0) {
+        $cNames = count($names);
+
+        if ($cNames === 0) {
             return [];
         }
 
-        $inQuery = '?' . implode(', ?', range(2, count($names)));
+        $inQuery = '?' . implode(', ?', range(2, $cNames + 1));
 
         $values = array_merge([1, $this->id], $names);
 

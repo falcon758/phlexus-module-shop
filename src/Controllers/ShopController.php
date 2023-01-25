@@ -249,7 +249,8 @@ class ShopController extends AbstractController
     private function createOrder(
         array $billing, array $shipment, int $paymentMethodID,
         int $shippingMethodID
-    ) {
+    ): ?Order
+    {
         try {
             $billingID = Address::createAddress(
                 $billing['address'],

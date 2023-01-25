@@ -62,6 +62,16 @@ class Address extends Model
     }
 
     /**
+     * Get encrypt fields
+     * 
+     * @return array Fields
+     */
+    public static function getEncryptFields() : array
+    {
+        return ['address'];
+    }
+
+    /**
      * Create address or return if exists
      * 
      * @param string $address    Address to create
@@ -81,7 +91,12 @@ class Address extends Model
 
         $newPostCode = PostCode::createPostCode($postCode, (int) $newLocale->id);
 
+        //@ToDo:: Encrypt address
         $address = trim($address);
+
+        if (preg_match('/^[a-zA-Z0-9\s.-]*$/', $address) !== 1) {
+            throw new \Exception('Unable to process address');
+        }
 
         $newAddress = self::findFirst([
             'conditions' => 'active = :active: AND postCodeID = :postCodeID: AND address = :address:',
@@ -100,7 +115,7 @@ class Address extends Model
         $newAddress->address    = $address;
         $newAddress->postCodeID = (int) $newPostCode->id;
 
-        if (preg_match('/^[a-zA-Z0-9\s.-]*$/', $address) !== 1 || !$newAddress->save()) {
+        if (!$newAddress->save()) {
             throw new \Exception('Unable to process address');
         }
         

@@ -70,7 +70,7 @@ class ShopController extends AbstractController
         $translationMessage = $this->translation->setTypeMessage();
 
         if (
-            !$this->security->checkToken('csrf', $this->request->getPost('csrf', null, null))
+            !$this->security->checkToken('csrf', (string) $this->request->getPost('csrf'))
             || !$this->cart->addProduct($productID) 
         ) {
             return $this->response->setJsonContent([
@@ -98,7 +98,7 @@ class ShopController extends AbstractController
 
         $translationMessage = $this->translation->setTypeMessage();
 
-        if (!$this->security->checkToken('csrf', $this->request->getPost('csrf', null, null))) {
+        if (!$this->security->checkToken('csrf', (string) $this->request->getPost('csrf'))) {
             return $this->response->setJsonContent([
                 'success' => false,
                 'message' => $translationMessage->_('unable-to-remove-product'),
@@ -177,7 +177,7 @@ class ShopController extends AbstractController
 
         $paymentMethodID = (int) $post['payment_method'];
 
-        $shippingMethodID = (int )$post['shipping_method'];
+        $shippingMethodID = (int) $post['shipping_method'];
 
         $addresses  = [];
         $billingID  = AddressType::BILLING;

@@ -29,7 +29,7 @@ class CallbackController extends AbstractController
             return $this->response->redirect('checkout');
         }
 
-        $token = $this->request->get('token');
+        $token = (string) $this->request->get('token');
 
         if (preg_match('/^[a-zA-Z0-9]+$/', $token) !== 1) {
             return $this->response->redirect('checkout');

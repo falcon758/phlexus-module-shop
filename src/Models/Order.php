@@ -680,23 +680,41 @@ class Order extends Model
             AND 
                 (
                         PST.createdAt < PSD.createdAt 
-                    OR (
-                        PST.createdAt = PSD.createdAt AND PST.id < PSD.id
-                    )
-                )", 'PSD')
+                    OR
+                        (
+                            PST.createdAt = PSD.createdAt AND PST.id < PSD.id
+                        )
+                )
+            AND
+                PST.active = PSD.active
+            AND
+                PST.statusID != :paymentAgainstStatusID:
+            AND
+                PST.paymentTypeID = PSD.paymentTypeID",
+                'PSD'
+            )
             ->where(
-                "$p_model.active = :active: 
-                AND $p_model.statusID = :status: 
-                AND I.active = :active: 
-                AND PR.isSubscription = :isSubscription: 
+                "$p_model.active = :orderActive:
+                AND I.active = :itemActive:
+                AND PST.active = :paymentActive:
+                AND $p_model.statusID = :orderStatusID:
+                AND PST.statusID = :paymentStatusID:
+                AND PST.paymentTypeID = :paymentTypeID:
+                AND PR.isSubscription = :isSubscription:
                 AND DATEDIFF(CURRENT_DATE(), PST.createdAt) >= Period.value - SOffset.value
                 AND PSD.id IS NULL",
                 [
-                    'active'         => self::ENABLED,
-                    'status'         => OrderStatus::RENEWAL,
-                    'isSubscription' => 1
+                    'paymentAgainstStatusID' => PaymentStatus::CANCELED,
+                    'orderActive'            => Order::ENABLED,
+                    'itemActive'             => Item::ENABLED,
+                    'paymentActive'          => Payment::ENABLED,
+                    'orderStatusID'          => OrderStatus::RENEWAL,
+                    'paymentStatusID'        => PaymentStatus::PAID,
+                    'paymentTypeID'          => PaymentType::RENEWAL,
+                    'isSubscription'         => 1
                 ]
-            )->orderBy("$p_model.id DESC")
+            )
+            ->orderBy("$p_model.id DESC")
             ->execute();
     }
 
@@ -724,22 +742,36 @@ class Order extends Model
                     OR (
                         PST.createdAt = PSD.createdAt AND PST.id < PSD.id
                     )
-                )", 'PSD')
+                )
+            AND
+                PST.active = PSD.active
+            AND
+                PST.statusID = PSD.statusID
+            AND
+                PST.paymentTypeID = PSD.paymentTypeID",
+                'PSD'
+            )
             ->where(
-                "$p_model.active = :active: 
-                AND $p_model.statusID = :status: 
-                AND I.active = :active: 
-                AND PR.isSubscription = :isSubscription: 
-                AND PST.statusID != :paymentStatus:
+                "$p_model.active = :orderActive:
+                AND I.active = :itemActive:
+                AND PST.active = :paymentActive:
+                AND $p_model.statusID = :orderStatusID:
+                AND PST.statusID = :paymentStatusID:
+                AND PST.paymentTypeID = :paymentTypeID:
+                AND PR.isSubscription = :isSubscription:
                 AND DATEDIFF(CURRENT_DATE(), PST.createdAt) > (SOffset.value + MaxDelay.value)
                 AND PSD.id IS NULL",
                 [
-                    'active'         => self::ENABLED,
-                    'status'         => OrderStatus::RENEWAL,
-                    'isSubscription' => 1,
-                    'paymentStatus'  => PaymentStatus::PAID
+                    'orderActive'     => Order::ENABLED,
+                    'itemActive'      => Item::ENABLED,
+                    'paymentActive'   => Payment::ENABLED,
+                    'orderStatusID'   => OrderStatus::RENEWAL,
+                    'paymentStatusID' => PaymentStatus::CREATED,
+                    'paymentTypeID'   => PaymentType::RENEWAL,
+                    'isSubscription'  => 1
                 ]
-            )->orderBy("$p_model.id DESC")
+            )
+            ->orderBy("$p_model.id DESC")
             ->execute();
     }
 }

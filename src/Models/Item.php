@@ -92,7 +92,8 @@ class Item extends Model
      *
      * @return bool
      */
-    public function disableItem(): bool {
+    public function disableItem(): bool
+    {
         $this->active = self::DISABLED;
         return $this->save();
     }
@@ -109,7 +110,8 @@ class Item extends Model
      * 
      * @throws Exception
      */
-    public static function createItem(int $productID, int $orderID, int $quantity, float $price): Item {
+    public static function createItem(int $productID, int $orderID, int $quantity, float $price): Item
+    {
         $item = new self;
 
         $product = Product::findFirstByid($productID);
@@ -138,7 +140,8 @@ class Item extends Model
      * 
      * @return bool
      */
-    public static function disableOrderItem(int $itemID, int $orderID): bool {
+    public static function disableOrderItem(int $itemID, int $orderID): bool
+    {
         $disableItem = Di::getDefault()->getShared('db')->prepare('
             UPDATE items SET active = :active WHERE id = :id AND orderID = :orderID
         ');

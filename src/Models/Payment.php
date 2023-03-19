@@ -474,11 +474,11 @@ class Payment extends Model
 
         return (
             new QueryBuilder(
-            [
-                'builder' => $query,
-                'limit'   => self::PAGE_LIMIT,
-                'page'    => $page,
-            ]
+                [
+                    'builder' => $query,
+                    'limit'   => self::PAGE_LIMIT,
+                    'page'    => $page,
+                ]
             )
         )->paginate();
     }
@@ -511,10 +511,10 @@ class Payment extends Model
                 I.productID AS productID,
                 I.quantity AS quantity,
                 I.price AS price,
-                SOffset.value - DATEDIFF(CURRENT_DATE(), P.createdAt) AS due_days,
-                DATE_FORMAT(FROM_UNIXTIME(UNIX_TIMESTAMP(P.createdAt) + (SOffset.value * 86400)), '%d-%m-%Y') AS due_date,
-                (SOffset.value + MaxDelay.value) - DATEDIFF(CURRENT_DATE(), P.createdAt) AS cancelation_days,
-                DATE_FORMAT(FROM_UNIXTIME(UNIX_TIMESTAMP(P.createdAt)  + ((SOffset.value + MaxDelay.value) * 86400)), '%d-%m-%Y') AS cancelation_date
+                SOffset.value - DATEDIFF(CURRENT_DATE(), $p_model.createdAt) AS due_days,
+                DATE_FORMAT(FROM_UNIXTIME(UNIX_TIMESTAMP($p_model.createdAt) + (SOffset.value * 86400)), '%d-%m-%Y') AS due_date,
+                (SOffset.value + MaxDelay.value) - DATEDIFF(CURRENT_DATE(), $p_model.createdAt) AS cancelation_days,
+                DATE_FORMAT(FROM_UNIXTIME(UNIX_TIMESTAMP($p_model.createdAt) + ((SOffset.value + MaxDelay.value) * 86400)), '%d-%m-%Y') AS cancelation_date
             ")
             ->innerJoin(Order::class, null, 'O')
             ->innerJoin(Item::class, 'O.id = I.orderID', 'I')
@@ -528,25 +528,26 @@ class Payment extends Model
                 AND O.statusID = :orderStatus: 
                 AND O.active = :orderActive: 
                 AND O.userID = :userID: 
-                AND I.active = :itemActive:
-            ", [
-                'paymentStatus' => PaymentStatus::CREATED,
-                'paymentActive' => self::ENABLED,
-                'orderStatus'   => OrderStatus::RENEWAL,
-                'orderActive'   => Order::ENABLED,
-                'userID'        => $user->id,
-                'itemActive'    => Item::ENABLED,
-            ])
+                AND I.active = :itemActive:",
+                [
+                    'paymentStatus' => PaymentStatus::CREATED,
+                    'paymentActive' => self::ENABLED,
+                    'orderStatus'   => OrderStatus::RENEWAL,
+                    'orderActive'   => Order::ENABLED,
+                    'userID'        => $user->id,
+                    'itemActive'    => Item::ENABLED,
+                ]
+            )
             ->orderBy("$p_model.id DESC");
 
 
             return (
                 new QueryBuilder(
-                [
-                    'builder' => $query,
-                    'limit'   => self::PAGE_LIMIT,
-                    'page'    => $page,
-                ]
+                    [
+                        'builder' => $query,
+                        'limit'   => self::PAGE_LIMIT,
+                        'page'    => $page,
+                    ]
                 )
             )->paginate();
     }

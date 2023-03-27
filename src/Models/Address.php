@@ -98,6 +98,8 @@ class Address extends Model
             throw new \Exception('Unable to process address');
         }
 
+        $address = self::encrypt($address);
+
         $newAddress = self::findFirst([
             'conditions' => 'active = :active: AND postCodeID = :postCodeID: AND address = :address:',
             'bind'       => [
@@ -106,6 +108,9 @@ class Address extends Model
                 'address' => $address,
             ],
         ]);
+
+
+        $address = self::decrypt($address);
 
         if ($newAddress) {
             return $newAddress;

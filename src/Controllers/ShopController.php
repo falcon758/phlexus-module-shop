@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Phlexus\Modules\Shop\Controllers;
 
-use Phalcon\Http\ResponseInterface;
-use Phalcon\Mvc\Controller;
-use Phalcon\Tag;
 use Phlexus\Modules\Shop\Libraries\Cart\Cart;
 use Phlexus\Modules\Shop\Models\Product;
 use Phlexus\Modules\Shop\Models\Address;
@@ -20,6 +17,9 @@ use Phlexus\Modules\Shop\Models\PaymentType;
 use Phlexus\Modules\Shop\Form\CheckoutForm;
 use Phlexus\Modules\BaseUser\Models\User;
 use Phlexus\Modules\Shop\Libraries\Payments\PaymentFactory;
+use Phalcon\Http\ResponseInterface;
+use Phalcon\Mvc\Controller;
+use Phalcon\Tag;
 
 /**
  * @RoutePrefix('/shop')
@@ -90,6 +90,7 @@ class ShopController extends AbstractController
      * @Get('/remove/{id:[0-9]+}')
      *
      * @param int $productID
+     * 
      * @return ResponseInterface
      */
     public function removeAction(int $productID): ResponseInterface

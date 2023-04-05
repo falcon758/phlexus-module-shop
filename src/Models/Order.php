@@ -395,31 +395,46 @@ class Order extends Model
             ->innerJoin(ProductAttribute::class, 'PR.id = Period.productID AND Period.name = "' . ProductAttribute::SUBSCRIPTION_PERIOD . '"', 'Period')
             ->innerJoin(ProductAttribute::class, 'PR.id = MaxDelay.productID AND MaxDelay.name = "' . ProductAttribute::SUBSCRIPTION_MAX_DELAY . '"', 'MaxDelay')
             ->innerJoin(Payment::class, "$p_model.id = PST.orderID", 'PST')
-            ->leftJoin(Payment::class, "
-                $p_model.id = PSD.orderID
-            AND 
-                (
-                        PST.createdAt < PSD.createdAt 
-                    OR (
-                        PST.createdAt = PSD.createdAt AND PST.id < PSD.id
+            ->leftJoin(Payment::class, 
+                    "$p_model.id = PSD.orderID
+                AND 
+                    (
+                            PST.createdAt < PSD.createdAt 
+                        OR (
+                            PST.createdAt = PSD.createdAt AND PST.id < PSD.id
+                        )
                     )
-                )", 'PSD')
+                
+                AND
+                    PST.active = PSD.active
+                AND
+                    PST.paymentTypeID = PSD.paymentTypeID
+                AND
+                    PST.statusID = PSD.statusID",
+                'PSD'
+            )
             ->where(
-                "$p_model.active = :orderActive: 
+                "$p_model.active = :orderActive:
+                AND I.active = :itemActive:
+                AND PST.active = :paymentActive:
+                AND $p_model.statusID = :orderStatusID:
                 AND $p_model.id = :orderID:
-                AND $p_model.statusID = :orderStatus: 
-                AND I.active = :itemActive: 
                 AND PR.id = :productID:
-                AND PR.isSubscription = :isSubscription: 
+                AND PST.statusID = :paymentStatusID:
+                AND PST.paymentTypeID = :paymentTypeID:
+                AND PR.isSubscription = :isSubscription:
                 AND DATEDIFF(CURRENT_DATE(), PST.createdAt) <= Period.value + MaxDelay.value
                 AND PSD.id IS NULL",
                 [
-                    'orderActive'    => self::ENABLED,
-                    'orderID'        => $this->id,
-                    'orderStatus'    => OrderStatus::RENEWAL,
-                    'itemActive'     => Item::ENABLED,
-                    'productID'      => $productID,
-                    'isSubscription' => 1
+                    'orderActive'     => self::ENABLED,
+                    'itemActive'      => Item::ENABLED,
+                    'paymentActive'   => Payment::ENABLED,
+                    'orderStatusID'   => OrderStatus::RENEWAL,
+                    'orderID'         => $this->id,
+                    'productID'       => $productID,
+                    'paymentStatusID' => PaymentStatus::PAID,
+                    'paymentTypeID'   => PaymentType::RENEWAL,
+                    'isSubscription'  => 1,
                 ]
             )
             ->execute()
@@ -675,22 +690,24 @@ class Order extends Model
             ->innerJoin(ProductAttribute::class, 'PR.id = Period.productID AND Period.name = "' . ProductAttribute::SUBSCRIPTION_PERIOD . '"', 'Period')
             ->innerJoin(ProductAttribute::class, 'PR.id = SOffset.productID AND SOffset.name = "' . ProductAttribute::SUBSCRIPTION_PAYMENT_OFFSET . '"', 'SOffset')
             ->innerJoin(Payment::class, "$p_model.id = PST.orderID", 'PST')
-            ->leftJoin(Payment::class, "
-                $p_model.id = PSD.orderID
-            AND 
-                (
-                        PST.createdAt < PSD.createdAt 
-                    OR
-                        (
-                            PST.createdAt = PSD.createdAt AND PST.id < PSD.id
-                        )
-                )
-            AND
-                PST.active = PSD.active
-            AND
-                PST.statusID != :paymentAgainstStatusID:
-            AND
-                PST.paymentTypeID = PSD.paymentTypeID",
+            ->leftJoin(Payment::class, 
+                    "$p_model.id = PSD.orderID
+                AND 
+                    (
+                            PST.createdAt < PSD.createdAt 
+                        OR
+                            (
+                                    PST.createdAt = PSD.createdAt
+                                AND
+                                    PST.id < PSD.id
+                            )
+                    )
+                AND
+                    PST.active = PSD.active
+                AND
+                    PST.paymentTypeID = PSD.paymentTypeID
+                AND
+                    PSD.statusID IN (:paymentStatusCreatedID:, :paymentStatusPaidID:)",
                 'PSD'
             )
             ->where(
@@ -704,14 +721,15 @@ class Order extends Model
                 AND DATEDIFF(CURRENT_DATE(), PST.createdAt) >= Period.value - SOffset.value
                 AND PSD.id IS NULL",
                 [
-                    'paymentAgainstStatusID' => PaymentStatus::CANCELED,
-                    'orderActive'            => Order::ENABLED,
-                    'itemActive'             => Item::ENABLED,
-                    'paymentActive'          => Payment::ENABLED,
-                    'orderStatusID'          => OrderStatus::RENEWAL,
-                    'paymentStatusID'        => PaymentStatus::PAID,
-                    'paymentTypeID'          => PaymentType::RENEWAL,
-                    'isSubscription'         => 1
+                    'paymentStatusCreatedID'  => PaymentStatus::CREATED,
+                    'paymentStatusPaidID'     => PaymentStatus::PAID,
+                    'orderActive'             => Order::ENABLED,
+                    'itemActive'              => Item::ENABLED,
+                    'paymentActive'           => Payment::ENABLED,
+                    'orderStatusID'           => OrderStatus::RENEWAL,
+                    'paymentStatusID'         => PaymentStatus::PAID,
+                    'paymentTypeID'           => PaymentType::RENEWAL,
+                    'isSubscription'          => 1
                 ]
             )
             ->orderBy("$p_model.id DESC")
@@ -734,21 +752,21 @@ class Order extends Model
             ->innerJoin(ProductAttribute::class, 'PR.id = SOffset.productID AND SOffset.name = "' . ProductAttribute::SUBSCRIPTION_PAYMENT_OFFSET . '"', 'SOffset')
             ->innerJoin(ProductAttribute::class, 'PR.id = MaxDelay.productID AND MaxDelay.name = "' . ProductAttribute::SUBSCRIPTION_MAX_DELAY . '"', 'MaxDelay')
             ->innerJoin(Payment::class, "$p_model.id = PST.orderID", 'PST')
-            ->leftJoin(Payment::class, "
-                $p_model.id = PSD.orderID
-            AND 
-                (
-                        PST.createdAt < PSD.createdAt 
-                    OR (
-                        PST.createdAt = PSD.createdAt AND PST.id < PSD.id
+            ->leftJoin(Payment::class, 
+                    "$p_model.id = PSD.orderID
+                AND 
+                    (
+                            PST.createdAt < PSD.createdAt 
+                        OR (
+                            PST.createdAt = PSD.createdAt AND PST.id < PSD.id
+                        )
                     )
-                )
-            AND
-                PST.active = PSD.active
-            AND
-                PST.statusID = PSD.statusID
-            AND
-                PST.paymentTypeID = PSD.paymentTypeID",
+                AND
+                    PST.active = PSD.active
+                AND
+                    PST.statusID = PSD.statusID
+                AND
+                    PST.paymentTypeID = PSD.paymentTypeID",
                 'PSD'
             )
             ->where(

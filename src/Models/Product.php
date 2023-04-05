@@ -214,15 +214,24 @@ class Product extends Model
             ->innerJoin(Item::class, "$p_model.id = I.productID", 'I')
             ->innerJoin(Order::class, "I.orderID = O.id", 'O')
             ->innerJoin(Payment::class, "O.id = PST.orderID", 'PST')
-            ->leftJoin(Payment::class, "
-                O.id = PSD.orderID
-            AND 
-                (
-                        PST.createdAt < PSD.createdAt 
-                    OR (
-                        PST.createdAt = PSD.createdAt AND PST.id < PSD.id
+            ->leftJoin(Payment::class, 
+                    "O.id = PSD.orderID
+                AND 
+                    (
+                            PST.createdAt < PSD.createdAt 
+                        OR (
+                            PST.createdAt = PSD.createdAt AND PST.id < PSD.id
+                        )
                     )
-                )", 'PSD')
+                
+                AND
+                    PST.active = PSD.active
+                AND
+                    PST.statusID = PSD.statusID
+                AND
+                    PST.paymentTypeID = PSD.paymentTypeID",
+                'PSD'
+            )
             ->where(
                 "O.active = :orderActive: 
                 AND O.statusID = :orderStatus: 

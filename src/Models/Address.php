@@ -91,26 +91,20 @@ class Address extends Model
 
         $newPostCode = PostCode::createPostCode($postCode, (int) $newLocale->id);
 
-        //@ToDo:: Encrypt address
         $address = trim($address);
 
         if (preg_match('/^[a-zA-Z0-9\s.-]*$/', $address) !== 1) {
             throw new \Exception('Unable to process address');
         }
 
-        $address = self::encrypt($address);
-
         $newAddress = self::findFirst([
             'conditions' => 'active = :active: AND postCodeID = :postCodeID: AND address = :address:',
             'bind'       => [
                 'active'    => self::ENABLED,
                 'postCodeID' => $newPostCode->id,
-                'address' => $address,
+                'address' => self::encrypt($address),
             ],
         ]);
-
-
-        $address = self::decrypt($address);
 
         if ($newAddress) {
             return $newAddress;

@@ -17,6 +17,7 @@ use Phlexus\Modules\Shop\Models\PaymentType;
 use Phlexus\Modules\Shop\Form\CheckoutForm;
 use Phlexus\Modules\BaseUser\Models\User;
 use Phlexus\Modules\Shop\Libraries\Payments\PaymentFactory;
+use Phlexus\Libraries\Helpers;
 use Phalcon\Http\ResponseInterface;
 use Phalcon\Mvc\Controller;
 use Phalcon\Tag;
@@ -55,6 +56,7 @@ class ShopController extends AbstractController
         $this->view->setVar('addRoute', '/cart/add/');
         $this->view->setVar('csrfToken', $this->security->getToken());
         $this->view->setVar('products', Product::find());
+        $this->view->setVar('imagesDir', Helpers::getInternalRelativeDir());
     }
 
     /**

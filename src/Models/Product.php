@@ -30,6 +30,11 @@ class Product extends Model
     public string $name;
 
     /**
+     * @var string|null
+     */
+    public $description;
+
+    /**
      * @var double
      */
     public string $price;

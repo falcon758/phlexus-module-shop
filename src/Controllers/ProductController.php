@@ -63,6 +63,11 @@ final class ProductController extends AbstractController
                 'required' => true
             ],
             [
+                'name'     => 'description',
+                'type'     => Text::class,
+                'required' => false
+            ],
+            [
                 'name'     => 'price',
                 'type'     => Text::class,
                 'required' => true

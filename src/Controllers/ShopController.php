@@ -15,7 +15,7 @@ use Phlexus\Modules\Shop\Models\Payment;
 use Phlexus\Modules\Shop\Models\PaymentMethod;
 use Phlexus\Modules\Shop\Models\PaymentType;
 use Phlexus\Modules\Shop\Form\CheckoutForm;
-use Phlexus\Modules\BaseUser\Models\User;
+use Phlexus\Modules\Shop\Models\User;
 use Phlexus\Modules\Shop\Libraries\Payments\PaymentFactory;
 use Phlexus\Libraries\Helpers;
 use Phalcon\Http\ResponseInterface;
@@ -178,6 +178,11 @@ class ShopController extends AbstractController
             return $this->response->redirect('checkout');
         }
 
+        $personalInfo = [
+            'name'      => (string) $post['name'],
+            'taxNumber' => (string) $post['tax_number'],
+        ];
+
         $paymentMethodID = (int) $post['payment_method'];
 
         $shippingMethodID = (int) $post['shipping_method'];
@@ -195,7 +200,7 @@ class ShopController extends AbstractController
         }
 
         $order = $this->createOrder(
-            $addresses[$billingID], $addresses[$shippingID],
+            $personalInfo, $addresses[$billingID], $addresses[$shippingID],
             $paymentMethodID, $shippingMethodID
         );
 
@@ -242,6 +247,7 @@ class ShopController extends AbstractController
     /**
      * Create order
      * 
+     * @param array $personalInfo     Personal info
      * @param array $billing          Billing address
      * @param array $shipment         Shipment address
      * @param array $paymentMethodID  Payment method
@@ -250,8 +256,8 @@ class ShopController extends AbstractController
      * @return mixed Order or null
      */
     private function createOrder(
-        array $billing, array $shipment, int $paymentMethodID,
-        int $shippingMethodID
+        array $personalInfo, array $billing, array $shipment,
+        int $paymentMethodID, int $shippingMethodID
     ): ?Order
     {
         try {
@@ -270,7 +276,7 @@ class ShopController extends AbstractController
             );
 
             // Get current logged user
-            $user = User::getUser();
+            $user = User::getUser(true);
 
             $userID = null;
 
@@ -279,6 +285,8 @@ class ShopController extends AbstractController
             } else {
                 return null;
             }
+
+            $user->savePersonalInfo($personalInfo['name'], $personalInfo['taxNumber']);
 
             $billingUserAddress = UserAddress::createUserAddress(
                 $userID,
@@ -305,6 +313,8 @@ class ShopController extends AbstractController
                 return null;
             }
         } catch(\Exception $e) {
+            var_dump($e->getMessage());
+            exit();
             $errorMessage = $this->translation->setTypeMessage()
                                               ->_('unable-to-create-order');
 

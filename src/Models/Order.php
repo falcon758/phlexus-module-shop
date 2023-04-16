@@ -533,9 +533,9 @@ class Order extends Model
      * 
      * @param string $hashCode
      *
-     * @return Simple|null
+     * @return array
      */
-    public static function getOrderByHash(string $hashCode): ?Simple
+    public static function getOrderByHash(string $hashCode): array
     {
         $user = User::getUser();
 
@@ -545,67 +545,74 @@ class Order extends Model
 
         $p_model = self::class;
 
-        return self::query()
-            ->columns('
-                U.email AS userEmail,
+        $order = self::query()->columns(
+                        'U.email AS userEmail,
 
-                BA.address AS billingAddress,
-                BP.postCode AS billingPostCode,
-                BC.country AS billingCountry,
+                        BA.address AS billingAddress,
+                        BP.postCode AS billingPostCode,
+                        BC.country AS billingCountry,
 
-                VT.tax AS vatTax,
+                        VT.tax AS vatTax,
 
-                SA.address AS shipmentAddress,
-                SP.postCode AS shipmentPostCode,
-                SC.country AS shipmentCountry,
+                        SA.address AS shipmentAddress,
+                        SP.postCode AS shipmentPostCode,
+                        SC.country AS shipmentCountry,
 
-                P.invoiceNumber AS invoiceNumber,
+                        P.invoiceNumber AS invoiceNumber,
 
-                PM.name AS paymentMethod,
-                SM.name AS shippingMethod,
+                        PM.name AS paymentMethod,
+                        SM.name AS shippingMethod,
 
-                I.productID AS productID,
-                I.quantity AS quantity,
-                I.price AS price,
-                SUM(L.quantity) AS totalQuantities,
-                SUM(L.price) AS totalPrice
-            ')
-            ->innerJoin(User::class, null, 'U')
+                        I.productID AS productID,
+                        I.quantity AS quantity,
+                        I.price AS price,
+                        SUM(L.quantity) AS totalQuantities,
+                        SUM(L.price) AS totalPrice'
+                    )
+                    ->innerJoin(User::class, null, 'U')
 
-            ->innerJoin(UserAddress::class, "$p_model.billingID = B.id", 'B')
-            ->innerJoin(Address::class, 'B.addressID = BA.id', 'BA')
-            ->innerJoin(PostCode::class, 'BA.postCodeID = BP.id', 'BP')
-            ->innerJoin(Locale::class, 'BP.localeID = BL.id', 'BL')
-            ->innerJoin(Country::class, 'BL.countryID = BC.id', 'BC')
+                    ->innerJoin(UserAddress::class, "$p_model.billingID = B.id", 'B')
+                    ->innerJoin(Address::class, 'B.addressID = BA.id', 'BA')
+                    ->innerJoin(PostCode::class, 'BA.postCodeID = BP.id', 'BP')
+                    ->innerJoin(Locale::class, 'BP.localeID = BL.id', 'BL')
+                    ->innerJoin(Country::class, 'BL.countryID = BC.id', 'BC')
 
-            ->innerJoin(VATTax::class, 'BC.id = VT.countryID', 'VT')
+                    ->innerJoin(VATTax::class, 'BC.id = VT.countryID', 'VT')
 
-            ->innerJoin(UserAddress::class, "$p_model.shipmentID = S.id", 'S')
-            ->innerJoin(Address::class, 'S.addressID = SA.id', 'SA')
-            ->innerJoin(PostCode::class, 'SA.postCodeID = SP.id', 'SP')
-            ->innerJoin(Locale::class, 'SP.localeID = SL.id', 'SL')
-            ->innerJoin(Country::class, 'SL.countryID = SC.id', 'SC')
+                    ->innerJoin(UserAddress::class, "$p_model.shipmentID = S.id", 'S')
+                    ->innerJoin(Address::class, 'S.addressID = SA.id', 'SA')
+                    ->innerJoin(PostCode::class, 'SA.postCodeID = SP.id', 'SP')
+                    ->innerJoin(Locale::class, 'SP.localeID = SL.id', 'SL')
+                    ->innerJoin(Country::class, 'SL.countryID = SC.id', 'SC')
 
-            ->innerJoin(Payment::class, null, 'P')
+                    ->innerJoin(Payment::class, null, 'P')
 
-            ->innerJoin(PaymentMethod::class, null, 'PM')
-            ->innerJoin(ShippingMethod::class, null, 'SM')
+                    ->innerJoin(PaymentMethod::class, null, 'PM')
+                    ->innerJoin(ShippingMethod::class, null, 'SM')
 
-            ->innerJoin(Item::class, null, 'I')
-            ->innerJoin(Item::class, 'I.orderID = L.orderID', 'L')
-            ->where(
-                "$p_model.active = :active: 
-                AND $p_model.userID = :userID: 
-                AND $p_model.hashCode = :hashCode:",
-                [
-                    'active'   => self::ENABLED,
-                    'userID'   => $user->id,
-                    'hashCode' => $hashCode
-                ]
-            )
-            ->orderBy("$p_model.id DESC")
-            ->groupBy('P.id, I.id, L.orderID, VT.id')
-            ->execute();
+                    ->innerJoin(Item::class, null, 'I')
+                    ->innerJoin(Item::class, 'I.orderID = L.orderID', 'L')
+                    ->where(
+                        "$p_model.active = :active: 
+                        AND $p_model.userID = :userID: 
+                        AND $p_model.hashCode = :hashCode:",
+                        [
+                            'active'   => self::ENABLED,
+                            'userID'   => $user->id,
+                            'hashCode' => $hashCode
+                        ]
+                    )
+                    ->orderBy("$p_model.id DESC")
+                    ->groupBy('P.id, I.id, L.orderID, VT.id')
+                    ->execute()
+                    ->toArray();
+
+        foreach ($order as $key => $parser) {
+            $order[$key]['billingAddress']  = self::decrypt($parser['billingAddress']);
+            $order[$key]['shipmentAddress'] = self::decrypt($parser['shipmentAddress']);
+        }
+
+        return $order;
     }
 
     /**

@@ -58,12 +58,11 @@ class OrderController extends AbstractController
             return $this->response->redirect('/orders');
         }
 
-        $groupedItems = Arrays::groupArray($order->toArray(), ['productID', 'quantity', 'price'], 'items');
+        $groupedItems = Arrays::groupArray($order, ['productID', 'quantity', 'price'], 'items');
 
         $company = PhlexusHelpers::phlexusConfig('company')->toArray();
 
         $this->view->setVar('company', $company);
-        $this->view->setVar('order', $order);
         $this->view->setVar('groupedOrder', $groupedItems);
     }
 }

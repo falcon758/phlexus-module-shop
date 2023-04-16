@@ -27,14 +27,84 @@ use Phalcon\Filter\Validation\Validator\Regex;
 
 class checkoutForm extends CaptchaForm
 {
+    private $translationForm;
+
+    private $translationMessage;
+
     /**
      * Initialize form
      */
     public function initialize()
     {
-        $translationForm = $this->translation->setPage()->setTypeForm();   
+        $this->translationForm    = $this->translation->setPage()->setTypeForm();
+        $this->translationMessage = $this->translation->setPage()->setTypeMessage();
 
         // Fields
+        $this->buildPersonalInfo();
+
+        $this->buildPaymentMethod();
+
+        $this->buildShippingMethod();
+
+        $sameAddress = (
+            new Check('same_address', [
+                'class' => 'form-control'
+            ])
+        )->setLabel($this->translationForm->_('field-same-address'));
+
+        $this->add($sameAddress);
+
+        $this->buildAddress(AddressType::BILLING);
+        $this->buildAddress(AddressType::SHIPPING);
+    }
+
+    /**
+     * Build personal info fields
+     */
+    private function buildPersonalInfo()
+    {
+        $translationForm    = $this->translationForm;
+        $translationMessage = $this->translationMessage;
+
+        $name = new Text('name', [
+            'class'       => 'form-control',
+            'placeholder' => $translationForm->_('field-name')
+        ]);
+
+        $taxNumber = new Text('tax_number', [
+            'class'       => 'form-control',
+            'placeholder' => $translationForm->_('field-tax-number')
+        ]);
+
+        $name->addValidators([
+            new PresenceOf(['message' => $translationMessage->_('field-name-required')]),
+            new Regex(
+                [
+                    'pattern' => '/^[a-zA-Z0-9\s.-]*$/',
+                    'message' => $translationMessage->_('field-name-invalid-characters'),
+                ]
+            )
+        ]);
+
+        $taxNumber->addValidators([
+            new PresenceOf(['message' => $translationMessage->_('field-tax-number-required')]),
+            new Regex(
+                [
+                    'pattern' => '/^[a-zA-Z0-9]+$/',
+                    'message' => $translationMessage->_('field-tax-number-invalid-characters'),
+                ]
+            )
+        ]);
+
+        $this->add($name);
+        $this->add($taxNumber);
+    }
+
+    /**
+     * Build payment method fields
+     */
+    private function buildPaymentMethod()
+    {
         $paymentMethodData = PaymentMethod::find();
         $paymentMethod = new Select(
             'payment_method',
@@ -42,30 +112,11 @@ class checkoutForm extends CaptchaForm
             [
                 'using'       => ['id', 'name'],
                 'class'       => 'form-control',
-                'placeholder' => $translationForm->_('field-payment-method')
+                'placeholder' => $this->translationForm->_('field-payment-method')
             ]
         );
 
-        $shippingMethodData = ShippingMethod::find();
-        $shippingMethod = new Select(
-            'shipping_method',
-            $shippingMethodData,
-            [
-                'using'       => ['id', 'name'],
-                'class'       => 'form-control',
-                'placeholder' => $translationForm->_('field-shipping-method')
-            ]
-        );
-
-        $sameAddress = new Check('same_address', [
-            'class' => 'form-control',
-            'label' => $translationForm->_('field-same-address')
-        ]);
-
-        $translationMessage = $this->translation->setTypeMessage();
-
-        // Validators
-        $paymentMethodRequired = $translationMessage->_('field-payment-method-required');
+        $paymentMethodRequired = $this->translationMessage->_('field-payment-method-required');
         $paymentMethod->addValidators([
             new PresenceOf(['message' => $paymentMethodRequired]),
             new InclusionIn(
@@ -76,7 +127,26 @@ class checkoutForm extends CaptchaForm
             )
         ]);
 
-        $shippingMethodRequired = $translationMessage->_('field-shipping-method-required');
+        $this->add($paymentMethod);
+    }
+
+    /**
+     * Build shipping method fields
+     */
+    private function buildShippingMethod()
+    {
+        $shippingMethodData = ShippingMethod::find();
+        $shippingMethod = new Select(
+            'shipping_method',
+            $shippingMethodData,
+            [
+                'using'       => ['id', 'name'],
+                'class'       => 'form-control',
+                'placeholder' => $this->translationForm->_('field-shipping-method')
+            ]
+        );
+
+        $shippingMethodRequired = $this->translationMessage->_('field-shipping-method-required');
         $shippingMethod->addValidators([
             new PresenceOf(['message' => $shippingMethodRequired]),
             new InclusionIn(
@@ -87,23 +157,15 @@ class checkoutForm extends CaptchaForm
             )
         ]);
 
-        $this->add($paymentMethod);
         $this->add($shippingMethod);
-
-        $this->buildAddress(AddressType::BILLING);
-        $this->buildAddress(AddressType::SHIPPING);
-
-
-        $this->add($sameAddress->setLabel($translationForm->_('field-same-address')));
     }
-
 
     /**
      * Build address fields
      */
-    public function buildAddress($type)
+    private function buildAddress($type)
     {
-        $translationForm = $this->translation->setPage()->setTypeForm();   
+        $translationForm = $this->translationForm;   
 
         // Fields
         $address = new Text("address_$type", [
@@ -127,7 +189,7 @@ class checkoutForm extends CaptchaForm
             ]
         );
 
-        $translationMessage = $this->translation->setTypeMessage();
+        $translationMessage =  $this->translationMessage;
 
         // Validators
         $address->addValidators([
@@ -144,7 +206,7 @@ class checkoutForm extends CaptchaForm
             new PresenceOf(['message' => $translationMessage->_('field-post-code-required')]),
             new Regex(
                 [
-                    'pattern' => '/^[0-9]+-[0-9]+$/',
+                    'pattern' => '/^[a-zA-Z0-9\-]+$/',
                     'message' => $translationMessage->_('field-post-code-invalid-characters'),
                 ]
             )

@@ -16,6 +16,7 @@ namespace Phlexus\Modules\Shop\Libraries\Payments;
 use Phalcon\Di\Di;
 use Phalcon\Http\ResponseInterface;
 use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
+use PayPalCheckoutSdk\Orders\OrdersCaptureRequest;
 use PayPalCheckoutSdk\Orders\OrdersGetRequest;
 
 class Paypal extends PaymentAbstract
@@ -61,9 +62,9 @@ class Paypal extends PaymentAbstract
 
         $translationMessage = $di->getShared('translation')->setTypeMessage();
 
-        try {
+	try {
             $response = $di->getShared('paypal')->execute($request);
-            
+
             if ($response->statusCode !== 201) {
                 return $this->response->redirect('checkout');
             }
@@ -94,7 +95,17 @@ class Paypal extends PaymentAbstract
      * @return ResponseInterface
      */
     public function processCallback(string $paymentID): ResponseInterface {
-        return $this->verifyPayment($paymentID);
+        $request = new OrdersCaptureRequest($paymentID);
+
+	try {
+            Di::getDefault()->getShared('paypal')->execute($request);
+        } catch (\HttpException $e) {
+            $this->flash->error($translationMessage->_('unable-to-process-payment'));
+
+            return $this->response->redirect('checkout');
+        }
+
+	return $this->verifyPayment($paymentID);
     }
 
     /**
@@ -146,7 +157,7 @@ class Paypal extends PaymentAbstract
         try {
             $response = Di::getDefault()->getShared('paypal')->execute($request);
 
-            if ($response->statusCode === 200 && in_array($response->result->status, ['APPROVED', 'COMPLETED'])) {
+            if ($response->statusCode === 200 && $response->result->status === 'COMPLETED') {
                 return true;
             }
         } catch (HttpException $e) {

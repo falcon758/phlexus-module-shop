@@ -313,8 +313,6 @@ class ShopController extends AbstractController
                 return null;
             }
         } catch(\Exception $e) {
-            var_dump($e->getMessage());
-            exit();
             $errorMessage = $this->translation->setTypeMessage()
                                               ->_('unable-to-create-order');
 

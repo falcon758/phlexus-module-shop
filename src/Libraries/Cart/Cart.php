@@ -27,6 +27,13 @@ class Cart implements CartInterface
     protected CONST SESSIONNAME = 'cart';
 
     /**
+     * Products Limit
+     *
+     * @var int
+     */
+    CONST PRODUCT_LIMIT = 1000;
+
+    /**
      * Session
      *
      * @var \Phalcon\Session\Manager
@@ -63,6 +70,10 @@ class Cart implements CartInterface
         $hasProduct = false;
         foreach ($cart as &$cartProduct) {
             if ($cartProduct['id'] == $productID) {
+                if (!$this->canAddProduct($cartProduct)) {
+                    return false;
+                }
+
                 $cartProduct['quantity'] += $quantity;
                 $hasProduct = true;
                 break;
@@ -70,6 +81,10 @@ class Cart implements CartInterface
         }
 
         if ($hasProduct === false) {
+            if (!$this->canAddProduct($product)) {
+                return false;
+            }
+
             $product['quantity'] = $quantity;
             $cart[] = $product;
         }
@@ -171,6 +186,29 @@ class Cart implements CartInterface
     public function clear(): bool
     {
         $this->session->remove('cart');
+
+        return true;
+    }
+
+    /**
+     * Can add product
+     * 
+     * @param $product Product cart data
+     * 
+     * @return bool
+     */
+    private function canAddProduct(array $product): bool
+    {
+        $isSubscription = ((int) $product['isSubscription']) === 1;
+        $quantity = (int) $product['quantity'] ?? 0;
+
+        if (
+            ($isSubscription && $quantity === 1)
+            || $quantity > self::PRODUCT_LIMIT
+            || $this->hasSubscriptionProducts()
+        ) {
+            return false;
+        }
 
         return true;
     }

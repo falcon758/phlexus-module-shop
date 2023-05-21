@@ -7,7 +7,7 @@ namespace Phlexus\Modules\Shop\Providers;
 use Phlexus\Providers\AbstractProvider;
 use Phlexus\Helpers;
 use PayPalCheckoutSdk\Core\PayPalHttpClient;
-use PayPalCheckoutSdk\Core\SandboxEnvironment;
+use PayPalCheckoutSdk\Core\ProductionEnvironment;
 
 class PayPalProvider extends AbstractProvider
 {
@@ -37,7 +37,7 @@ class PayPalProvider extends AbstractProvider
             $clientID     = $configs['client_id'];
             $clientSecret = $configs['client_secret'];
     
-            $environment = new SandboxEnvironment($clientID, $clientSecret);
+            $environment = new ProductionEnvironment($clientID, $clientSecret);
             $client      = new PayPalHttpClient($environment);
 
             return $client;

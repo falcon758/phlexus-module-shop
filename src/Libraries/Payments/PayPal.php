@@ -62,7 +62,7 @@ class Paypal extends PaymentAbstract
 
         $translationMessage = $di->getShared('translation')->setTypeMessage();
 
-	try {
+	    try {
             $response = $di->getShared('paypal')->execute($request);
 
             if ($response->statusCode !== 201) {

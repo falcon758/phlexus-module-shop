@@ -22,7 +22,7 @@ use Phlexus\Modules\BaseUser\Events\Listeners\DispatcherListener;
 use Phlexus\Modules\BaseUser\Events\Listeners\AuthorizationListener;
 
 /**
- * User Module
+ * Shop Module
  */
 class Module extends PhlexusModule
 {

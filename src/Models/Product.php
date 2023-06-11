@@ -241,6 +241,7 @@ class Product extends Model
                 "O.active = :orderActive: 
                 AND O.statusID = :orderStatus: 
                 AND I.active = :itemActive: 
+                AND $p_model.userID = :userID:
                 AND $p_model.id = :productID:
                 AND $p_model.isSubscription = :isSubscription: 
                 AND DATEDIFF(CURRENT_DATE(), PST.createdAt) <= Period.value + MaxDelay.value
@@ -249,6 +250,7 @@ class Product extends Model
                     'orderActive'    => Order::ENABLED,
                     'orderStatus'    => OrderStatus::RENEWAL,
                     'itemActive'     => Item::ENABLED,
+                    'userID'         => $userID,
                     'productID'      => $productID,
                     'isSubscription' => 1
                 ]

@@ -87,13 +87,17 @@ class UserAddress extends Model
      *
      * @return UserAddress
      */
-    public static function createUserAddress(int $userID, int $addressID, int $addressTypeID): UserAddress {
+    public static function createUserAddress(int $userID, int $addressID, int $addressTypeID): UserAddress
+    {
         $newUserAddress = self::findFirst(
             [
-                'conditions' => 'active = :active: AND addressID = :addressID: 
+                'conditions' => 'active = :active:
+                                AND userID = :userID:
+                                AND addressID = :addressID: 
                                 AND addressTypeID = :addressTypeID:',
                 'bind'       => [
                     'active'        => UserAddress::ENABLED,
+                    'userID'        => $userID,
                     'addressID'     => $addressID,
                     'addressTypeID' => $addressTypeID
                 ],

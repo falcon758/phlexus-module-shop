@@ -618,6 +618,8 @@ class Order extends Model
     /**
      * Get history
      * 
+     * @param int $page
+     * 
      * @return Repository
      * 
      * @throws Exception

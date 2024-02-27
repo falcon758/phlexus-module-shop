@@ -55,7 +55,7 @@ class ShopController extends AbstractController
 
         $this->view->setVar('addRoute', '/cart/add/');
         $this->view->setVar('csrfToken', $this->security->getToken());
-        $this->view->setVar('products', Product::find());
+        $this->view->setVar('products', Product::getAvailableProducts());
         $this->view->setVar('imagesDir', Files::getInternalRelativeDir());
     }
 
@@ -307,7 +307,7 @@ class ShopController extends AbstractController
 
             $products = $this->cart->getProducts();
 
-            if (!$order->createItems(array_column($products, 'quantity', 'id'))) {
+            if (!Item::createItems($order->id, array_column($products, 'quantity', 'id'))) {
                 $order->cancelOrder();
 
                 return null;

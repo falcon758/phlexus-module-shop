@@ -18,6 +18,7 @@ use Phalcon\Di\Di;
 use Phalcon\Mvc\Url;
 use Phalcon\Http\Response;
 use Phalcon\Flash\Session as FlashSession;
+use Phalcon\Events\ManagerInterface as EventsManagerInterface;
 
 abstract class PaymentAbstract implements PaymentInterface
 {
@@ -65,5 +66,38 @@ abstract class PaymentAbstract implements PaymentInterface
         $this->response = $httpResponse;
         $this->flash    = $flash;
         $this->payment  = $payment;
+
+        if ($di->has('eventsManager')) {
+            $this->setEventsManager($di->getShared('eventsManager'));
+        }
+    }
+
+    /**
+     * @return EventsManagerInterface
+     */
+    public function getEventsManager(): EventsManagerInterface
+    {
+        return $this->eventsManager;
+    }
+
+    /**
+     * @param EventsManagerInterface $eventsManager
+     * @return void
+     */
+    public function setEventsManager(EventsManagerInterface $eventsManager): void
+    {
+        $this->eventsManager = $eventsManager;
+    }
+
+    public function firePaymentSuccess(): bool
+    {
+        if (
+            $eventsManager->hasListeners('payment:success')
+            && !$eventsManager->fire('payment:success', $this->payment)
+        ) {
+            return false;
+        }
+
+        return true;
     }
 }

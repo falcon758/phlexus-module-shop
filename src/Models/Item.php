@@ -5,6 +5,9 @@ namespace Phlexus\Modules\Shop\Models;
 
 use Phalcon\Di\Di;
 use Phlexus\Models\Model;
+use Phalcon\Mvc\Model\Transaction\Manager as TxManager;
+use Phalcon\Mvc\Model\Transaction\Failed as TxFailed;
+use Exception;
 
 /**
  * Class Item
@@ -114,11 +117,7 @@ class Item extends Model
     {
         $item = new self;
 
-        $product = Product::findFirstByid($productID);
-
-        if (!$product) {
-            throw new \Exception('Product doesn\'t exists');
-        }
+        $product = self::getProductOrFail($productID);
 
         $item->productID = $productID;
         $item->orderID   = $orderID;
@@ -126,10 +125,55 @@ class Item extends Model
         $item->price     = $price;
 
         if (!$item->save()) {
-            throw new \Exception('Unable to process item');
+            throw new Exception('Unable to process item');
         }
 
         return $item;
+    }
+
+    /**
+     * Create items
+     * 
+     * @param array $products Products and quantities to assign
+     *
+     * @return bool
+     */
+    public static function createItems(int $orderID, array $products): bool
+    {
+        // Create a transaction manager
+        $manager = new TxManager();
+
+        // Request a transaction
+        $transaction = $manager->get();
+
+        try {
+            foreach ($products as $prodID => $quantity) {
+                $item = new Item();
+                $item->setTransaction($transaction);
+
+                $productID       = (int) $prodID;
+                $productQuantity = (int) $quantity;
+
+                $product = self::getProductOrFail($productID, $productQuantity);
+
+                $item->quantity  = $productQuantity;
+                $item->price     = (float) $product->price;
+                $item->productID = $productID;
+                $item->orderID   = (int) $orderID;
+
+                if (!$item->save()) {
+                    $transaction->rollback();
+                    return false;
+                }
+            }
+
+            $transaction->commit();
+        } catch (TxFailed $e) {
+            $transaction->rollback();
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -153,5 +197,16 @@ class Item extends Model
         $disableItem->bindParam(':orderID', $orderID);
 
         return $disableItem->execute();
+    }
+
+    public static function getProductOrFail(int $productID, int $quantity = 1)
+    {
+        $product = Product::getAvailableProduct($prodID, $quantity);
+
+        if (!$product) {
+            throw new Exception('Product not available');
+        }
+
+        return $product;
     }
 }

@@ -45,7 +45,7 @@ class SubscriptionTask extends Task
                         continue;
                     }
 
-                    $item = $newOrder->createItems([$order->productID => $order->quantity]);
+                    $item = Item::createItems($order->id, [$order->productID => $order->quantity]);
 
                     if (!$item) {
                         error_log('Failed to create new item!', 0);

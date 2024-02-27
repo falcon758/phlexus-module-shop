@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Phlexus\Modules\Shop\Libraries\Payments;
 
+use Phlexus\Modules\Shop\Models\PaymentAttribute;
 use Phalcon\Di\Di;
 use Phalcon\Http\ResponseInterface;
 use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
@@ -70,9 +71,14 @@ class Paypal extends PaymentAbstract
             }
 
             foreach ($response->result->links as $link) {
-                if ($link->rel === 'approve' && $payment->setAttributes([
-                    self::PAYPALORDER => $response->result->id
-                ])) {
+                if ($link->rel === 'approve'
+                    && PaymentAttribute::setAttributes(
+                            $payment->id,
+                        [
+                            self::PAYPALORDER => $response->result->id
+                        ]
+                    )
+                ) {
                     return $this->response->redirect($link->href);
                 }
             }
@@ -97,15 +103,15 @@ class Paypal extends PaymentAbstract
     public function processCallback(string $paymentID): ResponseInterface {
         $request = new OrdersCaptureRequest($paymentID);
 
-	try {
-            Di::getDefault()->getShared('paypal')->execute($request);
-        } catch (\HttpException $e) {
-            $this->flash->error($translationMessage->_('unable-to-process-payment'));
+        try {
+                Di::getDefault()->getShared('paypal')->execute($request);
+            } catch (\HttpException $e) {
+                $this->flash->error($translationMessage->_('unable-to-process-payment'));
 
-            return $this->response->redirect('checkout');
-        }
+                return $this->response->redirect('checkout');
+            }
 
-	return $this->verifyPayment($paymentID);
+        return $this->verifyPayment($paymentID);
     }
 
     /**
@@ -119,7 +125,7 @@ class Paypal extends PaymentAbstract
         $payment = $this->payment;
         $order   = $payment->order;
 
-        $attribute = $payment->getAttributes([self::PAYPALORDER]);
+        $attribute = PaymentAttribute::getAttributes($payment->id, [self::PAYPALORDER]);
 
         if (count($attribute) === 0 || $attribute[0]['value'] !== $paymentID) {
             return $this->response->redirect('products');
@@ -135,6 +141,8 @@ class Paypal extends PaymentAbstract
             $payment->paid();
 
             $this->flash->success($translationMessage->_('payment-processed-successfully'));
+
+            $this->firePaymentSuccess();
 
             return $this->response->redirect('order/success');
         }

@@ -5,11 +5,9 @@ namespace Phlexus\Modules\Shop\Models;
 
 use Phlexus\Modules\BaseUser\Models\User;
 use Phlexus\Models\Model;
-use Phalcon\Mvc\Model\Transaction\Manager as TxManager;
-use Phalcon\Mvc\Model\Transaction\Failed as TxFailed;
+use Phalcon\Mvc\Model\Resultset\Simple;
 use Phalcon\Paginator\Adapter\QueryBuilder;
 use Phalcon\Paginator\Repository;
-use Phalcon\Mvc\Model\Resultset\Simple;
 use Phalcon\Di\Di;
 
 /**
@@ -221,6 +219,20 @@ class Order extends Model
     }
 
     /**
+     * Discount all products from stock (if exists)
+     * 
+     * @return bool
+     */
+    public function applyStockDiscount(): bool
+    {
+        foreach ($this->items as $item) {
+            Product::decreaseStock($item->productID, $item->quantity);
+        }
+
+        return true;
+    }
+
+    /**
      * Create order
      * 
      * @param int $userID           User to assign order to
@@ -281,51 +293,6 @@ class Order extends Model
             $paymentMethodID, $shippingMethodID,
             $relatedOrder = 0, OrderStatus::RENEWAL
         );
-    }
-
-    /**
-     * Create items
-     * 
-     * @param array $products Products and quantities to assign
-     *
-     * @return bool
-     */
-    public function createItems(array $products): bool {
-        // Create a transaction manager
-        $manager = new TxManager();
-
-        // Request a transaction
-        $transaction = $manager->get();
-
-        try {
-            foreach ($products as $prodID => $quantity) {
-                $item = new Item;
-                $item->setTransaction($transaction);
-
-                $product = Product::findFirstByid((int) $prodID);
-
-                if (!$product) {
-                    throw new \Exception('Product doesn\'t exists');
-                }
-
-                $item->quantity  = (int) $quantity;
-                $item->price     = (float) $product->price;
-                $item->productID = (int) $product->id;
-                $item->orderID   = (int) $this->id;
-
-                if (!$item->save()) {
-                    $transaction->rollback();
-                    return false;
-                }
-            }
-
-            $transaction->commit();
-        } catch (TxFailed $e) {
-            $transaction->rollback();
-            return false;
-        }
-
-        return true;
     }
 
     /**

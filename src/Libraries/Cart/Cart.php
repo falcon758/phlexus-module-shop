@@ -58,7 +58,7 @@ class Cart implements CartInterface
      */
     public function addProduct(int $productID, int $quantity = 1): bool
     {
-        $modelProduct = Product::findFirstByid($productID);
+        $modelProduct = Product::getAvailableProduct($productID);
         if ($modelProduct === null) {
             return false;
         }
@@ -70,22 +70,24 @@ class Cart implements CartInterface
         $hasProduct = false;
         foreach ($cart as &$cartProduct) {
             if ($cartProduct['id'] == $productID) {
+                
+                $cartProduct['quantity'] += $quantity;
                 if (!$this->canAddProduct($cartProduct)) {
                     return false;
                 }
 
-                $cartProduct['quantity'] += $quantity;
                 $hasProduct = true;
                 break;
             }
         }
 
         if ($hasProduct === false) {
+
+            $product['quantity'] = $quantity;
             if (!$this->canAddProduct($product)) {
                 return false;
             }
 
-            $product['quantity'] = $quantity;
             $cart[] = $product;
         }
 
@@ -206,6 +208,7 @@ class Cart implements CartInterface
             ($isSubscription && $quantity === 1)
             || $quantity > self::PRODUCT_LIMIT
             || $this->hasSubscriptionProducts()
+            || !Product::getAvailableProduct($product['id'])
         ) {
             return false;
         }

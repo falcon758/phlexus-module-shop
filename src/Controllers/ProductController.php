@@ -130,7 +130,7 @@ final class ProductController extends AbstractController
             $product = $this->getModel();
 
             $productAttributes = ProductAttribute::getSubscriptionAttributes();
-            $this->getModel()->setAttributes($productAttributes);
+            ProductAttribute::setAttributes($product->id, $productAttributes);
         }
 
         return $response;

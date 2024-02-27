@@ -20,6 +20,7 @@ use Phlexus\Module as PhlexusModule;
 use Phlexus\Helpers;
 use Phlexus\Modules\BaseUser\Events\Listeners\DispatcherListener;
 use Phlexus\Modules\BaseUser\Events\Listeners\AuthorizationListener;
+use Phlexus\Modules\BaseUser\Events\Listeners\StockListener;
 
 /**
  * Shop Module
@@ -86,5 +87,6 @@ class Module extends PhlexusModule
 
         $di->getShared('eventsManager')->attach('dispatch', new DispatcherListener());
         $di->getShared('eventsManager')->attach('dispatch:beforeDispatchLoop', new AuthorizationListener());
+        $di->getShared('eventsManager')->attach('dispatch:afterDispatchLoop', new AuthorizationListener());
     }
 }

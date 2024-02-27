@@ -5,8 +5,8 @@ namespace Phlexus\Modules\Shop\Models;
 
 use Phlexus\Libraries\Media\Models\Media;
 use Phlexus\Models\Model;
-use Phalcon\Mvc\Model\Transaction\Manager as TxManager;
-use Phalcon\Mvc\Model\Transaction\Failed as TxFailed;
+use Phalcon\Mvc\Model\Resultset\Simple;
+use Phalcon\Mvc\Model\Row;
 
 /**
  * Class Product
@@ -92,44 +92,20 @@ class Product extends Model
     }
 
     /**
-     * Get Multiple Attributes
-     * 
-     * @param array $names Array of names to retrieve
-     * 
-     * @return array
-     */
-    public function getAttributes(array $names): array
-    {
-        if (count($names) === 0) {
-            return [];
-        }
-
-        $inQuery = '?' . implode(', ?', range(2, count($names)));
-
-        $values = array_merge([1, $this->id], $names);
-
-        $attributes = ProductAttribute::find(
-            [
-                'active = ?0 AND productID = ?1 AND name IN (' . $inQuery . ')',
-                'bind' => $values
-            ]
-        );
-
-        return $attributes->toArray();
-    }
-
-    /**
      * Get Subscription Attributes
      *
      * @return array
      */
     public function getSubscriptionAttributes(): array
     {
-        $productAttr = $this->getAttributes([
-            ProductAttribute::SUBSCRIPTION_PERIOD,
-            ProductAttribute::SUBSCRIPTION_PAYMENT_OFFSET,
-            ProductAttribute::SUBSCRIPTION_MAX_DELAY
-        ]);
+        $productAttr = ProductAttribute::getAttributes(
+            $this->id,
+            [
+                ProductAttribute::SUBSCRIPTION_PERIOD,
+                ProductAttribute::SUBSCRIPTION_PAYMENT_OFFSET,
+                ProductAttribute::SUBSCRIPTION_MAX_DELAY
+            ]
+        );
         
         if (count($productAttr) === 0) {
             return false;
@@ -162,41 +138,88 @@ class Product extends Model
     }
 
     /**
-     * Set Multiple Attributes
-     * 
-     * @param array $attributes Array of names to set
-     * 
+     * Get Available Products
+     *
+     * @return Simple
+     */
+    public static function getAvailableProducts(): Simple
+    {
+        $p_model = self::class;
+
+        return self::query()
+            ->leftJoin(ProductAttribute::class, "$p_model.id = Stock.productID AND Stock.name = '" . ProductAttribute::PRODUCT_STOCK . "'", 'Stock')
+            ->where(
+                "$p_model.active = :productActive:
+                AND (Stock.id IS NULL OR CAST(Stock.value AS INTEGER) > 0)",
+                [
+                    'productActive' => self::ENABLED,
+                ]
+            )
+            ->execute();
+    }
+
+    /**
+     * Get Available Product
+     *
+     * @return Simple
+     */
+    public static function getAvailableProduct(int $productID, int $quantity = 1): ?Row
+    {
+        $p_model = self::class;
+
+        return self::query()
+            ->leftJoin(ProductAttribute::class, "$p_model.id = Stock.productID AND Stock.name = '" . ProductAttribute::PRODUCT_STOCK . "'", 'Stock')
+            ->where(
+                "$p_model.active = :productActive:
+                AND $p_model.id = :productID:
+                AND (Stock.id IS NULL OR CAST(Stock.value AS INTEGER) >= :productQuantity:)",
+                [
+                    'productActive'   => self::ENABLED,
+                    'productID'       => $productID,
+                    'productQuantity' => $quantity,
+                ]
+            )
+            ->execute()
+            ->getFirst();
+    }
+
+    /**
+     * Change Product Stock
+     *
      * @return bool
      */
-    public function setAttributes(array $attributes): bool
+    public static function changeStock(int $productID, int $quantity = 1): bool
     {
-        // Create a transaction manager
-        $manager = new TxManager();
-
-        // Request a transaction
-        $transaction = $manager->get();
+        $attribute = ProductAttribute::getAttribute($productID, ProductAttribute::PRODUCT_STOCK);
         
-        try {
-            foreach ($attributes as $key => $value) {
-                $attribute = new ProductAttribute();
-                $attribute->setTransaction($transaction);
-                $attribute->name      = (string) $key;
-                $attribute->value     = (string) $value;
-                $attribute->productID = (int) $this->id;
-
-                if (!$attribute->save()) {
-                    $transaction->rollback();
-                    return false;
-                }
-            }
-
-            $transaction->commit();
-        } catch (TxFailed $e) {
-            $transaction->rollback();
+        if (!$attribute) {
             return false;
         }
 
-        return true;
+        // @TODO: change this to disallow negative values on stock
+        $attribute->value = $attribute->value + $quantity;
+
+        return $attribute->save();
+    }
+
+    /**
+     * Increase Product Stock
+     *
+     * @return bool
+     */
+    public static function increaseStock(int $productID, int $quantity = 1): bool
+    {
+        return self::changeStock($productID, $quantity);
+    }
+
+    /**
+     * Decrease Product Stock
+     *
+     * @return bool
+     */
+    public static function decreaseStock(int $productID, int $quantity = 1): bool
+    {
+        return self::changeStock($productID, -1 * $quantity);
     }
 
     /**

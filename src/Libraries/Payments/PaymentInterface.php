@@ -14,9 +14,21 @@ declare(strict_types=1);
 namespace Phlexus\Modules\Shop\Libraries\Payments;
 
 use Phalcon\Http\ResponseInterface;
+use Phalcon\Events\ManagerInterface as EventsManagerInterface;
 
 interface PaymentInterface
 {
+    /**
+     * @return EventsManagerInterface
+     */
+    public function getEventsManager(): EventsManagerInterface;
+
+    /**
+     * @param EventsManagerInterface $eventsManager
+     * @return void
+     */
+    public function setEventsManager(EventsManagerInterface $eventsManager): void;
+
     /**
      * Start payment process
      *

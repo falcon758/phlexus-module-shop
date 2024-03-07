@@ -55,6 +55,11 @@ class Product extends Model
     public $imageID;
 
     /**
+     * @var int
+     */
+    public int $productTypeID;
+
+    /**
      * @var string|null
      */
     public $createdAt;
@@ -75,6 +80,11 @@ class Product extends Model
         
         $this->hasOne('imageID', Media::class, 'id', [
             'alias'    => 'media',
+            'reusable' => true,
+        ]);
+
+        $this->hasOne('productTypeID', ProductType::class, 'id', [
+            'alias'    => 'productType',
             'reusable' => true,
         ]);
 

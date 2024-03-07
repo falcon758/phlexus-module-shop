@@ -217,9 +217,9 @@ class ShopController extends AbstractController
         if ($payment !== null) {
             $paymentProcess = (new PaymentFactory())->build($payment);
             return $paymentProcess->startPayment();
-        } else {
-            return $this->response->redirect('order/cancel');
         }
+        
+        return $this->response->redirect('order/cancel');
     }
 
     /**
@@ -307,7 +307,7 @@ class ShopController extends AbstractController
 
             $products = $this->cart->getProducts();
 
-            if (!Item::createItems($order->id, array_column($products, 'quantity', 'id'))) {
+            if (!Item::createItems((int) $order->id, array_column($products, 'quantity', 'id'))) {
                 $order->cancelOrder();
 
                 return null;

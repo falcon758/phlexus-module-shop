@@ -115,28 +115,11 @@ class Payment extends Model
 
     /**
      * After create
-     * 
-     * @todo Save record
      */
     public function afterCreate()
     {
         $this->invoiceNumber = self::generateInvoiceNumber((int) $this->id);
-        //$this->save();
-
-        // Save workaround
-        $saveInvoiceNumber = Di::getDefault()->getShared('db')->prepare(
-            'UPDATE
-                payments 
-            SET
-                invoiceNumber = :invoiceNumber 
-            WHERE
-                id = :id'
-        );
-
-        $saveInvoiceNumber->bindParam(':invoiceNumber', $this->invoiceNumber);
-        $saveInvoiceNumber->bindParam(':id', $this->id);
-
-        $saveInvoiceNumber->execute();
+        $this->save();
     }
 
     /**
@@ -190,6 +173,7 @@ class Payment extends Model
     public static function createPayment(float $totalPrice, int $paymentTypeID, int $paymentMethodID, int $orderID): Payment
     {
         $payment = new self;
+
         $payment->hashCode         = Di::getDefault()->getShared('security')->getRandom()->base64Safe(self::HASHLENGTH);
         $payment->totalPrice       = $totalPrice;
         $payment->paymentTypeID    = $paymentTypeID;

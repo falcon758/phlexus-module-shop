@@ -150,7 +150,7 @@ class Product extends Model
             ->leftJoin(ProductAttribute::class, "$p_model.id = Stock.productID AND Stock.name = '" . ProductAttribute::PRODUCT_STOCK . "'", 'Stock')
             ->where(
                 "$p_model.active = :productActive:
-                AND (Stock.id IS NULL OR CAST(Stock.value AS INTEGER) > 0)",
+                AND (Stock.id IS NULL OR CAST(Stock.value AS SIGNED) > 0)",
                 [
                     'productActive' => self::ENABLED,
                 ]
@@ -163,7 +163,7 @@ class Product extends Model
      *
      * @return Simple
      */
-    public static function getAvailableProduct(int $productID, int $quantity = 1): ?Row
+    public static function getAvailableProduct(int $productID, int $quantity = 1): ?Product
     {
         $p_model = self::class;
 
@@ -172,7 +172,7 @@ class Product extends Model
             ->where(
                 "$p_model.active = :productActive:
                 AND $p_model.id = :productID:
-                AND (Stock.id IS NULL OR CAST(Stock.value AS INTEGER) >= :productQuantity:)",
+                AND (Stock.id IS NULL OR CAST(Stock.value AS SIGNED) >= :productQuantity:)",
                 [
                     'productActive'   => self::ENABLED,
                     'productID'       => $productID,

@@ -91,6 +91,8 @@ abstract class PaymentAbstract implements PaymentInterface
 
     public function firePaymentSuccess(): bool
     {
+        $eventsManager = $this->eventsManager;
+        
         if (
             $eventsManager->hasListeners('payment:success')
             && !$eventsManager->fire('payment:success', $this->payment)

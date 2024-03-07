@@ -8,6 +8,7 @@ use Phalcon\Tag;
 use Phalcon\Http\ResponseInterface;
 use Phlexus\Modules\Shop\Models\Payment;
 use Phlexus\Modules\Shop\Libraries\Payments\PayPal;
+use Phlexus\Modules\Shop\Libraries\Payments\Test;
 
 /**
  * @RoutePrefix('/payment/callback')
@@ -36,5 +37,23 @@ class CallbackController extends AbstractController
         }
 
         return (new Paypal($payment))->processCallback($token);
+    }
+
+    /**
+     * @Get('/payment/callback/test')
+     */
+    public function testAction(string $paymentHash): ResponseInterface
+    {
+        $title = $this->translation->setTypePage()->_('title-shop-callback-test');
+
+        Tag::setTitle($title);
+
+        $payment = Payment::findFirstByhashCode($paymentHash);
+
+        if (!$payment) {
+            return $this->response->redirect('checkout');
+        }
+
+        return (new Test($payment))->processCallback("");
     }
 }

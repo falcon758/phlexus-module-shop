@@ -26,10 +26,12 @@ class PaymentFactory
      */
     public function build(Payment $payment): PaymentInterface {
         switch ($payment->paymentMethodID) {
+            // @TODO: Remove after test
+            case PaymentMethod::TEST:
+                return new Test($payment);
             case PaymentMethod::PAYPAL:
             default:
                 return new PayPal($payment);
-                break;
         }
     }
 }

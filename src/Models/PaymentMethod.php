@@ -18,6 +18,8 @@ class PaymentMethod extends Model
 
     public const PAYPAL = 1;
 
+    public const TEST = 2;
+
     /**
      * @var int
      */

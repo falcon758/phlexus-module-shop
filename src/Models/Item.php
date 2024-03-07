@@ -201,7 +201,7 @@ class Item extends Model
 
     public static function getProductOrFail(int $productID, int $quantity = 1)
     {
-        $product = Product::getAvailableProduct($prodID, $quantity);
+        $product = Product::getAvailableProduct($productID, $quantity);
 
         if (!$product) {
             throw new Exception('Product not available');

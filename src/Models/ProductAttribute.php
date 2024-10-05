@@ -20,6 +20,8 @@ class ProductAttribute extends Model
 
     public const PRODUCT_STOCK = 'product_stock';
 
+    public const PRODUCT_REFERENCE = 'product_reference';
+
     public const SUBSCRIPTION_PERIOD = 'subscription_period';
 
     public const SUBSCRIPTION_PAYMENT_OFFSET = 'subscription_payment_offset';

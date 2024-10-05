@@ -19,6 +19,10 @@ class Product extends Model
 
     public const ENABLED = 1;
 
+    public const HIDDEN = 0;
+
+    public const VISIBLE = 1;
+
     /**
      * @var int
      */
@@ -52,12 +56,22 @@ class Product extends Model
     /**
      * @var int|null
      */
+    public $visible;
+
+    /**
+     * @var int|null
+     */
     public $imageID;
 
     /**
      * @var int
      */
     public int $productTypeID;
+
+    /**
+     * @var int
+     */
+    public int $parentID;
 
     /**
      * @var string|null
@@ -85,6 +99,11 @@ class Product extends Model
 
         $this->hasOne('productTypeID', ProductType::class, 'id', [
             'alias'    => 'productType',
+            'reusable' => true,
+        ]);
+
+        $this->hasOne('parentID', Product::class, 'id', [
+            'alias'    => 'parentProduct',
             'reusable' => true,
         ]);
 
@@ -160,9 +179,11 @@ class Product extends Model
             ->leftJoin(ProductAttribute::class, "$p_model.id = Stock.productID AND Stock.name = '" . ProductAttribute::PRODUCT_STOCK . "'", 'Stock')
             ->where(
                 "$p_model.active = :productActive:
+                AND $p_model.visible = :productVisibility:
                 AND (Stock.id IS NULL OR CAST(Stock.value AS SIGNED) > 0)",
                 [
                     'productActive' => self::ENABLED,
+                    'visible'       => self::VISIBLE,
                 ]
             )
             ->execute();
@@ -181,10 +202,12 @@ class Product extends Model
             ->leftJoin(ProductAttribute::class, "$p_model.id = Stock.productID AND Stock.name = '" . ProductAttribute::PRODUCT_STOCK . "'", 'Stock')
             ->where(
                 "$p_model.active = :productActive:
+                AND $p_model.visible = :productVisibility:
                 AND $p_model.id = :productID:
                 AND (Stock.id IS NULL OR CAST(Stock.value AS SIGNED) >= :productQuantity:)",
                 [
                     'productActive'   => self::ENABLED,
+                    'visible'         => self::VISIBLE,
                     'productID'       => $productID,
                     'productQuantity' => $quantity,
                 ]
@@ -254,14 +277,13 @@ class Product extends Model
             ->innerJoin(Payment::class, "O.id = PST.orderID", 'PST')
             ->leftJoin(Payment::class, 
                     "O.id = PSD.orderID
-                AND 
+                AND
                     (
-                            PST.createdAt < PSD.createdAt 
+                            PST.createdAt < PSD.createdAt
                         OR (
                             PST.createdAt = PSD.createdAt AND PST.id < PSD.id
                         )
                     )
-                
                 AND
                     PST.active = PSD.active
                 AND
@@ -271,21 +293,23 @@ class Product extends Model
                 'PSD'
             )
             ->where(
-                "O.active = :orderActive: 
-                AND O.statusID = :orderStatus: 
-                AND I.active = :itemActive: 
+                "O.active = :orderActive:
+                AND O.statusID = :orderStatus:
+                AND I.active = :itemActive:
+                AND p_model.active = :productActive:
                 AND $p_model.userID = :userID:
                 AND $p_model.id = :productID:
-                AND $p_model.isSubscription = :isSubscription: 
+                AND $p_model.isSubscription = :isSubscription:
                 AND DATEDIFF(CURRENT_DATE(), PST.createdAt) <= Period.value + MaxDelay.value
                 AND PSD.id IS NULL",
                 [
                     'orderActive'    => Order::ENABLED,
                     'orderStatus'    => OrderStatus::RENEWAL,
                     'itemActive'     => Item::ENABLED,
+                    'itemActive'     => self::ENABLED,
                     'userID'         => $userID,
                     'productID'      => $productID,
-                    'isSubscription' => 1
+                    'isSubscription' => 1,
                 ]
             )
             ->execute()

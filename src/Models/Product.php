@@ -26,7 +26,7 @@ class Product extends Model
     /**
      * @var int
      */
-    public $id;
+    public ?int $id;
 
     /**
      * @var string
@@ -36,7 +36,7 @@ class Product extends Model
     /**
      * @var string|null
      */
-    public $description;
+    public ?string $description;
 
     /**
      * @var double
@@ -46,22 +46,22 @@ class Product extends Model
     /**
      * @var int
      */
-    public $isSubscription;
+    public ?int $isSubscription;
 
     /**
      * @var int|null
      */
-    public $active;
+    public ?int $active;
 
     /**
      * @var int|null
      */
-    public $visible;
+    public ?int $visible;
 
     /**
      * @var int|null
      */
-    public $imageID;
+    public ?int $imageID;
 
     /**
      * @var int
@@ -71,17 +71,17 @@ class Product extends Model
     /**
      * @var int
      */
-    public int $parentID;
+    public ?int $parentID;
 
     /**
      * @var string|null
      */
-    public $createdAt;
+    public ?string $createdAt;
 
     /**
      * @var string|null
      */
-    public $modifiedAt;
+    public ?string $modifiedAt;
 
     /**
      * Initialize
@@ -182,8 +182,8 @@ class Product extends Model
                 AND $p_model.visible = :productVisibility:
                 AND (Stock.id IS NULL OR CAST(Stock.value AS SIGNED) > 0)",
                 [
-                    'productActive' => self::ENABLED,
-                    'visible'       => self::VISIBLE,
+                    'productActive'     => self::ENABLED,
+                    'productVisibility' => self::VISIBLE,
                 ]
             )
             ->execute();
@@ -206,10 +206,10 @@ class Product extends Model
                 AND $p_model.id = :productID:
                 AND (Stock.id IS NULL OR CAST(Stock.value AS SIGNED) >= :productQuantity:)",
                 [
-                    'productActive'   => self::ENABLED,
-                    'visible'         => self::VISIBLE,
-                    'productID'       => $productID,
-                    'productQuantity' => $quantity,
+                    'productActive'     => self::ENABLED,
+                    'productVisibility' => self::VISIBLE,
+                    'productID'         => $productID,
+                    'productQuantity'   => $quantity,
                 ]
             )
             ->execute()

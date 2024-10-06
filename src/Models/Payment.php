@@ -29,7 +29,7 @@ class Payment extends Model
     /**
      * @var int|null
      */
-    public ?int $id;
+    public ?int $id = null;
 
     /**
      * @var string
@@ -49,12 +49,12 @@ class Payment extends Model
     /**
      * @var int|null
      */
-    public?int $statusID;
+    public?int $statusID = null;
 
     /**
      * @var int|null
      */
-    public ?int $active;
+    public ?int $active = null;
 
     /**
      * @var int
@@ -74,12 +74,12 @@ class Payment extends Model
     /**
      * @var string|null
      */
-    public ?string $createdAt;
+    public ?string $createdAt = null;
 
     /**
      * @var string|null
      */
-    public ?string $modifiedAt;
+    public ?string $modifiedAt = null;
 
     /**
      * Initialize

@@ -26,7 +26,7 @@ class Product extends Model
     /**
      * @var int
      */
-    public ?int $id;
+    public ?int $id = null;
 
     /**
      * @var string
@@ -36,7 +36,7 @@ class Product extends Model
     /**
      * @var string|null
      */
-    public ?string $description;
+    public ?string $description = null;
 
     /**
      * @var double
@@ -46,22 +46,22 @@ class Product extends Model
     /**
      * @var int
      */
-    public ?int $isSubscription;
+    public ?int $isSubscription = null;
 
     /**
      * @var int|null
      */
-    public ?int $active;
+    public ?int $active = null;
 
     /**
      * @var int|null
      */
-    public ?int $visible;
+    public ?int $visible = null;
 
     /**
      * @var int|null
      */
-    public ?int $imageID;
+    public ?int $imageID = null;
 
     /**
      * @var int
@@ -71,17 +71,17 @@ class Product extends Model
     /**
      * @var int
      */
-    public ?int $parentID;
+    public ?int $parentID = null;
 
     /**
      * @var string|null
      */
-    public ?string $createdAt;
+    public ?string $createdAt = null;
 
     /**
      * @var string|null
      */
-    public ?string $modifiedAt;
+    public ?string $modifiedAt = null;
 
     /**
      * Initialize

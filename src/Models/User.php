@@ -15,12 +15,12 @@ class User extends UserModel
     /**
      * @var string|null
      */
-    public ?string $name;
+    public ?string $name = null;
 
     /**
      * @var string|null
      */
-    public ?string $taxNumber;
+    public ?string $taxNumber = null;
 
     /**
      * Get encrypt fields

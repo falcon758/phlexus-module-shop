@@ -44,7 +44,7 @@ class Payment extends Model
     /**
      * @var string|null
      */
-    public ?string $invoiceNumber;
+    public ?string $invoiceNumber = null;
 
     /**
      * @var int|null

@@ -205,7 +205,7 @@ class Cart implements CartInterface
         $quantity = (int) $product['quantity'] ?? 0;
 
         if (
-            ($isSubscription && $quantity === 1)
+            ($isSubscription && $quantity > 1)
             || $quantity > self::PRODUCT_LIMIT
             || $this->hasSubscriptionProducts()
             || !Product::getAvailableProduct((int) $product['id'])

@@ -17,9 +17,9 @@ class Country extends Model
     public const ENABLED = 1;
 
     /**
-     * @var int
+     * @var int|null
      */
-    public $id;
+    public ?int $id;
 
     /**
      * @var string
@@ -34,17 +34,17 @@ class Country extends Model
     /**
      * @var int|null
      */
-    public $active;
+    public ?int $active;
 
     /**
      * @var string|null
      */
-    public $createdAt;
+    public ?string $createdAt;
 
     /**
      * @var string|null
      */
-    public $modifiedAt;
+    public ?string $modifiedAt;
 
     /**
      * Initialize

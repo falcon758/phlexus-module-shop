@@ -18,6 +18,7 @@ use Phlexus\Modules\Shop\Models\Country;
 use Phlexus\Modules\Shop\Models\AddressType;
 use Phlexus\Modules\Shop\Models\PaymentMethod;
 use Phlexus\Modules\Shop\Models\ShippingMethod;
+use Phlexus\Libraries\Translations\TranslationInterface;
 use Phalcon\Forms\Element\Text;
 use Phalcon\Forms\Element\Select;
 use Phalcon\Forms\Element\Check;
@@ -27,9 +28,9 @@ use Phalcon\Filter\Validation\Validator\Regex;
 
 class checkoutForm extends CaptchaForm
 {
-    private $translationForm;
+    private TranslationInterface $translationForm;
 
-    private $translationMessage;
+    private TranslationInterface $translationMessage;
 
     /**
      * Initialize form

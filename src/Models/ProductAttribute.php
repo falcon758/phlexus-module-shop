@@ -35,9 +35,9 @@ class ProductAttribute extends Model
     public const SUBSCRIPTION_MAX_DELAY_DEFAULT = 10;
 
     /**
-     * @var int
+     * @var int|null
      */
-    public $id;
+    public ?int $id;
 
     /**
      * @var string
@@ -52,7 +52,7 @@ class ProductAttribute extends Model
     /**
      * @var int|null
      */
-    public $active;
+    public ?int $active;
 
     /**
      * @var int
@@ -62,12 +62,12 @@ class ProductAttribute extends Model
     /**
      * @var string|null
      */
-    public $createdAt;
+    public ?string $createdAt;
 
     /**
      * @var string|null
      */
-    public $modifiedAt;
+    public ?string $modifiedAt;
 
     /**
      * Initialize

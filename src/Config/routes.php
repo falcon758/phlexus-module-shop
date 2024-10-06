@@ -115,9 +115,9 @@ $routes->addGet('/payment/callback/paypal/{paymentHash:[a-zA-Z0-9]+}', [
 ]);
 
 // @TODO: Remove after tests
-/*$routes->addGet('/payment/callback/test/{paymentHash:[a-zA-Z0-9]+}', [
+$routes->addGet('/payment/callback/test/{paymentHash:[a-zA-Z0-9]+}', [
     'controller' => 'callback',
     'action'     => 'test',
-]);*/
+]);
 
 return $routes;

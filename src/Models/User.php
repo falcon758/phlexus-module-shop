@@ -13,14 +13,14 @@ use Phlexus\Modules\BaseUser\Models\User as  UserModel;
 class User extends UserModel
 {
     /**
-     * @var string
+     * @var string|null
      */
-    public $name;
+    public ?string $name;
 
     /**
-     * @var string
+     * @var string|null
      */
-    public $taxNumber;
+    public ?string $taxNumber;
 
     /**
      * Get encrypt fields

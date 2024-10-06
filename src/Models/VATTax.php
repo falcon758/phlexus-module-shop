@@ -17,9 +17,9 @@ class VATTax extends Model
     public const ENABLED = 1;
 
     /**
-     * @var int
+     * @var int|null
      */
-    public $id;
+    public ?int $id;
 
     /**
      * @var double
@@ -29,7 +29,7 @@ class VATTax extends Model
     /**
      * @var int|null
      */
-    public $active;
+    public ?int $active;
 
     /**
      * @var int
@@ -39,12 +39,12 @@ class VATTax extends Model
     /**
      * @var string|null
      */
-    public $createdAt;
+    public ?string $createdAt;
 
     /**
      * @var string|null
      */
-    public $modifiedAt;
+    public ?string $modifiedAt;
 
     /**
      * Initialize

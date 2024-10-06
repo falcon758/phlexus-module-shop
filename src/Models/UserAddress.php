@@ -19,14 +19,14 @@ class UserAddress extends Model
     public const ENABLED = 1;
 
     /**
-     * @var int
+     * @var int|null
      */
-    public $id;
+    public ?int $id;
 
     /**
      * @var int|null
      */
-    public $active;
+    public ?int $active;
 
     /**
      * @var int
@@ -46,12 +46,12 @@ class UserAddress extends Model
     /**
      * @var string|null
      */
-    public $createdAt;
+    public ?string $createdAt;
 
     /**
      * @var string|null
      */
-    public $modifiedAt;
+    public ?string $modifiedAt;
 
     /**
      * Initialize

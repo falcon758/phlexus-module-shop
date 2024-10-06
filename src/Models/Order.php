@@ -24,9 +24,9 @@ class Order extends Model
     private const HASHLENGTH = 40;
 
     /**
-     * @var int
+     * @var int|null
      */
-    public $id;
+    public ?int $id;
 
     /**
      * @var string
@@ -36,17 +36,17 @@ class Order extends Model
     /**
      * @var int|null
      */
-    public $paid;
+    public ?int $paid;
 
     /**
      * @var int|null
      */
-    public $statusID;
+    public ?int $statusID;
 
     /**
      * @var int|null
      */
-    public $active;
+    public ?int $active;
 
     /**
      * @var int
@@ -76,17 +76,17 @@ class Order extends Model
     /**
      * @var int|null
      */
-    public $parentID;
+    public ?int $parentID;
 
     /**
      * @var string|null
      */
-    public $createdAt;
+    public ?string $createdAt;
 
     /**
      * @var string|null
      */
-    public $modifiedAt;
+    public ?string $modifiedAt;
 
     /**
      * Initialize

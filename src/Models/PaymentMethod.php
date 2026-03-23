@@ -18,11 +18,11 @@ class PaymentMethod extends Model
 
     public const PAYPAL = 1;
 
-    public const TEST = 2;
+    public const APPLEPAY = 2;
 
-    public const APPLEPAY = 3;
+    public const GOOGLEPAY = 3;
 
-    public const GOOGLEPAY = 4;
+    public const TEST = 4;
 
     /**
      * @var int|null

@@ -5,7 +5,8 @@
     "require": {
         "falcon758/phlexus-module-users": "^2.1.0",
         "falcon758/phlexus-library-media": "^2.1.0",
-        "paypal/paypal-checkout-sdk": "^1.0"
+        "paypal/paypal-checkout-sdk": "^1.0",
+        "stripe/stripe-php": "^12.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^8",

@@ -9,6 +9,8 @@ use Phalcon\Http\ResponseInterface;
 use Phlexus\Modules\Shop\Models\Payment;
 use Phlexus\Modules\Shop\Libraries\Payments\PayPal;
 use Phlexus\Modules\Shop\Libraries\Payments\Test;
+use Phlexus\Modules\Shop\Libraries\Payments\ApplePay;
+use Phlexus\Modules\Shop\Libraries\Payments\GooglePay;
 
 /**
  * @RoutePrefix('/payment/callback')
@@ -37,6 +39,54 @@ class CallbackController extends AbstractController
         }
 
         return (new Paypal($payment))->processCallback($token);
+    }
+
+    /**
+     * @Get('/payment/callback/apple')
+     */
+    public function appleAction(string $paymentHash): ResponseInterface
+    {
+        $title = $this->translation->setTypePage()->_('title-shop-callback-apple');
+
+        Tag::setTitle($title);
+
+        $payment = Payment::findFirstByhashCode($paymentHash);
+
+        if (!$payment) {
+            return $this->response->redirect('checkout');
+        }
+
+        $sessionID = (string) $this->request->get('session_id');
+
+        if (preg_match('/^[a-zA-Z0-9_]+$/', $sessionID) !== 1) {
+            return $this->response->redirect('checkout');
+        }
+
+        return (new ApplePay($payment))->processCallback($sessionID);
+    }
+
+    /**
+     * @Get('/payment/callback/google')
+     */
+    public function googleAction(string $paymentHash): ResponseInterface
+    {
+        $title = $this->translation->setTypePage()->_('title-shop-callback-google');
+
+        Tag::setTitle($title);
+
+        $payment = Payment::findFirstByhashCode($paymentHash);
+
+        if (!$payment) {
+            return $this->response->redirect('checkout');
+        }
+
+        $sessionID = (string) $this->request->get('session_id');
+
+        if (preg_match('/^[a-zA-Z0-9_]+$/', $sessionID) !== 1) {
+            return $this->response->redirect('checkout');
+        }
+
+        return (new GooglePay($payment))->processCallback($sessionID);
     }
 
     /**

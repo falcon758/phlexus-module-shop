@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Phlexus\Modules\Shop\Controllers;
 
 use Phlexus\Modules\Shop\Models\Order;
-use Phlexus\Libraries\Arrays;
+use Phlexus\PhlexusHelpers\Arrays;
 use Phlexus\Helpers as PhlexusHelpers;
 use Phalcon\Tag;
 

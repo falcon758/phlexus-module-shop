@@ -7,7 +7,7 @@ namespace Phlexus\Modules\Shop\Controllers;
 use Phlexus\Modules\Shop\Models\Payment;
 use Phlexus\Modules\Shop\Models\PaymentType;
 use Phlexus\Modules\Shop\Libraries\Payments\PaymentFactory;
-use Phlexus\Libraries\Arrays;
+use Phlexus\PhlexusHelpers\Arrays;
 use Phlexus\Helpers as PhlexusHelpers;
 use Phalcon\Tag;
 

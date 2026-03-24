@@ -84,7 +84,7 @@ $routes->addGet('/orders', [
     'action'     => 'index',
 ]);
 
-$routes->addGet('/order/{orderHash:[a-zA-Z0-9]+}', [
+$routes->addGet('/order/view/{orderHash:[a-zA-Z0-9]+}', [
     'controller' => 'order',
     'action'     => 'view',
 ]);

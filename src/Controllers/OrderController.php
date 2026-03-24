@@ -34,7 +34,7 @@ class OrderController extends AbstractController
         $groupedItems = Arrays::groupArray($groupedKey, ['productID', 'quantity', 'price'], 'items');
 
         $this->view->setVar('csrfToken', $this->security->getToken());
-        $this->view->setVar('orderRoute', '/order/');
+        $this->view->setVar('orderRoute', '/order/view/');
         $this->view->setVar('orders', $orders);
         $this->view->setVar('groupedOrders', $groupedItems);
     }

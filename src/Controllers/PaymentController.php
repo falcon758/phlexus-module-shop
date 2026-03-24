@@ -80,7 +80,7 @@ class PaymentController extends AbstractController
             return $this->response->redirect('/payments/history');
         }
 
-        $groupedItems = Arrays::groupArray($payment->toArray(), ['productID', 'quantity', 'price'], 'items');
+        $groupedItems = Arrays::groupArray($payment, ['productID', 'quantity', 'price'], 'items');
 
         $company = PhlexusHelpers::phlexusConfig('company')->toArray();
 

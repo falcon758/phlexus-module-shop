@@ -258,9 +258,9 @@ class Payment extends Model
      * 
      * @param string $hashCode
      *
-     * @return Simple|null
+     * @return array|null
      */
-    public static function getPaymentByHash(string $hashCode): ?Simple
+    public static function getPaymentByHash(string $hashCode): ?array
     {
         $user = User::getUser();
 
@@ -270,7 +270,7 @@ class Payment extends Model
 
         $p_model = self::class;
 
-        return self::query()
+        $payment = self::query()
             ->columns("
                 $p_model.invoiceNumber AS invoiceNumber,
 
@@ -334,7 +334,19 @@ class Payment extends Model
             )
             ->orderBy("$p_model.id DESC")
             ->groupBy("$p_model.id, I.id, L.orderID, VT.id")
-            ->execute();
+            ->execute()
+            ->toArray();
+
+        if (count($payment) === 0) {
+            return null;
+        }
+
+        foreach ($payment as &$pay){
+            $pay['billingAddress'] = self::decrypt($pay['billingAddress']);
+            $pay['shipmentAddress'] = self::decrypt($pay['shipmentAddress']);
+        }
+
+        return $payment;
     }
 
     /**

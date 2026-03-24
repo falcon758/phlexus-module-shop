@@ -56,8 +56,6 @@ class GooglePay extends PaymentAbstract
                 'line_items'  => $lineItems,
                 'success_url' => $this->url->get('/payment/callback/google/' . $payment->hashCode) . '?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url'  => $this->url->get('/checkout'),
-                // Wallets like Google Pay are supported automatically on Stripe Checkout
-                'payment_method_types' => ['card'],
             ]);
 
             if (

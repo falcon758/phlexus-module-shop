@@ -17,7 +17,7 @@ use Phlexus\Modules\Shop\Models\PaymentAttribute;
 use Phalcon\Di\Di;
 use Phalcon\Http\ResponseInterface;
 
-class StripePay extends PaymentAbstract
+class Stripe extends PaymentAbstract
 {
     private const STRIPE_SESSION = 'stripe_session_id';
 

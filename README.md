@@ -20,7 +20,7 @@ php /path/to/phlexus/cli.php 'Phlexus\Modules\Shop\Tasks\Subscription' verifySub
 	- Apple Pay: 3
 	- Google Pay: 4
 - Routes:
-	- Success callbacks are handled at `/payment/callback/apple/{paymentHash}` and `/payment/callback/google/{paymentHash}`.
+	- Success callbacks are handled at `/payment/callback/stripe/{paymentHash}` and `/payment/callback/stripe/{paymentHash}`.
 - How it works:
 	- Start payment creates a Stripe Checkout Session and redirects the user.
 	- Wallets (Apple Pay, Google Pay) are automatically available on Checkout.

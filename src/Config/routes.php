@@ -109,19 +109,9 @@ $routes->addGet('/payment/pay/{paymentHash:[a-zA-Z0-9]+}', [
     'action'     => 'pay',
 ]);
 
-$routes->addGet('/payment/callback/paypal/{paymentHash:[a-zA-Z0-9]+}', [
+$routes->addGet('/payment/callback/stripe/{paymentHash:[a-zA-Z0-9]+}', [
     'controller' => 'callback',
-    'action'     => 'paypal',
-]);
-
-$routes->addGet('/payment/callback/apple/{paymentHash:[a-zA-Z0-9]+}', [
-    'controller' => 'callback',
-    'action'     => 'apple',
-]);
-
-$routes->addGet('/payment/callback/google/{paymentHash:[a-zA-Z0-9]+}', [
-    'controller' => 'callback',
-    'action'     => 'google',
+    'action'     => 'stripe',
 ]);
 
 // @TODO: Remove after tests

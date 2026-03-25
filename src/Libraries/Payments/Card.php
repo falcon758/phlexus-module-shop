@@ -17,7 +17,7 @@ use Phlexus\Modules\Shop\Models\PaymentAttribute;
 use Phalcon\Di\Di;
 use Phalcon\Http\ResponseInterface;
 
-class GooglePay extends Stripe
+class Card extends Stripe
 {
     // Silence is gold
 }

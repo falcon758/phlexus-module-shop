@@ -33,9 +33,13 @@ class PaymentFactory
                 return new ApplePay($payment);
             case PaymentMethod::GOOGLEPAY:
                 return new GooglePay($payment);
-            case PaymentMethod::PAYPAL:
+            case PaymentMethod::MBWAY:
+                return new MBWay($payment);
+            case PaymentMethod::CARD:
+                return new Card($payment);
+            case PaymentMethod::STRIPE:
             default:
-                return new PayPal($payment);
+                return new STRIPE($payment);
         }
     }
 }

@@ -26,16 +26,9 @@ class PaymentFactory
      */
     public function build(Payment $payment): PaymentInterface {
         switch ($payment->paymentMethodID) {
-            // @TODO: Remove after test
-            case PaymentMethod::TEST:
-                return new Test($payment);
-            case PaymentMethod::APPLEPAY:
-                return new ApplePay($payment);
-            case PaymentMethod::GOOGLEPAY:
-                return new GooglePay($payment);
-            case PaymentMethod::PAYPAL:
+            case PaymentMethod::STRIPE:
             default:
-                return new PayPal($payment);
+                return new Stripe($payment);
         }
     }
 }

@@ -51,6 +51,11 @@ abstract class PaymentAbstract implements PaymentInterface
     protected Payment $payment;
 
     /**
+     * Event Manager
+     */
+    protected EventsManagerInterface $eventsManager;
+
+    /**
      * Construct Payment
      * 
      * @param string $order Payment to process

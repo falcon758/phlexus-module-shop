@@ -17,7 +17,7 @@ use Phlexus\Modules\Shop\Models\PaymentAttribute;
 use Phalcon\Di\Di;
 use Phalcon\Http\ResponseInterface;
 
-class GooglePay extends PaymentAbstract
+class Stripe extends PaymentAbstract
 {
     private const STRIPE_SESSION = 'stripe_session_id';
 
@@ -54,10 +54,8 @@ class GooglePay extends PaymentAbstract
             $session = $stripe->checkout->sessions->create([
                 'mode'        => 'payment',
                 'line_items'  => $lineItems,
-                'success_url' => $this->url->get('/payment/callback/google/' . $payment->hashCode) . '?session_id={CHECKOUT_SESSION_ID}',
+                'success_url' => $this->url->get('/payment/callback/stripe/' . $payment->hashCode) . '?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url'  => $this->url->get('/checkout'),
-                // Wallets like Google Pay are supported automatically on Stripe Checkout
-                'payment_method_types' => ['card'],
             ]);
 
             if (

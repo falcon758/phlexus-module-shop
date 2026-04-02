@@ -318,7 +318,7 @@ class Order extends Model
             LIMIT 1;
         ');
 
-        $lastOrder->bindParam(':orderID', $this->id);
+        $lastOrder->bindValue(':orderID', (int) $this->id, \PDO::PARAM_INT);
         $lastOrder->execute();
         $result = $lastOrder->fetch(\PDO::FETCH_ASSOC);
         

@@ -62,7 +62,7 @@ class Stripe extends PaymentAbstract
                 isset($session->id, $session->url)
                 && PaymentAttribute::setAttributes($payment->id, [self::STRIPE_SESSION => $session->id])
             ) {
-                return $this->response->redirect($session->url);
+                return $this->response->redirect($session->url, true);
             }
         } catch (\Exception $e) {
             $this->flash->error($translationMessage->_('unable-to-process-payment'));

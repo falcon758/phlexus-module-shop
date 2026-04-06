@@ -89,6 +89,7 @@ class Payment extends Model
     public function initialize()
     {
         $this->setSource('payments');
+        $this->skipAttributesOnUpdate(['createdAt']);
 
         $this->hasOne('statusID', OrderStatus::class, 'id', [
             'alias'    => 'orderStatus',
@@ -119,7 +120,7 @@ class Payment extends Model
     public function afterCreate()
     {
         $this->invoiceNumber = self::generateInvoiceNumber((int) $this->id);
-        $this->save();
+        $this->update(null, ['invoiceNumber']);
     }
 
     /**

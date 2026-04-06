@@ -124,6 +124,14 @@ class Payment extends Model
     }
 
     /**
+     * Before update
+     */
+    public function beforeUpdate()
+    {
+        $this->modifiedAt = date('Y-m-d H:i:s');
+    }
+
+    /**
      * Cancel payment
      * 
      * @return bool

@@ -77,11 +77,20 @@ class ProductAttribute extends Model
     public function initialize()
     {
         $this->setSource('product_attributes');
+        $this->skipAttributesOnUpdate(['createdAt']);
 
         $this->hasOne('productID', Product::class, 'id', [
             'alias'    => 'product',
             'reusable' => true,
         ]);
+    }
+
+    /**
+     * Before update
+     */
+    public function beforeUpdate()
+    {
+        $this->modifiedAt = date('Y-m-d H:i:s');
     }
 
     /**

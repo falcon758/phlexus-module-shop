@@ -68,6 +68,7 @@ class Item extends Model
     public function initialize()
     {
         $this->setSource('items');
+        $this->skipAttributesOnUpdate(['createdAt']);
 
         $this->hasOne('productID', Product::class, 'id', [
             'alias'    => 'product',
@@ -78,6 +79,14 @@ class Item extends Model
             'alias'    => 'order',
             'reusable' => true,
         ]);
+    }
+
+    /**
+     * Before update
+     */
+    public function beforeUpdate()
+    {
+        $this->modifiedAt = date('Y-m-d H:i:s');
     }
 
     /**

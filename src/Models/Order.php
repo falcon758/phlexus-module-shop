@@ -96,6 +96,7 @@ class Order extends Model
     public function initialize()
     {
         $this->setSource('orders');
+        $this->skipAttributesOnUpdate(['createdAt']);
 
         $this->hasOne('userID', User::class, 'id', [
             'alias'    => 'user',
@@ -125,6 +126,14 @@ class Order extends Model
         $this->hasMany('id', Item::class, 'orderID', ['alias' => 'items']);
 
         $this->hasMany('id', Payment::class, 'orderID', ['alias' => 'payments']);
+    }
+
+    /**
+     * Before update
+     */
+    public function beforeUpdate()
+    {
+        $this->modifiedAt = date('Y-m-d H:i:s');
     }
 
     /**

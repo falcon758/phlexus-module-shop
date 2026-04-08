@@ -54,5 +54,14 @@ class ShippingMethod extends Model
     public function initialize()
     {
         $this->setSource('shipping_method');
+        $this->skipAttributesOnUpdate(['createdAt']);
+    }
+
+    /**
+     * Before update
+     */
+    public function beforeUpdate()
+    {
+        $this->modifiedAt = date('Y-m-d H:i:s');
     }
 }

@@ -61,6 +61,7 @@ class UserAddress extends Model
     public function initialize()
     {
         $this->setSource('user_address');
+        $this->skipAttributesOnUpdate(['createdAt']);
 
         $this->hasOne('userID', User::class, 'id', [
             'alias'    => 'user',
@@ -76,6 +77,14 @@ class UserAddress extends Model
             'alias'    => 'addressType',
             'reusable' => true,
         ]);
+    }
+
+    /**
+     * Before update
+     */
+    public function beforeUpdate()
+    {
+        $this->modifiedAt = date('Y-m-d H:i:s');
     }
 
     /**

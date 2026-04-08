@@ -65,11 +65,20 @@ class PaymentAttribute extends Model
     public function initialize()
     {
         $this->setSource('payment_attributes');
+        $this->skipAttributesOnUpdate(['createdAt']);
 
         $this->hasOne('paymentID', Payment::class, 'id', [
             'alias'    => 'payment',
             'reusable' => true,
         ]);
+    }
+
+    /**
+     * Before update
+     */
+    public function beforeUpdate()
+    {
+        $this->modifiedAt = date('Y-m-d H:i:s');
     }
 
     /**

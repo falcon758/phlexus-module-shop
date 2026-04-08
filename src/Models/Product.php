@@ -91,6 +91,7 @@ class Product extends Model
     public function initialize()
     {
         $this->setSource('products');
+        $this->skipAttributesOnUpdate(['createdAt']);
         
         $this->hasOne('imageID', Media::class, 'id', [
             'alias'    => 'media',
@@ -108,6 +109,14 @@ class Product extends Model
         ]);
 
         $this->hasMany('id', ProductAttribute::class, 'productID', ['alias' => 'productAttribute']);
+    }
+
+    /**
+     * Before update
+     */
+    public function beforeUpdate()
+    {
+        $this->modifiedAt = date('Y-m-d H:i:s');
     }
 
     /**

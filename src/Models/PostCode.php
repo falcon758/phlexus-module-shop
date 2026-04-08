@@ -54,11 +54,20 @@ class PostCode extends Model
     public function initialize()
     {
         $this->setSource('post_codes');
+        $this->skipAttributesOnUpdate(['createdAt']);
 
         $this->hasOne('localeID', Locale::class, 'id', [
             'alias'    => 'locale',
             'reusable' => true,
         ]);
+    }
+
+    /**
+     * Before update
+     */
+    public function beforeUpdate()
+    {
+        $this->modifiedAt = date('Y-m-d H:i:s');
     }
 
     /**

@@ -459,17 +459,18 @@ class Payment extends Model
             ->where("
                 $p_model.statusID = :paymentStatus: 
                 AND $p_model.active = :paymentActive: 
-                AND O.statusID = :orderStatus: 
+                AND (O.statusID = :orderStatusCreated: OR O.statusID = :orderStatusRenewal:) 
                 AND O.active = :orderActive: 
                 AND O.userID = :userID: 
                 AND I.active = :itemActive:",
                 [
-                    'paymentStatus' => PaymentStatus::CREATED,
-                    'paymentActive' => self::ENABLED,
-                    'orderStatus'   => OrderStatus::RENEWAL,
-                    'orderActive'   => Order::ENABLED,
-                    'userID'        => $user->id,
-                    'itemActive'    => Item::ENABLED,
+                    'paymentStatus'      => PaymentStatus::CREATED,
+                    'paymentActive'      => self::ENABLED,
+                    'orderStatusCreated' => OrderStatus::CREATED,
+                    'orderStatusRenewal' => OrderStatus::RENEWAL,
+                    'orderActive'        => Order::ENABLED,
+                    'userID'             => $user->id,
+                    'itemActive'         => Item::ENABLED,
                 ]
             )
             ->orderBy("$p_model.id DESC");

@@ -54,11 +54,20 @@ class Address extends Model
     public function initialize()
     {
         $this->setSource('address');
+        $this->skipAttributesOnUpdate(['createdAt']);
 
         $this->hasOne('postCodeID', PostCode::class, 'id', [
             'alias'    => 'postCode',
             'reusable' => true,
         ]);
+    }
+
+    /**
+     * Before update
+     */
+    public function beforeUpdate()
+    {
+        $this->modifiedAt = date('Y-m-d H:i:s');
     }
 
     /**

@@ -53,5 +53,14 @@ class AddressType extends Model
     public function initialize()
     {
         $this->setSource('address_type');
+        $this->skipAttributesOnUpdate(['createdAt']);
+    }
+
+    /**
+     * Before update
+     */
+    public function beforeUpdate()
+    {
+        $this->modifiedAt = date('Y-m-d H:i:s');
     }
 }

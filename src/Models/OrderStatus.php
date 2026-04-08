@@ -57,5 +57,14 @@ class OrderStatus extends Model
     public function initialize()
     {
         $this->setSource('order_status');
+        $this->skipAttributesOnUpdate(['createdAt']);
+    }
+
+    /**
+     * Before update
+     */
+    public function beforeUpdate()
+    {
+        $this->modifiedAt = date('Y-m-d H:i:s');
     }
 }

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Phlexus\Modules\Shop\Models;
 
-use Phalcon\Mvc\Model;
+use Phlexus\Models\Model;
 
 /**
  * Class VATTax
@@ -54,11 +54,21 @@ class VATTax extends Model
     public function initialize()
     {
         $this->setSource('vat_tax');
+        $this->skipAttributesOnUpdate(['createdAt']);
 
         $this->hasOne('countryID', Country::class, 'id', [
             'alias'    => 'country',
             'reusable' => true,
         ]);
+    }
+
+
+    /**
+     * Before update
+     */
+    public function beforeUpdate()
+    {
+        $this->modifiedAt = date('Y-m-d H:i:s');
     }
 
     /**

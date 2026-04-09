@@ -114,10 +114,5 @@ $routes->addGet('/payment/callback/stripe/{paymentHash:[a-zA-Z0-9]+}', [
     'action'     => 'stripe',
 ]);
 
-// @TODO: Remove after tests
-$routes->addGet('/payment/callback/test/{paymentHash:[a-zA-Z0-9]+}', [
-    'controller' => 'callback',
-    'action'     => 'test',
-]);
 
 return $routes;

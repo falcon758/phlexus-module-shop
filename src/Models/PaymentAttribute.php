@@ -98,7 +98,7 @@ class PaymentAttribute extends Model
 
         $inQuery = '?' . implode(', ?', range(2, $cNames + 1));
 
-        $values = array_merge([self::ACTIVE, $paymentID], $names);
+        $values = array_merge([self::ENABLED, $paymentID], $names);
 
         $attributes = PaymentAttribute::find(
             [

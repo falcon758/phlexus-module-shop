@@ -16,7 +16,7 @@ use Phlexus\Modules\Shop\Libraries\Payments\Test;
 class CallbackController extends AbstractController
 {
     /**
-     * @Get('/payment/callback/apple')
+     * @Get('/payment/callback/stripe/{paymentHash:[a-zA-Z0-9]+}')
      */
     public function stripeAction(string $paymentHash): ResponseInterface
     {
@@ -37,23 +37,5 @@ class CallbackController extends AbstractController
         }
 
         return (new Stripe($payment))->processCallback($sessionID);
-    }
-
-    /**
-     * @Get('/payment/callback/test')
-     */
-    public function testAction(string $paymentHash): ResponseInterface
-    {
-        $title = $this->translation->setTypePage()->_('title-shop-callback-test');
-
-        Tag::setTitle($title);
-
-        $payment = Payment::findFirstByhashCode($paymentHash);
-
-        if (!$payment) {
-            return $this->response->redirect('checkout');
-        }
-
-        return (new Test($payment))->processCallback("");
     }
 }

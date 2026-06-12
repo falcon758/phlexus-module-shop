@@ -300,7 +300,7 @@ class Order extends Model
         return self::createOrder(
             $userID, $billingID, $shipmentID,
             $paymentMethodID, $shippingMethodID,
-            $relatedOrder = 0, OrderStatus::RENEWAL
+            $relatedOrder, OrderStatus::RENEWAL
         );
     }
 

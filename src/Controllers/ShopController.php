@@ -72,6 +72,8 @@ class ShopController extends AbstractController
         $translationMessage = $this->translation->setTypeMessage();
 
         if (
+            !$this->request->isPost()
+            ||
             !$this->security->checkToken('csrf', (string) $this->request->getPost('csrf'))
             || !$this->cart->addProduct($productID) 
         ) {
@@ -89,7 +91,7 @@ class ShopController extends AbstractController
     }
 
     /**
-     * @Get('/remove/{id:[0-9]+}')
+    * @Post('/remove/{id:[0-9]+}')
      *
      * @param int $productID
      * 
@@ -101,7 +103,7 @@ class ShopController extends AbstractController
 
         $translationMessage = $this->translation->setTypeMessage();
 
-        if (!$this->security->checkToken('csrf', (string) $this->request->getPost('csrf'))) {
+        if (!$this->request->isPost() || !$this->security->checkToken('csrf', (string) $this->request->getPost('csrf'))) {
             return $this->response->setJsonContent([
                 'success' => false,
                 'message' => $translationMessage->_('unable-to-remove-product'),
@@ -122,6 +124,10 @@ class ShopController extends AbstractController
      */
     public function checkoutAction()
     {
+        if (($response = $this->redirectIfGuest('/user')) !== null) {
+            return $response;
+        }
+
         $title = $this->translation->setTypePage()->_('title-shop-checkout');
 
         Tag::setTitle($title);
@@ -136,7 +142,7 @@ class ShopController extends AbstractController
             return $this->response->redirect('cart');
         }
 
-        $user = User::getUser();
+        $user = $this->getAuthenticatedUser();
         
         if ($user === null) {
             $this->flash->warning($translationMessage->_('login-before-checkout'));
@@ -156,11 +162,19 @@ class ShopController extends AbstractController
     }
 
     /**
-     * @Get('/checkout/order')
+     * @Post('/checkout/order')
      */
     public function orderAction()
     {
         $this->view->disable();
+
+        if (!$this->request->isPost()) {
+            return $this->response->redirect('checkout');
+        }
+
+        if (($response = $this->redirectIfGuest('/user')) !== null) {
+            return $response;
+        }
 
         if (!$this->cart->hasProducts()) {
             return $this->response->redirect('cart');
@@ -169,6 +183,10 @@ class ShopController extends AbstractController
         $form = new CheckoutForm(false);
 
         $post = $this->request->getPost();
+
+        if (!$this->security->checkToken('csrf', (string) ($post['csrf'] ?? ''))) {
+            return $this->response->redirect('checkout');
+        }
 
         if (!$form->isValid($post)) {
             foreach ($form->getMessages() as $message) {

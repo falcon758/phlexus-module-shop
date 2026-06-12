@@ -19,6 +19,10 @@ class OrderController extends AbstractController
      */
     public function indexAction()
     {
+        if (($response = $this->redirectIfGuest('/user')) !== null) {
+            return $response;
+        }
+
         $title = $this->translation->setTypePage()->_('title-shop-orders');
 
         Tag::setTitle($title);
@@ -44,6 +48,10 @@ class OrderController extends AbstractController
      */
     public function viewAction(string $orderHash)
     {
+        if (($response = $this->redirectIfGuest('/user')) !== null) {
+            return $response;
+        }
+
         $title = $this->translation->setTypePage()->_('title-shop-order-view');
 
         Tag::setTitle($title);

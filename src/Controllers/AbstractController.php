@@ -5,6 +5,7 @@ namespace Phlexus\Modules\Shop\Controllers;
 
 use Phalcon\Mvc\Controller;
 use Phalcon\Http\ResponseInterface;
+use Phlexus\Modules\BaseUser\Models\User as BaseUser;
 use Phlexus\Modules\Shop\Models\User;
 
 /**
@@ -33,7 +34,7 @@ abstract class AbstractController extends Controller
         return '/' . $basePosition;
     }
 
-    protected function getAuthenticatedUser(): ?User
+    protected function getAuthenticatedUser(): ?BaseUser
     {
         return User::getUser();
     }

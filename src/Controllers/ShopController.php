@@ -217,6 +217,16 @@ class ShopController extends AbstractController
             ];
         }
 
+        $currentUser = User::getUser();
+        if ($currentUser !== null) {
+            $cartProductIDs  = array_column($this->cart->getProducts(), 'id');
+            $existingPayment = Payment::getExistingUnpaidByUserProducts((int) $currentUser->id, $cartProductIDs);
+            if ($existingPayment !== null) {
+                $paymentProcess = (new PaymentFactory())->build($existingPayment);
+                return $paymentProcess->startPayment();
+            }
+        }
+
         $order = $this->createOrder(
             $personalInfo, $addresses[$billingID], $addresses[$shippingID],
             $paymentMethodID, $shippingMethodID

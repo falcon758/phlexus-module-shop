@@ -488,6 +488,52 @@ class Payment extends Model
     }
 
     /**
+     * Get existing unpaid payment for user and products
+     *
+     * Returns the most recent CREATED payment for the given user whose order
+     * contains exactly all of the supplied product IDs (no more, no less).
+     * Used to avoid creating duplicate payment records when the user re-submits
+     * the same cart.
+     *
+     * @param int   $userID     User id to search for
+     * @param array $productIDs Product ids to match
+     *
+     * @return Payment|null
+     */
+    public static function getExistingUnpaidByUserProducts(int $userID, array $productIDs): ?Payment
+    {
+        if (empty($productIDs)) {
+            return null;
+        }
+
+        $productCount   = count($productIDs);
+        $productIDsList = implode(',', array_map('intval', $productIDs));
+
+        $db  = Di::getDefault()->getShared('db');
+        $sql = "SELECT p.id FROM payments p
+                INNER JOIN orders o ON o.id = p.orderID
+                INNER JOIN items i ON i.orderID = o.id AND i.active = " . Item::ENABLED . "
+                WHERE p.statusID = " . PaymentStatus::CREATED . "
+                  AND p.active = " . self::ENABLED . "
+                  AND o.active = " . Order::ENABLED . "
+                  AND o.userID = ?
+                  AND i.productID IN ($productIDsList)
+                GROUP BY p.id
+                HAVING COUNT(DISTINCT i.productID) = ?
+                   AND COUNT(DISTINCT i.id) = ?
+                ORDER BY p.id DESC
+                LIMIT 1";
+
+        $result = $db->fetchOne($sql, \PDO::FETCH_ASSOC, [$userID, $productCount, $productCount]);
+
+        if (!$result) {
+            return null;
+        }
+
+        return self::findFirst((int) $result['id']);
+    }
+
+    /**
      * Generate invoice number
      * 
      * @param int $orderID Order 

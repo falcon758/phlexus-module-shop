@@ -55,7 +55,7 @@ class Stripe extends PaymentAbstract
                 'mode'        => 'payment',
                 'line_items'  => $lineItems,
                 'success_url' => $this->url->get('/payment/callback/stripe/' . $payment->hashCode) . '?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url'  => $this->url->get('/checkout'),
+                'cancel_url'  => $this->url->get('/payments'),
             ]);
 
             if (

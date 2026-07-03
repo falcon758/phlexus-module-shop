@@ -758,20 +758,21 @@ class Order extends Model
                 "$p_model.active = :orderActive:
                 AND I.active = :itemActive:
                 AND PST.active = :paymentActive:
-                AND $p_model.statusID = :orderStatusID:
+                AND $p_model.statusID IN (:orderStatusCreated:, :orderStatusRenewal:)
                 AND PST.statusID = :paymentStatusID:
                 AND PST.paymentTypeID = :paymentTypeID:
                 AND PR.isSubscription = :isSubscription:
                 AND DATEDIFF(CURRENT_DATE(), PST.createdAt) > (SOffset.value + MaxDelay.value)
                 AND PSD.id IS NULL",
                 [
-                    'orderActive'     => Order::ENABLED,
-                    'itemActive'      => Item::ENABLED,
-                    'paymentActive'   => Payment::ENABLED,
-                    'orderStatusID'   => OrderStatus::RENEWAL,
-                    'paymentStatusID' => PaymentStatus::CREATED,
-                    'paymentTypeID'   => PaymentType::RENEWAL,
-                    'isSubscription'  => 1
+                    'orderActive'        => Order::ENABLED,
+                    'itemActive'         => Item::ENABLED,
+                    'paymentActive'      => Payment::ENABLED,
+                    'orderStatusCreated' => OrderStatus::CREATED,
+                    'orderStatusRenewal' => OrderStatus::RENEWAL,
+                    'paymentStatusID'    => PaymentStatus::CREATED,
+                    'paymentTypeID'      => PaymentType::RENEWAL,
+                    'isSubscription'     => 1
                 ]
             )
             ->orderBy("$p_model.id DESC")

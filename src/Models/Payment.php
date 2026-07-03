@@ -530,7 +530,10 @@ class Payment extends Model
             return null;
         }
 
-        return self::findFirst((int) $result['id']);
+        return self::findFirst([
+            'conditions' => 'id = :id:',
+            'bind'       => ['id' => (int) $result['id']],
+        ]);
     }
 
     /**

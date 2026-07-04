@@ -200,6 +200,21 @@ class Order extends Model
     }
 
     /**
+     * Expire order
+     *
+     * Marks the order as done without altering the paid flag,
+     * preserving the payment history for expired subscriptions.
+     *
+     * @return bool
+     */
+    public function expireOrder(): bool
+    {
+        $this->statusID = OrderStatus::DONE;
+
+        return $this->save();
+    }
+
+    /**
      * Set order as paid
      * 
      * @return bool
@@ -775,6 +790,37 @@ class Order extends Model
                     'isSubscription'     => 1
                 ]
             )
+            ->orderBy("$p_model.id DESC")
+            ->execute();
+    }
+
+    /**
+     * Get all orders with no active items
+     *
+     * Returns active orders in CREATED or RENEWAL state where every
+     * item has been disabled, i.e. the subscription has fully expired.
+     *
+     * @return Simple
+     */
+    public static function getAllInactiveOrders(): Simple
+    {
+        $p_model = self::class;
+
+        return self::query()
+            ->columns("$p_model.*")
+            ->innerJoin(Item::class, null, 'I')
+            ->leftJoin(Item::class, "$p_model.id = IA.orderID AND IA.active = " . Item::ENABLED, 'IA')
+            ->where(
+                "$p_model.active = :orderActive:
+                AND $p_model.statusID IN (:orderStatusCreated:, :orderStatusRenewal:)
+                AND IA.id IS NULL",
+                [
+                    'orderActive'        => self::ENABLED,
+                    'orderStatusCreated' => OrderStatus::CREATED,
+                    'orderStatusRenewal' => OrderStatus::RENEWAL,
+                ]
+            )
+            ->groupBy("$p_model.id")
             ->orderBy("$p_model.id DESC")
             ->execute();
     }

@@ -19,7 +19,7 @@ class OrderController extends AbstractController
      */
     public function indexAction()
     {
-        if (($response = $this->redirectIfGuest('/user')) !== null) {
+        if (($response = $this->redirectIfGuest('/user/auth')) !== null) {
             return $response;
         }
 
@@ -48,7 +48,7 @@ class OrderController extends AbstractController
      */
     public function viewAction(string $orderHash)
     {
-        if (($response = $this->redirectIfGuest('/user')) !== null) {
+        if (($response = $this->redirectIfGuest('/user/auth')) !== null) {
             return $response;
         }
 

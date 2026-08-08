@@ -21,7 +21,7 @@ class PaymentController extends AbstractController
      */
     public function indexAction()
     {
-        if (($response = $this->redirectIfGuest('/user')) !== null) {
+        if (($response = $this->redirectIfGuest('/user/auth')) !== null) {
             return $response;
         }
 
@@ -45,7 +45,7 @@ class PaymentController extends AbstractController
      */
     public function historyAction()
     {
-        if (($response = $this->redirectIfGuest('/user')) !== null) {
+        if (($response = $this->redirectIfGuest('/user/auth')) !== null) {
             return $response;
         }
 
@@ -74,7 +74,7 @@ class PaymentController extends AbstractController
      */
     public function viewAction(string $paymentHash)
     {
-        if (($response = $this->redirectIfGuest('/user')) !== null) {
+        if (($response = $this->redirectIfGuest('/user/auth')) !== null) {
             return $response;
         }
 
@@ -108,7 +108,7 @@ class PaymentController extends AbstractController
     {
         $this->view->disable();
 
-        if (($response = $this->redirectIfGuest('/user')) !== null) {
+        if (($response = $this->redirectIfGuest('/user/auth')) !== null) {
             return $response;
         }
         

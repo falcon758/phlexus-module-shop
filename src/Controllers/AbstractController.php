@@ -39,7 +39,7 @@ abstract class AbstractController extends Controller
         return User::getUser();
     }
 
-    protected function redirectIfGuest(string $route = '/user'): ?ResponseInterface
+    protected function redirectIfGuest(string $route = '/user/auth'): ?ResponseInterface
     {
         if ($this->getAuthenticatedUser() !== null) {
             return null;

@@ -124,7 +124,7 @@ class ShopController extends AbstractController
      */
     public function checkoutAction()
     {
-        if (($response = $this->redirectIfGuest('/user')) !== null) {
+        if (($response = $this->redirectIfGuest('/user/auth')) !== null) {
             return $response;
         }
 
@@ -147,7 +147,7 @@ class ShopController extends AbstractController
         if ($user === null) {
             $this->flash->warning($translationMessage->_('login-before-checkout'));
 
-            return $this->response->redirect('/user');
+            return $this->response->redirect('/user/auth');
         }
 
         // @Todo: Implement address fullfill
@@ -172,7 +172,7 @@ class ShopController extends AbstractController
             return $this->response->redirect('checkout');
         }
 
-        if (($response = $this->redirectIfGuest('/user')) !== null) {
+        if (($response = $this->redirectIfGuest('/user/auth')) !== null) {
             return $response;
         }
 
